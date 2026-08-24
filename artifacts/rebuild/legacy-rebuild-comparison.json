@@ -1,0 +1,13 @@
+{
+  "status": "informational-only",
+  "reason": "The user requested a rule-led rebuild, so the legacy visual is archived rather than used as a pixel target.",
+  "before": "/Users/parkyubin/Desktop/03_Workshop/디학 AIxAE/ae-mcp-student/new-axis-procedural/artifacts/baseline/before-render-2800x2080.png",
+  "after": "/Users/parkyubin/Desktop/03_Workshop/디학 AIxAE/ae-mcp-student/new-axis-procedural/artifacts/rebuild/pleos-27-axis-master-2800x2080.png",
+  "width": 2800,
+  "height": 2080,
+  "meanAbsoluteRgbError": 109.49877701465202,
+  "meanAbsoluteLuminanceError": 111.4858923859814,
+  "changedPixelsAbove5": 5823964,
+  "changedPixelRatioAbove5": 0.9999938186813186,
+  "heatmap": "/Users/parkyubin/Desktop/03_Workshop/디학 AIxAE/ae-mcp-student/new-axis-procedural/artifacts/rebuild/legacy-rebuild-difference.png"
+}

@@ -1,0 +1,48 @@
+{
+  "browser": "Codex in-app browser",
+  "url": "http://127.0.0.1:5173/",
+  "runtimeError": null,
+  "newConsoleErrors": [],
+  "preview": {
+    "canvasCount": 1,
+    "fpsObserved": 114,
+    "gpuMaxTextureSize": 16384,
+    "finalMode": "studio-3d",
+    "finalCamera": "OrthographicCamera",
+    "finalMaterial": "reference-matte"
+  },
+  "actual3D": {
+    "scene": "Scene",
+    "meshCount": 5,
+    "geometry": "BufferGeometry",
+    "verticesPerFace": 3,
+    "flatNormalPerFace": true,
+    "material": "MeshPhysicalMaterial",
+    "cameras": ["OrthographicCamera", "PerspectiveCamera"],
+    "lights": ["HemisphereLight", "DirectionalLight", "DirectionalLight", "DirectionalLight"],
+    "depthTexture": true,
+    "renderTarget": true
+  },
+  "interactionChecks": {
+    "leftPanelCollapse": true,
+    "rightPanelCollapse": true,
+    "uiHideAndRestore": true,
+    "splitCompare": true,
+    "numberAndSliderInput": true,
+    "undoRedo": true,
+    "raycastFaceSelection": true,
+    "presetSave": true,
+    "presetPersistenceAfterReload": true,
+    "userBaseColorUpload": true,
+    "userNormalUpload": true,
+    "texturePreview": true,
+    "faceLocalProjection": true,
+    "screenContinuousProjection": true,
+    "canvasOnly2800x2080Export": true
+  },
+  "captureCounts": {
+    "cameraGeometryLighting": 9,
+    "materialPresets": 8,
+    "textureCases": 7
+  }
+}

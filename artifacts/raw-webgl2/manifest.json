@@ -1,0 +1,212 @@
+{
+  "version": 1,
+  "scope": "PLEOS Raw WebGL2 Rendering Studio — Phase 1",
+  "policy": {
+    "purpose": "Declare required QA evidence without treating planned or copied files as newly rendered output.",
+    "allowedProvenance": [
+      "direct browser screenshot of the named renderer state",
+      "PNG produced by the raw renderer offscreen export path",
+      "byte-for-byte copy of an earlier local legacy capture, explicitly labeled as legacy"
+    ],
+    "prohibitedProvenance": [
+      "reference artwork presented as renderer output",
+      "AI-generated substitute",
+      "manually composited or retouched result",
+      "renamed file whose renderer, preset, dimensions, or capture time is unknown"
+    ],
+    "referenceAssetRule": "The supplied PDFs and JPG may be inspected locally, but must never enter the production texture, shader, compositing, or Vite public-asset graph.",
+    "verification": "File presence is reported by npm run verify:raw. Set RAW_WEBGL2_REQUIRE_ARTIFACTS=1 only after every capture has real provenance metadata.",
+    "browserCaptureConstraint": "If browser automation is blocked, leave the artifact absent and record the limitation; do not fabricate a result."
+  },
+  "artifacts": [
+    {
+      "file": "before-ui.png",
+      "category": "legacy-baseline",
+      "required": true,
+      "expectedCapture": "legacy renderer UI before migration",
+      "expectedDimensions": "native captured viewport",
+      "captureStatus": "verified-legacy-copy",
+      "provenance": "Converted without visual alteration from artifacts/webgl-rebuild/pleos-new-axis-webgl.png, the stored 1280x720 active Three.js checkpoint."
+    },
+    {
+      "file": "before-ui-1440x900.png",
+      "category": "legacy-baseline",
+      "required": true,
+      "expectedCapture": "legacy renderer UI before migration",
+      "expectedDimensions": "1440x900",
+      "captureStatus": "not-verified",
+      "provenance": null
+    },
+    {
+      "file": "before-render.png",
+      "category": "legacy-baseline",
+      "required": true,
+      "expectedCapture": "legacy canvas without UI before migration",
+      "expectedDimensions": "native legacy master or recorded source dimensions",
+      "captureStatus": "not-verified",
+      "provenance": null
+    },
+    {
+      "file": "raw-axis-wireframe.png",
+      "category": "geometry-debug",
+      "required": true,
+      "expectedCapture": "raw renderer wireframe debug mode",
+      "expectedDimensions": "preview viewport",
+      "captureStatus": "not-verified",
+      "provenance": null
+    },
+    {
+      "file": "raw-axis-normal.png",
+      "category": "geometry-debug",
+      "required": true,
+      "expectedCapture": "raw renderer face-normal debug mode",
+      "expectedDimensions": "preview viewport",
+      "captureStatus": "not-verified",
+      "provenance": null
+    },
+    {
+      "file": "raw-axis-front.png",
+      "category": "geometry",
+      "required": true,
+      "expectedCapture": "orthographic front projection",
+      "expectedDimensions": "preview viewport",
+      "captureStatus": "not-verified",
+      "provenance": null
+    },
+    {
+      "file": "raw-axis-perspective.png",
+      "category": "geometry",
+      "required": true,
+      "expectedCapture": "perspective view exposing physical depth",
+      "expectedDimensions": "preview viewport",
+      "captureStatus": "not-verified",
+      "provenance": null
+    },
+    {
+      "file": "matte-reference.png",
+      "category": "material",
+      "required": true,
+      "expectedCapture": "Matte Reference preset",
+      "expectedDimensions": "preview viewport or declared export size",
+      "captureStatus": "not-verified",
+      "provenance": null
+    },
+    {
+      "file": "matte-graphite.png",
+      "category": "material",
+      "required": true,
+      "expectedCapture": "Matte Graphite preset",
+      "expectedDimensions": "preview viewport or declared export size",
+      "captureStatus": "not-verified",
+      "provenance": null
+    },
+    {
+      "file": "matte-blue.png",
+      "category": "material",
+      "required": true,
+      "expectedCapture": "Matte Pleos Blue preset",
+      "expectedDimensions": "preview viewport or declared export size",
+      "captureStatus": "not-verified",
+      "provenance": null
+    },
+    {
+      "file": "prism-clear.png",
+      "category": "material",
+      "required": true,
+      "expectedCapture": "Clear Prism preset",
+      "expectedDimensions": "preview viewport or declared export size",
+      "captureStatus": "not-verified",
+      "provenance": null
+    },
+    {
+      "file": "prism-smoked.png",
+      "category": "material",
+      "required": true,
+      "expectedCapture": "Smoked Prism preset",
+      "expectedDimensions": "preview viewport or declared export size",
+      "captureStatus": "not-verified",
+      "provenance": null
+    },
+    {
+      "file": "prism-pleos-blue.png",
+      "category": "material",
+      "required": true,
+      "expectedCapture": "Pleos Blue Prism preset",
+      "expectedDimensions": "preview viewport or declared export size",
+      "captureStatus": "not-verified",
+      "provenance": null
+    },
+    {
+      "file": "prism-full-spectrum.png",
+      "category": "experimental-material",
+      "required": true,
+      "expectedCapture": "Full Spectrum Prism preset with experimental warning visible or recorded",
+      "expectedDimensions": "preview viewport or declared export size",
+      "captureStatus": "not-verified",
+      "provenance": null
+    },
+    {
+      "file": "lighting-key-only.png",
+      "category": "lighting-isolation",
+      "required": true,
+      "expectedCapture": "key light enabled; fill and rim disabled",
+      "expectedDimensions": "preview viewport",
+      "captureStatus": "not-verified",
+      "provenance": null
+    },
+    {
+      "file": "lighting-fill-only.png",
+      "category": "lighting-isolation",
+      "required": true,
+      "expectedCapture": "fill light enabled; key and rim disabled",
+      "expectedDimensions": "preview viewport",
+      "captureStatus": "not-verified",
+      "provenance": null
+    },
+    {
+      "file": "lighting-rim-only.png",
+      "category": "lighting-isolation",
+      "required": true,
+      "expectedCapture": "rim light enabled; key and fill disabled",
+      "expectedDimensions": "preview viewport",
+      "captureStatus": "not-verified",
+      "provenance": null
+    },
+    {
+      "file": "lighting-cards.png",
+      "category": "lighting",
+      "required": true,
+      "expectedCapture": "analytic reflection cards affecting view-dependent highlights",
+      "expectedDimensions": "preview viewport",
+      "captureStatus": "not-verified",
+      "provenance": null
+    },
+    {
+      "file": "raw-render-2800x2080.png",
+      "category": "final-export",
+      "required": true,
+      "expectedCapture": "offscreen Raw WebGL2 PNG export",
+      "expectedDimensions": "2800x2080",
+      "captureStatus": "not-verified",
+      "provenance": null
+    },
+    {
+      "file": "raw-render-4096x4096.png",
+      "category": "final-export",
+      "required": true,
+      "expectedCapture": "offscreen Raw WebGL2 PNG export",
+      "expectedDimensions": "4096x4096",
+      "captureStatus": "not-verified",
+      "provenance": null
+    },
+    {
+      "file": "legacy-vs-raw-split.png",
+      "category": "migration-comparison",
+      "required": true,
+      "expectedCapture": "same camera/crop legacy and raw comparison",
+      "expectedDimensions": "preview viewport",
+      "captureStatus": "not-verified",
+      "provenance": null
+    }
+  ]
+}

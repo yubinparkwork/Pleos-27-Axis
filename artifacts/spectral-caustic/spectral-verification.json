@@ -1,0 +1,62 @@
+{
+  "status": "pass",
+  "generatedAt": "2026-08-20T06:01:29.127Z",
+  "images": {
+    "soft-spectral-caustic-2048.png": {
+      "width": 2048,
+      "height": 2048,
+      "luminanceRange": [
+        36,
+        187
+      ],
+      "meanChroma": 66.54739737510681,
+      "clippedRatio": 0,
+      "bytes": 6063959
+    },
+    "pleos-blue-spectral-2048.png": {
+      "width": 2048,
+      "height": 2048,
+      "luminanceRange": [
+        30,
+        122
+      ],
+      "meanChroma": 52.44219088554382,
+      "clippedRatio": 0,
+      "bytes": 6234300
+    },
+    "full-spectrum-experimental-2048.png": {
+      "width": 2048,
+      "height": 2048,
+      "luminanceRange": [
+        31,
+        198
+      ],
+      "meanChroma": 70.5149884223938,
+      "clippedRatio": 0.0028281211853027344,
+      "bytes": 6284376
+    },
+    "dark-violet-caustic-2048.png": {
+      "width": 2048,
+      "height": 2048,
+      "luminanceRange": [
+        33,
+        143
+      ],
+      "meanChroma": 59.38188290596008,
+      "clippedRatio": 0,
+      "bytes": 6279562
+    },
+    "soft-spectral-caustic-4096.png": {
+      "width": 4096,
+      "height": 4096,
+      "luminanceRange": [
+        36,
+        187
+      ],
+      "meanChroma": 66.50150322914124,
+      "clippedRatio": 0,
+      "bytes": 23778299
+    }
+  },
+  "contactSheet": "/Users/parkyubin/Desktop/03_Workshop/디학 AIxAE/ae-mcp-student/new-axis-procedural/artifacts/spectral-caustic/spectral-presets-contact-sheet.png"
+}

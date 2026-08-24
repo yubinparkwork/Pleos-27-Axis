@@ -1,0 +1,96 @@
+{
+  "status": "pass",
+  "generatedAt": "2026-08-20T03:39:14.753Z",
+  "png": {
+    "width": 2800,
+    "height": 2080,
+    "luminanceRange": [
+      37,
+      255
+    ],
+    "opaquePixels": 5824000,
+    "bytes": 4340277,
+    "path": "/Users/parkyubin/Desktop/03_Workshop/디학 AIxAE/ae-mcp-student/new-axis-procedural/artifacts/rebuild/pleos-27-axis-master-2800x2080.png"
+  },
+  "exr": {
+    "width": 2800,
+    "height": 2080,
+    "channelTypes": {
+      "A": 1,
+      "B": 1,
+      "G": 1,
+      "R": 1
+    },
+    "bytes": 6074655,
+    "path": "/Users/parkyubin/Desktop/03_Workshop/디학 AIxAE/ae-mcp-student/new-axis-procedural/artifacts/rebuild/pleos-27-axis-master-2800x2080.exr"
+  },
+  "sequence": {
+    "frames": 60,
+    "frameRate": 30,
+    "firstFrame": {
+      "width": 960,
+      "height": 540,
+      "luminanceRange": [
+        5,
+        255
+      ],
+      "opaquePixels": 518400
+    },
+    "lastFrame": {
+      "width": 960,
+      "height": 540,
+      "luminanceRange": [
+        5,
+        255
+      ],
+      "opaquePixels": 518400
+    },
+    "bytes": 10012162,
+    "path": "/Users/parkyubin/Desktop/03_Workshop/디학 AIxAE/ae-mcp-student/new-axis-procedural/artifacts/rebuild/pleos-27-axis-preview-60frames.zip",
+    "contactSheetPath": "/Users/parkyubin/Desktop/03_Workshop/디학 AIxAE/ae-mcp-student/new-axis-procedural/artifacts/rebuild/export-sequence-contact-sheet.png"
+  },
+  "runtime": {
+    "renderer": {
+      "backend": "WebGL 2 Fallback",
+      "canvas": {
+        "cssWidth": 350,
+        "cssHeight": 260,
+        "bufferWidth": 350,
+        "bufferHeight": 260,
+        "dpr": 1
+      },
+      "geometry": {
+        "sectors": 5,
+        "triangles": 9,
+        "hasDepth": true,
+        "hasNormals": true
+      },
+      "camera": {
+        "type": "OrthographicCamera",
+        "position": [
+          0,
+          0,
+          5
+        ],
+        "target": [
+          0,
+          0,
+          0
+        ]
+      },
+      "material": {
+        "preset": "reference-matte",
+        "texture": true,
+        "uploaded": []
+      },
+      "gpu": {
+        "maxTextureSize": 8192
+      }
+    },
+    "restoredTime": 0.875,
+    "sampledRange": [
+      0,
+      1.9666666666666666
+    ]
+  }
+}

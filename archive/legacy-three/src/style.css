@@ -1,0 +1,151 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+  background: #050607;
+  color: #f4f4f2;
+  font-synthesis: none;
+  text-rendering: geometricPrecision;
+}
+
+* { box-sizing: border-box; }
+html, body, #app { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+body { background: #050607; }
+button, input { font: inherit; }
+
+.crystal-app {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #050607;
+  isolation: isolate;
+}
+
+.crystal-stage,
+.crystal-stage canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.crystal-stage { cursor: grab; }
+.crystal-stage:active { cursor: grabbing; }
+
+.topbar {
+  position: absolute;
+  z-index: 5;
+  inset: 0 0 auto 0;
+  height: 68px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(5, 6, 7, .72), rgba(5, 6, 7, 0));
+}
+
+.wordmark { display: flex; align-items: baseline; gap: 12px; letter-spacing: .16em; }
+.wordmark strong { font-size: 13px; font-weight: 700; }
+.wordmark span { color: rgba(255,255,255,.45); font-size: 9px; font-weight: 600; }
+
+.render-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255,255,255,.5);
+  font-size: 9px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.render-status::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #9fffc6;
+  box-shadow: 0 0 12px rgba(159,255,198,.5);
+}
+
+.control-dock {
+  position: absolute;
+  z-index: 5;
+  left: 24px;
+  bottom: 24px;
+  width: min(390px, calc(100vw - 48px));
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 14px;
+  background: rgba(11, 12, 14, .68);
+  box-shadow: 0 20px 80px rgba(0,0,0,.28);
+  backdrop-filter: blur(22px) saturate(125%);
+  transition: opacity .24s ease, transform .24s ease;
+}
+
+.controls-hidden .control-dock { opacity: 0; transform: translateY(12px); pointer-events: none; }
+
+.dock-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+.dock-head p { margin: 3px 0 0; color: rgba(255,255,255,.42); font-size: 9px; line-height: 1.45; letter-spacing: .1em; text-transform: uppercase; }
+.dock-head h1 { margin: 0; font-size: 14px; font-weight: 600; letter-spacing: -.01em; }
+
+.look-switch { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 13px; }
+.look-switch button,
+.dock-actions button {
+  appearance: none;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 8px;
+  color: rgba(255,255,255,.58);
+  background: rgba(255,255,255,.035);
+  height: 34px;
+  cursor: pointer;
+  font-size: 10px;
+  letter-spacing: .04em;
+  transition: .18s ease;
+}
+
+.look-switch button:hover,
+.dock-actions button:hover { color: #fff; border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.07); }
+.look-switch button.active { color: #111; background: #f2f2ef; border-color: #f2f2ef; }
+
+.sliders { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.sliders label { display: grid; grid-template-columns: 1fr auto; gap: 8px; color: rgba(255,255,255,.48); font-size: 9px; letter-spacing: .07em; text-transform: uppercase; }
+.sliders output { color: rgba(255,255,255,.82); font-variant-numeric: tabular-nums; }
+.sliders input { grid-column: 1 / -1; width: 100%; accent-color: #efefeb; }
+
+.dock-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 14px; }
+
+.hint {
+  position: absolute;
+  z-index: 4;
+  right: 24px;
+  bottom: 25px;
+  color: rgba(255,255,255,.28);
+  font-size: 9px;
+  line-height: 1.6;
+  letter-spacing: .12em;
+  text-align: right;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.exporting::after {
+  content: "Rendering 2800 × 2080";
+  position: absolute;
+  z-index: 10;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: rgba(255,255,255,.82);
+  background: rgba(5,6,7,.78);
+  backdrop-filter: blur(12px);
+  font-size: 10px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 700px) {
+  .topbar { height: 56px; padding: 0 16px; }
+  .control-dock { left: 12px; bottom: 12px; width: calc(100vw - 24px); }
+  .hint { display: none; }
+}

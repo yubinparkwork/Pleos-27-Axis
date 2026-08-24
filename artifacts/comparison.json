@@ -1,0 +1,59 @@
+{
+  "reference": "/Users/parkyubin/Desktop/03_Workshop/디학 AIxAE/ae-mcp-student/new-axis-procedural/public/reference/pleos-3d-new-axis.png",
+  "render": "/Users/parkyubin/Desktop/03_Workshop/디학 AIxAE/ae-mcp-student/new-axis-procedural/artifacts/new-axis-2800x2080.png",
+  "reference_source_size": [
+    2000,
+    1486
+  ],
+  "comparison_size": [
+    2800,
+    2080
+  ],
+  "text_exclusion_mask": {
+    "x1": 780,
+    "y1": 920,
+    "x2": 2020,
+    "y2": 1110
+  },
+  "valid_pixels": 5588400,
+  "mae_luminance_255": 2.5841,
+  "p95_luminance_error_255": 9,
+  "max_luminance_error_255": 48,
+  "plane_mae": {
+    "topRight": 3.4497,
+    "rightMiddle": 2.6565,
+    "bottomRight": 0.4826,
+    "bottomLeft": 6.8078,
+    "leftPlane": 1.7039
+  },
+  "plane_signed_error_render_minus_reference": {
+    "topRight": -0.2134,
+    "rightMiddle": 0.0004,
+    "bottomRight": -0.2718,
+    "bottomLeft": 0.4371,
+    "leftPlane": -0.3514
+  },
+  "plane_mean_luminance": {
+    "topRight": {
+      "reference": 127.7779,
+      "render": 127.5645
+    },
+    "rightMiddle": {
+      "reference": 96.5518,
+      "render": 96.5523
+    },
+    "bottomRight": {
+      "reference": 0.6127,
+      "render": 0.3409
+    },
+    "bottomLeft": {
+      "reference": 77.3849,
+      "render": 77.8221
+    },
+    "leftPlane": {
+      "reference": 14.1306,
+      "render": 13.7792
+    }
+  },
+  "heatmap": "/Users/parkyubin/Desktop/03_Workshop/디학 AIxAE/ae-mcp-student/new-axis-procedural/artifacts/new-axis-difference-heatmap.png"
+}

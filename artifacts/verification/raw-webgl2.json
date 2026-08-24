@@ -1,0 +1,1244 @@
+{
+  "status": "pass",
+  "renderer": "raw-webgl2",
+  "productionFilesScanned": 74,
+  "forbiddenSourceHits": [],
+  "forbiddenDependencyHits": [],
+  "requiredImplementationFiles": 22,
+  "liveImportGraph": {
+    "entry": "src/main.ts",
+    "files": [
+      "src/main.ts",
+      "src/raw-webgl/camera/OrbitController.ts",
+      "src/raw-webgl/camera/index.ts",
+      "src/raw-webgl/core/Buffer.ts",
+      "src/raw-webgl/core/Framebuffer.ts",
+      "src/raw-webgl/core/GLCapabilities.ts",
+      "src/raw-webgl/core/GLContext.ts",
+      "src/raw-webgl/core/GLStateCache.ts",
+      "src/raw-webgl/core/RenderTarget.ts",
+      "src/raw-webgl/core/ResourceManager.ts",
+      "src/raw-webgl/core/ShaderProgram.ts",
+      "src/raw-webgl/core/Texture.ts",
+      "src/raw-webgl/core/UniformBuffer.ts",
+      "src/raw-webgl/core/VertexArray.ts",
+      "src/raw-webgl/core/index.ts",
+      "src/raw-webgl/debug/DebugRenderer.ts",
+      "src/raw-webgl/debug/PerformanceMonitor.ts",
+      "src/raw-webgl/geometry/MeshAccumulator.ts",
+      "src/raw-webgl/geometry/closedOpticalSolid.ts",
+      "src/raw-webgl/geometry/foldedSurface.ts",
+      "src/raw-webgl/geometry/index.ts",
+      "src/raw-webgl/geometry/math.ts",
+      "src/raw-webgl/geometry/preset.ts",
+      "src/raw-webgl/geometry/types.ts",
+      "src/raw-webgl/geometry/validation.ts",
+      "src/raw-webgl/lighting/LightRig.ts",
+      "src/raw-webgl/lighting/ReflectionCardEnvironment.ts",
+      "src/raw-webgl/lighting/index.ts",
+      "src/raw-webgl/lighting/lightingPresets.ts",
+      "src/raw-webgl/materials/materialPresets.ts",
+      "src/raw-webgl/math/cameraMath.ts",
+      "src/raw-webgl/math/geometryMath.ts",
+      "src/raw-webgl/math/index.ts",
+      "src/raw-webgl/math/mat4.ts",
+      "src/raw-webgl/math/vec3.ts",
+      "src/raw-webgl/passes/BackgroundPass.ts",
+      "src/raw-webgl/passes/CompositePass.ts",
+      "src/raw-webgl/passes/ExportPass.ts",
+      "src/raw-webgl/passes/FxaaPass.ts",
+      "src/raw-webgl/passes/MattePass.ts",
+      "src/raw-webgl/passes/PassProgram.ts",
+      "src/raw-webgl/passes/PassSurface.ts",
+      "src/raw-webgl/passes/PrismBackfacePass.ts",
+      "src/raw-webgl/passes/PrismFrontfacePass.ts",
+      "src/raw-webgl/passes/ToneMapPass.ts",
+      "src/raw-webgl/renderer/ExportRenderer.ts",
+      "src/raw-webgl/renderer/GpuAxisMesh.ts",
+      "src/raw-webgl/renderer/LightingUniforms.ts",
+      "src/raw-webgl/renderer/PipelineTargets.ts",
+      "src/raw-webgl/renderer/RawStudioRendererController.ts",
+      "src/raw-webgl/renderer/RawWebGLRenderer.ts",
+      "src/raw-webgl/renderer/RenderLoop.ts",
+      "src/raw-webgl/renderer/ResizeManager.ts",
+      "src/raw-webgl/renderer/ShaderSource.ts",
+      "src/raw-webgl/renderer/Uniforms.ts",
+      "src/raw-webgl/renderer/index.ts",
+      "src/raw-webgl/shaders/common/brdf.glsl",
+      "src/raw-webgl/shaders/common/color-space.glsl",
+      "src/raw-webgl/shaders/common/dithering.glsl",
+      "src/raw-webgl/shaders/common/environment.glsl",
+      "src/raw-webgl/shaders/common/fresnel.glsl",
+      "src/raw-webgl/shaders/common/math.glsl",
+      "src/raw-webgl/shaders/common/tone-mapping.glsl",
+      "src/raw-webgl/shaders/debug/debug.frag.glsl",
+      "src/raw-webgl/shaders/debug/debug.vert.glsl",
+      "src/raw-webgl/shaders/matte/matte.frag.glsl",
+      "src/raw-webgl/shaders/matte/matte.vert.glsl",
+      "src/raw-webgl/shaders/post/background.frag.glsl",
+      "src/raw-webgl/shaders/post/copy.frag.glsl",
+      "src/raw-webgl/shaders/post/fullscreen.vert.glsl",
+      "src/raw-webgl/shaders/post/fxaa.frag.glsl",
+      "src/raw-webgl/shaders/post/tonemap.frag.glsl",
+      "src/raw-webgl/shaders/prism/prism-backface.frag.glsl",
+      "src/raw-webgl/shaders/prism/prism-backface.vert.glsl",
+      "src/raw-webgl/shaders/prism/prism-front.frag.glsl",
+      "src/raw-webgl/shaders/prism/prism-front.vert.glsl",
+      "src/studio/index.ts",
+      "src/studio/state/RawStudioState.ts",
+      "src/studio/ui/LegacyArchiveView.ts",
+      "src/studio/ui/RawStudioApp.css",
+      "src/studio/ui/RawStudioApp.ts",
+      "src/style.css"
+    ],
+    "edges": [
+      [
+        "src/main.ts",
+        "src/raw-webgl/renderer/index.ts"
+      ],
+      [
+        "src/main.ts",
+        "src/studio/index.ts"
+      ],
+      [
+        "src/main.ts",
+        "src/studio/ui/LegacyArchiveView.ts"
+      ],
+      [
+        "src/main.ts",
+        "src/style.css"
+      ],
+      [
+        "src/raw-webgl/camera/index.ts",
+        "src/raw-webgl/camera/OrbitController.ts"
+      ],
+      [
+        "src/raw-webgl/camera/OrbitController.ts",
+        "src/raw-webgl/math/index.ts"
+      ],
+      [
+        "src/raw-webgl/core/Buffer.ts",
+        "src/raw-webgl/core/ResourceManager.ts"
+      ],
+      [
+        "src/raw-webgl/core/Framebuffer.ts",
+        "src/raw-webgl/core/ResourceManager.ts"
+      ],
+      [
+        "src/raw-webgl/core/Framebuffer.ts",
+        "src/raw-webgl/core/Texture.ts"
+      ],
+      [
+        "src/raw-webgl/core/GLContext.ts",
+        "src/raw-webgl/core/GLCapabilities.ts"
+      ],
+      [
+        "src/raw-webgl/core/index.ts",
+        "src/raw-webgl/core/Buffer.ts"
+      ],
+      [
+        "src/raw-webgl/core/index.ts",
+        "src/raw-webgl/core/Framebuffer.ts"
+      ],
+      [
+        "src/raw-webgl/core/index.ts",
+        "src/raw-webgl/core/GLCapabilities.ts"
+      ],
+      [
+        "src/raw-webgl/core/index.ts",
+        "src/raw-webgl/core/GLContext.ts"
+      ],
+      [
+        "src/raw-webgl/core/index.ts",
+        "src/raw-webgl/core/GLStateCache.ts"
+      ],
+      [
+        "src/raw-webgl/core/index.ts",
+        "src/raw-webgl/core/RenderTarget.ts"
+      ],
+      [
+        "src/raw-webgl/core/index.ts",
+        "src/raw-webgl/core/ResourceManager.ts"
+      ],
+      [
+        "src/raw-webgl/core/index.ts",
+        "src/raw-webgl/core/ShaderProgram.ts"
+      ],
+      [
+        "src/raw-webgl/core/index.ts",
+        "src/raw-webgl/core/Texture.ts"
+      ],
+      [
+        "src/raw-webgl/core/index.ts",
+        "src/raw-webgl/core/UniformBuffer.ts"
+      ],
+      [
+        "src/raw-webgl/core/index.ts",
+        "src/raw-webgl/core/VertexArray.ts"
+      ],
+      [
+        "src/raw-webgl/core/RenderTarget.ts",
+        "src/raw-webgl/core/Framebuffer.ts"
+      ],
+      [
+        "src/raw-webgl/core/RenderTarget.ts",
+        "src/raw-webgl/core/GLCapabilities.ts"
+      ],
+      [
+        "src/raw-webgl/core/RenderTarget.ts",
+        "src/raw-webgl/core/ResourceManager.ts"
+      ],
+      [
+        "src/raw-webgl/core/RenderTarget.ts",
+        "src/raw-webgl/core/Texture.ts"
+      ],
+      [
+        "src/raw-webgl/core/ResourceManager.ts",
+        "src/raw-webgl/core/GLContext.ts"
+      ],
+      [
+        "src/raw-webgl/core/ShaderProgram.ts",
+        "src/raw-webgl/core/GLCapabilities.ts"
+      ],
+      [
+        "src/raw-webgl/core/ShaderProgram.ts",
+        "src/raw-webgl/core/ResourceManager.ts"
+      ],
+      [
+        "src/raw-webgl/core/Texture.ts",
+        "src/raw-webgl/core/ResourceManager.ts"
+      ],
+      [
+        "src/raw-webgl/core/UniformBuffer.ts",
+        "src/raw-webgl/core/Buffer.ts"
+      ],
+      [
+        "src/raw-webgl/core/VertexArray.ts",
+        "src/raw-webgl/core/Buffer.ts"
+      ],
+      [
+        "src/raw-webgl/core/VertexArray.ts",
+        "src/raw-webgl/core/ResourceManager.ts"
+      ],
+      [
+        "src/raw-webgl/debug/DebugRenderer.ts",
+        "src/raw-webgl/core/index.ts"
+      ],
+      [
+        "src/raw-webgl/debug/DebugRenderer.ts",
+        "src/raw-webgl/geometry/index.ts"
+      ],
+      [
+        "src/raw-webgl/debug/DebugRenderer.ts",
+        "src/raw-webgl/passes/PassProgram.ts"
+      ],
+      [
+        "src/raw-webgl/debug/DebugRenderer.ts",
+        "src/raw-webgl/passes/PassSurface.ts"
+      ],
+      [
+        "src/raw-webgl/debug/DebugRenderer.ts",
+        "src/raw-webgl/renderer/GpuAxisMesh.ts"
+      ],
+      [
+        "src/raw-webgl/debug/DebugRenderer.ts",
+        "src/raw-webgl/renderer/Uniforms.ts"
+      ],
+      [
+        "src/raw-webgl/debug/DebugRenderer.ts",
+        "src/raw-webgl/shaders/debug/debug.frag.glsl"
+      ],
+      [
+        "src/raw-webgl/debug/DebugRenderer.ts",
+        "src/raw-webgl/shaders/debug/debug.vert.glsl"
+      ],
+      [
+        "src/raw-webgl/debug/PerformanceMonitor.ts",
+        "src/raw-webgl/core/index.ts"
+      ],
+      [
+        "src/raw-webgl/geometry/closedOpticalSolid.ts",
+        "src/raw-webgl/geometry/math.ts"
+      ],
+      [
+        "src/raw-webgl/geometry/closedOpticalSolid.ts",
+        "src/raw-webgl/geometry/MeshAccumulator.ts"
+      ],
+      [
+        "src/raw-webgl/geometry/closedOpticalSolid.ts",
+        "src/raw-webgl/geometry/preset.ts"
+      ],
+      [
+        "src/raw-webgl/geometry/closedOpticalSolid.ts",
+        "src/raw-webgl/geometry/types.ts"
+      ],
+      [
+        "src/raw-webgl/geometry/foldedSurface.ts",
+        "src/raw-webgl/geometry/math.ts"
+      ],
+      [
+        "src/raw-webgl/geometry/foldedSurface.ts",
+        "src/raw-webgl/geometry/MeshAccumulator.ts"
+      ],
+      [
+        "src/raw-webgl/geometry/foldedSurface.ts",
+        "src/raw-webgl/geometry/preset.ts"
+      ],
+      [
+        "src/raw-webgl/geometry/foldedSurface.ts",
+        "src/raw-webgl/geometry/types.ts"
+      ],
+      [
+        "src/raw-webgl/geometry/index.ts",
+        "src/raw-webgl/geometry/closedOpticalSolid.ts"
+      ],
+      [
+        "src/raw-webgl/geometry/index.ts",
+        "src/raw-webgl/geometry/foldedSurface.ts"
+      ],
+      [
+        "src/raw-webgl/geometry/index.ts",
+        "src/raw-webgl/geometry/preset.ts"
+      ],
+      [
+        "src/raw-webgl/geometry/index.ts",
+        "src/raw-webgl/geometry/types.ts"
+      ],
+      [
+        "src/raw-webgl/geometry/index.ts",
+        "src/raw-webgl/geometry/validation.ts"
+      ],
+      [
+        "src/raw-webgl/geometry/math.ts",
+        "src/raw-webgl/geometry/types.ts"
+      ],
+      [
+        "src/raw-webgl/geometry/MeshAccumulator.ts",
+        "src/raw-webgl/geometry/math.ts"
+      ],
+      [
+        "src/raw-webgl/geometry/MeshAccumulator.ts",
+        "src/raw-webgl/geometry/types.ts"
+      ],
+      [
+        "src/raw-webgl/geometry/preset.ts",
+        "src/raw-webgl/geometry/types.ts"
+      ],
+      [
+        "src/raw-webgl/geometry/validation.ts",
+        "src/raw-webgl/geometry/closedOpticalSolid.ts"
+      ],
+      [
+        "src/raw-webgl/geometry/validation.ts",
+        "src/raw-webgl/geometry/foldedSurface.ts"
+      ],
+      [
+        "src/raw-webgl/geometry/validation.ts",
+        "src/raw-webgl/geometry/math.ts"
+      ],
+      [
+        "src/raw-webgl/geometry/validation.ts",
+        "src/raw-webgl/geometry/preset.ts"
+      ],
+      [
+        "src/raw-webgl/geometry/validation.ts",
+        "src/raw-webgl/geometry/types.ts"
+      ],
+      [
+        "src/raw-webgl/lighting/index.ts",
+        "src/raw-webgl/lighting/lightingPresets.ts"
+      ],
+      [
+        "src/raw-webgl/lighting/index.ts",
+        "src/raw-webgl/lighting/LightRig.ts"
+      ],
+      [
+        "src/raw-webgl/lighting/index.ts",
+        "src/raw-webgl/lighting/ReflectionCardEnvironment.ts"
+      ],
+      [
+        "src/raw-webgl/lighting/lightingPresets.ts",
+        "src/raw-webgl/materials/materialPresets.ts"
+      ],
+      [
+        "src/raw-webgl/lighting/LightRig.ts",
+        "src/raw-webgl/core/index.ts"
+      ],
+      [
+        "src/raw-webgl/lighting/LightRig.ts",
+        "src/raw-webgl/lighting/lightingPresets.ts"
+      ],
+      [
+        "src/raw-webgl/lighting/ReflectionCardEnvironment.ts",
+        "src/raw-webgl/core/index.ts"
+      ],
+      [
+        "src/raw-webgl/lighting/ReflectionCardEnvironment.ts",
+        "src/raw-webgl/lighting/lightingPresets.ts"
+      ],
+      [
+        "src/raw-webgl/math/cameraMath.ts",
+        "src/raw-webgl/math/geometryMath.ts"
+      ],
+      [
+        "src/raw-webgl/math/cameraMath.ts",
+        "src/raw-webgl/math/mat4.ts"
+      ],
+      [
+        "src/raw-webgl/math/cameraMath.ts",
+        "src/raw-webgl/math/vec3.ts"
+      ],
+      [
+        "src/raw-webgl/math/geometryMath.ts",
+        "src/raw-webgl/math/vec3.ts"
+      ],
+      [
+        "src/raw-webgl/math/index.ts",
+        "src/raw-webgl/math/cameraMath.ts"
+      ],
+      [
+        "src/raw-webgl/math/index.ts",
+        "src/raw-webgl/math/geometryMath.ts"
+      ],
+      [
+        "src/raw-webgl/math/index.ts",
+        "src/raw-webgl/math/mat4.ts"
+      ],
+      [
+        "src/raw-webgl/math/index.ts",
+        "src/raw-webgl/math/vec3.ts"
+      ],
+      [
+        "src/raw-webgl/math/mat4.ts",
+        "src/raw-webgl/math/vec3.ts"
+      ],
+      [
+        "src/raw-webgl/passes/BackgroundPass.ts",
+        "src/raw-webgl/core/index.ts"
+      ],
+      [
+        "src/raw-webgl/passes/BackgroundPass.ts",
+        "src/raw-webgl/lighting/lightingPresets.ts"
+      ],
+      [
+        "src/raw-webgl/passes/BackgroundPass.ts",
+        "src/raw-webgl/passes/PassProgram.ts"
+      ],
+      [
+        "src/raw-webgl/passes/BackgroundPass.ts",
+        "src/raw-webgl/passes/PassSurface.ts"
+      ],
+      [
+        "src/raw-webgl/passes/BackgroundPass.ts",
+        "src/raw-webgl/renderer/Uniforms.ts"
+      ],
+      [
+        "src/raw-webgl/passes/BackgroundPass.ts",
+        "src/raw-webgl/shaders/post/background.frag.glsl"
+      ],
+      [
+        "src/raw-webgl/passes/BackgroundPass.ts",
+        "src/raw-webgl/shaders/post/fullscreen.vert.glsl"
+      ],
+      [
+        "src/raw-webgl/passes/CompositePass.ts",
+        "src/raw-webgl/core/index.ts"
+      ],
+      [
+        "src/raw-webgl/passes/CompositePass.ts",
+        "src/raw-webgl/passes/PassProgram.ts"
+      ],
+      [
+        "src/raw-webgl/passes/CompositePass.ts",
+        "src/raw-webgl/passes/PassSurface.ts"
+      ],
+      [
+        "src/raw-webgl/passes/CompositePass.ts",
+        "src/raw-webgl/renderer/Uniforms.ts"
+      ],
+      [
+        "src/raw-webgl/passes/CompositePass.ts",
+        "src/raw-webgl/shaders/post/copy.frag.glsl"
+      ],
+      [
+        "src/raw-webgl/passes/CompositePass.ts",
+        "src/raw-webgl/shaders/post/fullscreen.vert.glsl"
+      ],
+      [
+        "src/raw-webgl/passes/ExportPass.ts",
+        "src/raw-webgl/core/index.ts"
+      ],
+      [
+        "src/raw-webgl/passes/ExportPass.ts",
+        "src/raw-webgl/passes/PassProgram.ts"
+      ],
+      [
+        "src/raw-webgl/passes/ExportPass.ts",
+        "src/raw-webgl/passes/PassSurface.ts"
+      ],
+      [
+        "src/raw-webgl/passes/ExportPass.ts",
+        "src/raw-webgl/renderer/Uniforms.ts"
+      ],
+      [
+        "src/raw-webgl/passes/ExportPass.ts",
+        "src/raw-webgl/shaders/post/copy.frag.glsl"
+      ],
+      [
+        "src/raw-webgl/passes/ExportPass.ts",
+        "src/raw-webgl/shaders/post/fullscreen.vert.glsl"
+      ],
+      [
+        "src/raw-webgl/passes/FxaaPass.ts",
+        "src/raw-webgl/core/index.ts"
+      ],
+      [
+        "src/raw-webgl/passes/FxaaPass.ts",
+        "src/raw-webgl/passes/PassProgram.ts"
+      ],
+      [
+        "src/raw-webgl/passes/FxaaPass.ts",
+        "src/raw-webgl/passes/PassSurface.ts"
+      ],
+      [
+        "src/raw-webgl/passes/FxaaPass.ts",
+        "src/raw-webgl/renderer/Uniforms.ts"
+      ],
+      [
+        "src/raw-webgl/passes/FxaaPass.ts",
+        "src/raw-webgl/shaders/post/fullscreen.vert.glsl"
+      ],
+      [
+        "src/raw-webgl/passes/FxaaPass.ts",
+        "src/raw-webgl/shaders/post/fxaa.frag.glsl"
+      ],
+      [
+        "src/raw-webgl/passes/MattePass.ts",
+        "src/raw-webgl/core/index.ts"
+      ],
+      [
+        "src/raw-webgl/passes/MattePass.ts",
+        "src/raw-webgl/lighting/lightingPresets.ts"
+      ],
+      [
+        "src/raw-webgl/passes/MattePass.ts",
+        "src/raw-webgl/materials/materialPresets.ts"
+      ],
+      [
+        "src/raw-webgl/passes/MattePass.ts",
+        "src/raw-webgl/passes/PassProgram.ts"
+      ],
+      [
+        "src/raw-webgl/passes/MattePass.ts",
+        "src/raw-webgl/passes/PassSurface.ts"
+      ],
+      [
+        "src/raw-webgl/passes/MattePass.ts",
+        "src/raw-webgl/renderer/GpuAxisMesh.ts"
+      ],
+      [
+        "src/raw-webgl/passes/MattePass.ts",
+        "src/raw-webgl/renderer/Uniforms.ts"
+      ],
+      [
+        "src/raw-webgl/passes/MattePass.ts",
+        "src/raw-webgl/shaders/matte/matte.frag.glsl"
+      ],
+      [
+        "src/raw-webgl/passes/MattePass.ts",
+        "src/raw-webgl/shaders/matte/matte.vert.glsl"
+      ],
+      [
+        "src/raw-webgl/passes/PassProgram.ts",
+        "src/raw-webgl/core/index.ts"
+      ],
+      [
+        "src/raw-webgl/passes/PassProgram.ts",
+        "src/raw-webgl/renderer/ShaderSource.ts"
+      ],
+      [
+        "src/raw-webgl/passes/PassProgram.ts",
+        "src/raw-webgl/shaders/common/brdf.glsl"
+      ],
+      [
+        "src/raw-webgl/passes/PassProgram.ts",
+        "src/raw-webgl/shaders/common/color-space.glsl"
+      ],
+      [
+        "src/raw-webgl/passes/PassProgram.ts",
+        "src/raw-webgl/shaders/common/dithering.glsl"
+      ],
+      [
+        "src/raw-webgl/passes/PassProgram.ts",
+        "src/raw-webgl/shaders/common/environment.glsl"
+      ],
+      [
+        "src/raw-webgl/passes/PassProgram.ts",
+        "src/raw-webgl/shaders/common/fresnel.glsl"
+      ],
+      [
+        "src/raw-webgl/passes/PassProgram.ts",
+        "src/raw-webgl/shaders/common/math.glsl"
+      ],
+      [
+        "src/raw-webgl/passes/PassProgram.ts",
+        "src/raw-webgl/shaders/common/tone-mapping.glsl"
+      ],
+      [
+        "src/raw-webgl/passes/PassSurface.ts",
+        "src/raw-webgl/core/index.ts"
+      ],
+      [
+        "src/raw-webgl/passes/PassSurface.ts",
+        "src/raw-webgl/lighting/lightingPresets.ts"
+      ],
+      [
+        "src/raw-webgl/passes/PrismBackfacePass.ts",
+        "src/raw-webgl/core/index.ts"
+      ],
+      [
+        "src/raw-webgl/passes/PrismBackfacePass.ts",
+        "src/raw-webgl/materials/materialPresets.ts"
+      ],
+      [
+        "src/raw-webgl/passes/PrismBackfacePass.ts",
+        "src/raw-webgl/passes/PassProgram.ts"
+      ],
+      [
+        "src/raw-webgl/passes/PrismBackfacePass.ts",
+        "src/raw-webgl/passes/PassSurface.ts"
+      ],
+      [
+        "src/raw-webgl/passes/PrismBackfacePass.ts",
+        "src/raw-webgl/renderer/GpuAxisMesh.ts"
+      ],
+      [
+        "src/raw-webgl/passes/PrismBackfacePass.ts",
+        "src/raw-webgl/renderer/Uniforms.ts"
+      ],
+      [
+        "src/raw-webgl/passes/PrismBackfacePass.ts",
+        "src/raw-webgl/shaders/prism/prism-backface.frag.glsl"
+      ],
+      [
+        "src/raw-webgl/passes/PrismBackfacePass.ts",
+        "src/raw-webgl/shaders/prism/prism-backface.vert.glsl"
+      ],
+      [
+        "src/raw-webgl/passes/PrismFrontfacePass.ts",
+        "src/raw-webgl/core/index.ts"
+      ],
+      [
+        "src/raw-webgl/passes/PrismFrontfacePass.ts",
+        "src/raw-webgl/lighting/lightingPresets.ts"
+      ],
+      [
+        "src/raw-webgl/passes/PrismFrontfacePass.ts",
+        "src/raw-webgl/materials/materialPresets.ts"
+      ],
+      [
+        "src/raw-webgl/passes/PrismFrontfacePass.ts",
+        "src/raw-webgl/passes/PassProgram.ts"
+      ],
+      [
+        "src/raw-webgl/passes/PrismFrontfacePass.ts",
+        "src/raw-webgl/passes/PassSurface.ts"
+      ],
+      [
+        "src/raw-webgl/passes/PrismFrontfacePass.ts",
+        "src/raw-webgl/passes/PrismBackfacePass.ts"
+      ],
+      [
+        "src/raw-webgl/passes/PrismFrontfacePass.ts",
+        "src/raw-webgl/renderer/GpuAxisMesh.ts"
+      ],
+      [
+        "src/raw-webgl/passes/PrismFrontfacePass.ts",
+        "src/raw-webgl/renderer/Uniforms.ts"
+      ],
+      [
+        "src/raw-webgl/passes/PrismFrontfacePass.ts",
+        "src/raw-webgl/shaders/prism/prism-front.frag.glsl"
+      ],
+      [
+        "src/raw-webgl/passes/PrismFrontfacePass.ts",
+        "src/raw-webgl/shaders/prism/prism-front.vert.glsl"
+      ],
+      [
+        "src/raw-webgl/passes/ToneMapPass.ts",
+        "src/raw-webgl/core/index.ts"
+      ],
+      [
+        "src/raw-webgl/passes/ToneMapPass.ts",
+        "src/raw-webgl/passes/PassProgram.ts"
+      ],
+      [
+        "src/raw-webgl/passes/ToneMapPass.ts",
+        "src/raw-webgl/passes/PassSurface.ts"
+      ],
+      [
+        "src/raw-webgl/passes/ToneMapPass.ts",
+        "src/raw-webgl/renderer/Uniforms.ts"
+      ],
+      [
+        "src/raw-webgl/passes/ToneMapPass.ts",
+        "src/raw-webgl/shaders/post/fullscreen.vert.glsl"
+      ],
+      [
+        "src/raw-webgl/passes/ToneMapPass.ts",
+        "src/raw-webgl/shaders/post/tonemap.frag.glsl"
+      ],
+      [
+        "src/raw-webgl/passes/ToneMapPass.ts",
+        "src/studio/state/RawStudioState.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/ExportRenderer.ts",
+        "src/raw-webgl/core/index.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/ExportRenderer.ts",
+        "src/raw-webgl/passes/ExportPass.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/GpuAxisMesh.ts",
+        "src/raw-webgl/core/index.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/GpuAxisMesh.ts",
+        "src/raw-webgl/geometry/index.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/index.ts",
+        "src/raw-webgl/renderer/ExportRenderer.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/index.ts",
+        "src/raw-webgl/renderer/GpuAxisMesh.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/index.ts",
+        "src/raw-webgl/renderer/LightingUniforms.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/index.ts",
+        "src/raw-webgl/renderer/PipelineTargets.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/index.ts",
+        "src/raw-webgl/renderer/RawStudioRendererController.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/index.ts",
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/index.ts",
+        "src/raw-webgl/renderer/RenderLoop.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/index.ts",
+        "src/raw-webgl/renderer/ResizeManager.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/index.ts",
+        "src/raw-webgl/renderer/ShaderSource.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/LightingUniforms.ts",
+        "src/raw-webgl/core/index.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/LightingUniforms.ts",
+        "src/raw-webgl/lighting/index.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/LightingUniforms.ts",
+        "src/raw-webgl/passes/PassSurface.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/PipelineTargets.ts",
+        "src/raw-webgl/core/index.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawStudioRendererController.ts",
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawStudioRendererController.ts",
+        "src/studio/state/RawStudioState.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawStudioRendererController.ts",
+        "src/studio/ui/RawStudioApp.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts",
+        "src/raw-webgl/camera/index.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts",
+        "src/raw-webgl/core/index.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts",
+        "src/raw-webgl/debug/DebugRenderer.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts",
+        "src/raw-webgl/debug/PerformanceMonitor.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts",
+        "src/raw-webgl/geometry/index.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts",
+        "src/raw-webgl/math/index.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts",
+        "src/raw-webgl/passes/BackgroundPass.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts",
+        "src/raw-webgl/passes/CompositePass.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts",
+        "src/raw-webgl/passes/ExportPass.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts",
+        "src/raw-webgl/passes/FxaaPass.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts",
+        "src/raw-webgl/passes/MattePass.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts",
+        "src/raw-webgl/passes/PassSurface.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts",
+        "src/raw-webgl/passes/PrismBackfacePass.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts",
+        "src/raw-webgl/passes/PrismFrontfacePass.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts",
+        "src/raw-webgl/passes/ToneMapPass.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts",
+        "src/raw-webgl/renderer/ExportRenderer.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts",
+        "src/raw-webgl/renderer/GpuAxisMesh.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts",
+        "src/raw-webgl/renderer/LightingUniforms.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts",
+        "src/raw-webgl/renderer/PipelineTargets.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts",
+        "src/raw-webgl/renderer/RenderLoop.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts",
+        "src/raw-webgl/renderer/ResizeManager.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/RawWebGLRenderer.ts",
+        "src/studio/state/RawStudioState.ts"
+      ],
+      [
+        "src/raw-webgl/renderer/Uniforms.ts",
+        "src/raw-webgl/core/index.ts"
+      ],
+      [
+        "src/studio/index.ts",
+        "src/studio/state/RawStudioState.ts"
+      ],
+      [
+        "src/studio/index.ts",
+        "src/studio/ui/RawStudioApp.ts"
+      ],
+      [
+        "src/studio/state/RawStudioState.ts",
+        "src/raw-webgl/lighting/lightingPresets.ts"
+      ],
+      [
+        "src/studio/state/RawStudioState.ts",
+        "src/raw-webgl/materials/materialPresets.ts"
+      ],
+      [
+        "src/studio/ui/RawStudioApp.ts",
+        "src/raw-webgl/lighting/lightingPresets.ts"
+      ],
+      [
+        "src/studio/ui/RawStudioApp.ts",
+        "src/raw-webgl/materials/materialPresets.ts"
+      ],
+      [
+        "src/studio/ui/RawStudioApp.ts",
+        "src/studio/state/RawStudioState.ts"
+      ],
+      [
+        "src/studio/ui/RawStudioApp.ts",
+        "src/studio/ui/RawStudioApp.css"
+      ]
+    ]
+  },
+  "requiredLiveModules": 17,
+  "pipelineResponsibilities": {
+    "background": true,
+    "matte": true,
+    "prism-backface": true,
+    "prism-front": true,
+    "composite": true,
+    "tonemap": true,
+    "fxaa": true,
+    "export": true
+  },
+  "shaderEntryFiles": 11,
+  "commonShaderFiles": 7,
+  "shaderIncludeGraph": {
+    "src/raw-webgl/shaders/matte/matte.vert.glsl": [],
+    "src/raw-webgl/shaders/matte/matte.frag.glsl": [
+      "math",
+      "fresnel",
+      "brdf",
+      "environment"
+    ],
+    "src/raw-webgl/shaders/prism/prism-backface.vert.glsl": [],
+    "src/raw-webgl/shaders/prism/prism-backface.frag.glsl": [],
+    "src/raw-webgl/shaders/prism/prism-front.vert.glsl": [],
+    "src/raw-webgl/shaders/prism/prism-front.frag.glsl": [
+      "math",
+      "fresnel",
+      "brdf",
+      "environment"
+    ],
+    "src/raw-webgl/shaders/post/fullscreen.vert.glsl": [],
+    "src/raw-webgl/shaders/post/background.frag.glsl": [
+      "math",
+      "environment"
+    ],
+    "src/raw-webgl/shaders/post/copy.frag.glsl": [],
+    "src/raw-webgl/shaders/post/tonemap.frag.glsl": [
+      "color-space",
+      "tone-mapping",
+      "dithering"
+    ],
+    "src/raw-webgl/shaders/post/fxaa.frag.glsl": []
+  },
+  "coreContracts": {
+    "webgl2Only": true,
+    "preserveDrawingBuffer": false,
+    "contextLossHandlers": true,
+    "numberedShaderDiagnostics": true,
+    "framebufferCompletenessGate": true,
+    "resourceRestoreAndDispose": true
+  },
+  "geometrySelfTest": {
+    "valid": true,
+    "foldedVariants": {
+      "30-basic": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "9 intentional boundary edges found"
+        ],
+        "vertexCount": 19,
+        "triangleCount": 9,
+        "weldedVertexCount": 10,
+        "componentCount": 1,
+        "boundaryEdgeCount": 9,
+        "nonManifoldEdgeCount": 0,
+        "inconsistentWindingEdgeCount": 0,
+        "degenerateTriangleCount": 0,
+        "reversedNormalTriangleCount": 0,
+        "nonUnitNormalCount": 0,
+        "centerNodeVertexCount": 5,
+        "centerNodeWeldedCount": 1,
+        "centerNodeGroupCount": 5,
+        "exactSharedCenter": true,
+        "finiteData": true,
+        "rayMetadataMatches": true,
+        "positiveBounds": true,
+        "positiveSectorCount": 5,
+        "nonPositiveSectorCount": 0
+      },
+      "30-v1": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "10 intentional boundary edges found"
+        ],
+        "vertexCount": 22,
+        "triangleCount": 10,
+        "weldedVertexCount": 11,
+        "componentCount": 1,
+        "boundaryEdgeCount": 10,
+        "nonManifoldEdgeCount": 0,
+        "inconsistentWindingEdgeCount": 0,
+        "degenerateTriangleCount": 0,
+        "reversedNormalTriangleCount": 0,
+        "nonUnitNormalCount": 0,
+        "centerNodeVertexCount": 6,
+        "centerNodeWeldedCount": 1,
+        "centerNodeGroupCount": 6,
+        "exactSharedCenter": true,
+        "finiteData": true,
+        "rayMetadataMatches": true,
+        "positiveBounds": true,
+        "positiveSectorCount": 6,
+        "nonPositiveSectorCount": 0
+      },
+      "30-v2": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "8 intentional boundary edges found"
+        ],
+        "vertexCount": 16,
+        "triangleCount": 8,
+        "weldedVertexCount": 9,
+        "componentCount": 1,
+        "boundaryEdgeCount": 8,
+        "nonManifoldEdgeCount": 0,
+        "inconsistentWindingEdgeCount": 0,
+        "degenerateTriangleCount": 0,
+        "reversedNormalTriangleCount": 0,
+        "nonUnitNormalCount": 0,
+        "centerNodeVertexCount": 4,
+        "centerNodeWeldedCount": 1,
+        "centerNodeGroupCount": 4,
+        "exactSharedCenter": true,
+        "finiteData": true,
+        "rayMetadataMatches": true,
+        "positiveBounds": true,
+        "positiveSectorCount": 4,
+        "nonPositiveSectorCount": 0
+      },
+      "30-v3": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "7 intentional boundary edges found"
+        ],
+        "vertexCount": 13,
+        "triangleCount": 7,
+        "weldedVertexCount": 8,
+        "componentCount": 1,
+        "boundaryEdgeCount": 7,
+        "nonManifoldEdgeCount": 0,
+        "inconsistentWindingEdgeCount": 0,
+        "degenerateTriangleCount": 0,
+        "reversedNormalTriangleCount": 0,
+        "nonUnitNormalCount": 0,
+        "centerNodeVertexCount": 3,
+        "centerNodeWeldedCount": 1,
+        "centerNodeGroupCount": 3,
+        "exactSharedCenter": true,
+        "finiteData": true,
+        "rayMetadataMatches": true,
+        "positiveBounds": true,
+        "positiveSectorCount": 3,
+        "nonPositiveSectorCount": 0
+      },
+      "45-basic": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "10 intentional boundary edges found"
+        ],
+        "vertexCount": 22,
+        "triangleCount": 10,
+        "weldedVertexCount": 11,
+        "componentCount": 1,
+        "boundaryEdgeCount": 10,
+        "nonManifoldEdgeCount": 0,
+        "inconsistentWindingEdgeCount": 0,
+        "degenerateTriangleCount": 0,
+        "reversedNormalTriangleCount": 0,
+        "nonUnitNormalCount": 0,
+        "centerNodeVertexCount": 6,
+        "centerNodeWeldedCount": 1,
+        "centerNodeGroupCount": 6,
+        "exactSharedCenter": true,
+        "finiteData": true,
+        "rayMetadataMatches": true,
+        "positiveBounds": true,
+        "positiveSectorCount": 6,
+        "nonPositiveSectorCount": 0
+      },
+      "45-v1": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "11 intentional boundary edges found"
+        ],
+        "vertexCount": 25,
+        "triangleCount": 11,
+        "weldedVertexCount": 12,
+        "componentCount": 1,
+        "boundaryEdgeCount": 11,
+        "nonManifoldEdgeCount": 0,
+        "inconsistentWindingEdgeCount": 0,
+        "degenerateTriangleCount": 0,
+        "reversedNormalTriangleCount": 0,
+        "nonUnitNormalCount": 0,
+        "centerNodeVertexCount": 7,
+        "centerNodeWeldedCount": 1,
+        "centerNodeGroupCount": 7,
+        "exactSharedCenter": true,
+        "finiteData": true,
+        "rayMetadataMatches": true,
+        "positiveBounds": true,
+        "positiveSectorCount": 7,
+        "nonPositiveSectorCount": 0
+      },
+      "45-v2": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "7 intentional boundary edges found"
+        ],
+        "vertexCount": 13,
+        "triangleCount": 7,
+        "weldedVertexCount": 8,
+        "componentCount": 1,
+        "boundaryEdgeCount": 7,
+        "nonManifoldEdgeCount": 0,
+        "inconsistentWindingEdgeCount": 0,
+        "degenerateTriangleCount": 0,
+        "reversedNormalTriangleCount": 0,
+        "nonUnitNormalCount": 0,
+        "centerNodeVertexCount": 3,
+        "centerNodeWeldedCount": 1,
+        "centerNodeGroupCount": 3,
+        "exactSharedCenter": true,
+        "finiteData": true,
+        "rayMetadataMatches": true,
+        "positiveBounds": true,
+        "positiveSectorCount": 3,
+        "nonPositiveSectorCount": 0
+      },
+      "45-v3": {
+        "valid": true,
+        "errors": [],
+        "warnings": [
+          "9 intentional boundary edges found"
+        ],
+        "vertexCount": 19,
+        "triangleCount": 9,
+        "weldedVertexCount": 10,
+        "componentCount": 1,
+        "boundaryEdgeCount": 9,
+        "nonManifoldEdgeCount": 0,
+        "inconsistentWindingEdgeCount": 0,
+        "degenerateTriangleCount": 0,
+        "reversedNormalTriangleCount": 0,
+        "nonUnitNormalCount": 0,
+        "centerNodeVertexCount": 5,
+        "centerNodeWeldedCount": 1,
+        "centerNodeGroupCount": 5,
+        "exactSharedCenter": true,
+        "finiteData": true,
+        "rayMetadataMatches": true,
+        "positiveBounds": true,
+        "positiveSectorCount": 5,
+        "nonPositiveSectorCount": 0
+      }
+    },
+    "folded": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "10 intentional boundary edges found"
+      ],
+      "vertexCount": 22,
+      "triangleCount": 10,
+      "weldedVertexCount": 11,
+      "componentCount": 1,
+      "boundaryEdgeCount": 10,
+      "nonManifoldEdgeCount": 0,
+      "inconsistentWindingEdgeCount": 0,
+      "degenerateTriangleCount": 0,
+      "reversedNormalTriangleCount": 0,
+      "nonUnitNormalCount": 0,
+      "centerNodeVertexCount": 6,
+      "centerNodeWeldedCount": 1,
+      "centerNodeGroupCount": 6,
+      "exactSharedCenter": true,
+      "finiteData": true,
+      "rayMetadataMatches": true,
+      "positiveBounds": true,
+      "positiveSectorCount": 6,
+      "nonPositiveSectorCount": 0
+    },
+    "optical": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "vertexCount": 434,
+      "triangleCount": 312,
+      "weldedVertexCount": 159,
+      "componentCount": 2,
+      "boundaryEdgeCount": 0,
+      "nonManifoldEdgeCount": 0,
+      "inconsistentWindingEdgeCount": 0,
+      "degenerateTriangleCount": 0,
+      "reversedNormalTriangleCount": 0,
+      "nonUnitNormalCount": 0,
+      "centerNodeVertexCount": 18,
+      "centerNodeWeldedCount": 1,
+      "centerNodeGroupCount": 2,
+      "exactSharedCenter": true,
+      "finiteData": true,
+      "rayMetadataMatches": true,
+      "positiveBounds": true,
+      "positiveSectorCount": 0,
+      "nonPositiveSectorCount": 0
+    }
+  },
+  "artifacts": {
+    "manifest": "artifacts/raw-webgl2/manifest.json",
+    "strict": false,
+    "present": [
+      "before-ui.png"
+    ],
+    "pending": [
+      "before-ui-1440x900.png",
+      "before-render.png",
+      "raw-axis-wireframe.png",
+      "raw-axis-normal.png",
+      "raw-axis-front.png",
+      "raw-axis-perspective.png",
+      "matte-reference.png",
+      "matte-graphite.png",
+      "matte-blue.png",
+      "prism-clear.png",
+      "prism-smoked.png",
+      "prism-pleos-blue.png",
+      "prism-full-spectrum.png",
+      "lighting-key-only.png",
+      "lighting-fill-only.png",
+      "lighting-rim-only.png",
+      "lighting-cards.png",
+      "raw-render-2800x2080.png",
+      "raw-render-4096x4096.png",
+      "legacy-vs-raw-split.png"
+    ]
+  }
+}

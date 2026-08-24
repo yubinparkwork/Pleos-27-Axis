@@ -1,0 +1,54 @@
+{
+  "startedAt": "2026-08-20T05:47:43.114Z",
+  "outputs": [
+    {
+      "preset": "soft-spectral-caustic",
+      "width": 4096,
+      "height": 4096,
+      "bytes": 23778299,
+      "filename": "soft-spectral-caustic-4096.png"
+    }
+  ],
+  "renderer": {
+    "backend": "WebGL 2",
+    "outputBuffer": "RGBA8 / sRGB",
+    "antialiasing": "MSAA 4× max",
+    "quality": "final",
+    "canvas": {
+      "cssWidth": 350,
+      "cssHeight": 350,
+      "bufferWidth": 700,
+      "bufferHeight": 700,
+      "dpr": 2
+    },
+    "geometry": {
+      "sectors": 5,
+      "triangles": 12996,
+      "hasDepth": true,
+      "hasNormals": true
+    },
+    "camera": {
+      "type": "OrthographicCamera",
+      "position": [
+        0,
+        0,
+        5
+      ],
+      "target": [
+        0,
+        0,
+        0
+      ]
+    },
+    "material": {
+      "preset": "reference-matte",
+      "texture": false,
+      "uploaded": []
+    },
+    "gpu": {
+      "maxTextureSize": 16384
+    }
+  },
+  "maxTextureSupports8192": true,
+  "completedAt": "2026-08-20T05:47:47.687Z"
+}

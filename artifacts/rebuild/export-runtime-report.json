@@ -1,0 +1,401 @@
+{
+  "status": "complete",
+  "renderer": {
+    "backend": "WebGL 2 Fallback",
+    "canvas": {
+      "cssWidth": 350,
+      "cssHeight": 260,
+      "bufferWidth": 350,
+      "bufferHeight": 260,
+      "dpr": 1
+    },
+    "geometry": {
+      "sectors": 5,
+      "triangles": 9,
+      "hasDepth": true,
+      "hasNormals": true
+    },
+    "camera": {
+      "type": "OrthographicCamera",
+      "position": [
+        0,
+        0,
+        5
+      ],
+      "target": [
+        0,
+        0,
+        0
+      ]
+    },
+    "material": {
+      "preset": "reference-matte",
+      "texture": true,
+      "uploaded": []
+    },
+    "gpu": {
+      "maxTextureSize": 8192
+    }
+  },
+  "still": {
+    "width": 2800,
+    "height": 2080,
+    "pngBytes": 4340277,
+    "exrBytes": 6074655,
+    "exrStorage": "RGBA half-float scene-linear"
+  },
+  "sequence": {
+    "width": 960,
+    "height": 540,
+    "frames": 60,
+    "frameRate": 30,
+    "firstTime": 0,
+    "lastTime": 1.9666666666666666,
+    "restoredTime": 0.875,
+    "expectedRestoredTime": 0.875,
+    "zipBytes": 10012162
+  },
+  "progress": [
+    {
+      "phase": "Preparing exact frame",
+      "progress": 0.08,
+      "output": "png"
+    },
+    {
+      "phase": "Offscreen render",
+      "progress": 0.28,
+      "output": "png"
+    },
+    {
+      "phase": "High-quality downsample",
+      "progress": 0.72,
+      "output": "png"
+    },
+    {
+      "phase": "Preparing exact frame",
+      "progress": 0.08,
+      "output": "exr"
+    },
+    {
+      "phase": "Scene-linear half-float render",
+      "progress": 0.3,
+      "output": "exr"
+    },
+    {
+      "phase": "Encoding OpenEXR",
+      "progress": 0.68,
+      "output": "exr"
+    },
+    {
+      "phase": "Rendering frame 1/60",
+      "progress": 0.015333333333333334,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 2/60",
+      "progress": 0.03066666666666667,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 3/60",
+      "progress": 0.046000000000000006,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 4/60",
+      "progress": 0.06133333333333334,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 5/60",
+      "progress": 0.07666666666666666,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 6/60",
+      "progress": 0.09200000000000001,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 7/60",
+      "progress": 0.10733333333333334,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 8/60",
+      "progress": 0.12266666666666667,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 9/60",
+      "progress": 0.138,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 10/60",
+      "progress": 0.15333333333333332,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 11/60",
+      "progress": 0.16866666666666666,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 12/60",
+      "progress": 0.18400000000000002,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 13/60",
+      "progress": 0.19933333333333336,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 14/60",
+      "progress": 0.21466666666666667,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 15/60",
+      "progress": 0.23,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 16/60",
+      "progress": 0.24533333333333335,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 17/60",
+      "progress": 0.26066666666666666,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 18/60",
+      "progress": 0.276,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 19/60",
+      "progress": 0.29133333333333333,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 20/60",
+      "progress": 0.30666666666666664,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 21/60",
+      "progress": 0.322,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 22/60",
+      "progress": 0.3373333333333333,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 23/60",
+      "progress": 0.3526666666666667,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 24/60",
+      "progress": 0.36800000000000005,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 25/60",
+      "progress": 0.38333333333333336,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 26/60",
+      "progress": 0.3986666666666667,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 27/60",
+      "progress": 0.41400000000000003,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 28/60",
+      "progress": 0.42933333333333334,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 29/60",
+      "progress": 0.4446666666666667,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 30/60",
+      "progress": 0.46,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 31/60",
+      "progress": 0.4753333333333334,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 32/60",
+      "progress": 0.4906666666666667,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 33/60",
+      "progress": 0.5060000000000001,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 34/60",
+      "progress": 0.5213333333333333,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 35/60",
+      "progress": 0.5366666666666667,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 36/60",
+      "progress": 0.552,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 37/60",
+      "progress": 0.5673333333333334,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 38/60",
+      "progress": 0.5826666666666667,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 39/60",
+      "progress": 0.5980000000000001,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 40/60",
+      "progress": 0.6133333333333333,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 41/60",
+      "progress": 0.6286666666666667,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 42/60",
+      "progress": 0.644,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 43/60",
+      "progress": 0.6593333333333333,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 44/60",
+      "progress": 0.6746666666666666,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 45/60",
+      "progress": 0.6900000000000001,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 46/60",
+      "progress": 0.7053333333333334,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 47/60",
+      "progress": 0.7206666666666667,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 48/60",
+      "progress": 0.7360000000000001,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 49/60",
+      "progress": 0.7513333333333333,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 50/60",
+      "progress": 0.7666666666666667,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 51/60",
+      "progress": 0.782,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 52/60",
+      "progress": 0.7973333333333334,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 53/60",
+      "progress": 0.8126666666666666,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 54/60",
+      "progress": 0.8280000000000001,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 55/60",
+      "progress": 0.8433333333333334,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 56/60",
+      "progress": 0.8586666666666667,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 57/60",
+      "progress": 0.874,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 58/60",
+      "progress": 0.8893333333333334,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 59/60",
+      "progress": 0.9046666666666666,
+      "output": "sequence"
+    },
+    {
+      "phase": "Rendering frame 60/60",
+      "progress": 0.92,
+      "output": "sequence"
+    },
+    {
+      "phase": "Packing PNG sequence",
+      "progress": 0.96,
+      "output": "sequence"
+    },
+    {
+      "phase": "Complete",
+      "progress": 1,
+      "output": "sequence"
+    }
+  ],
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36"
+}

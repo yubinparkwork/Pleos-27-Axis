@@ -1,0 +1,15 @@
+{
+  "status": "pass",
+  "requiredFiles": 14,
+  "approvedAxisDefinitions": 8,
+  "approvedRaySets": 8,
+  "brandColorTokens": 18,
+  "productionPdfFiles": 0,
+  "archivedLegacyScripts": [
+    "capture-studio.mjs",
+    "capture.mjs",
+    "compare-studio-baseline.mjs",
+    "compare.mjs",
+    "verify-studio.mjs"
+  ]
+}
