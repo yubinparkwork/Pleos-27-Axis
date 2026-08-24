@@ -13,15 +13,7 @@ import {
   type LightingState,
 } from "../../raw-webgl/lighting/lightingPresets";
 
-export type RawInspectorTab =
-  | "geometry"
-  | "material"
-  | "prism"
-  | "lighting"
-  | "cards"
-  | "camera"
-  | "output"
-  | "debug";
+export type RawInspectorTab = "material" | "lighting" | "output";
 
 export type RawMaterialMode = "matte" | "prism";
 export type RawGeometryMode = "folded-surface" | "closed-optical-solid";
@@ -118,7 +110,6 @@ export interface RawDebugState {
 
 export interface RawStudioUiState {
   tab: RawInspectorTab;
-  selectedCard: number;
   leftPanelOpen: boolean;
   rightPanelOpen: boolean;
 }
@@ -185,7 +176,9 @@ export function createDefaultRawStudioState(): RawStudioState {
       axisFamily: "30deg",
       variation: "30-v1",
       originGrid: [10, 10],
-      mode: "folded-surface",
+      // The default composition follows the approved Type B New Axis idea:
+      // two true cubes meet at the 20 x 20 grid's exact center node.
+      mode: "closed-optical-solid",
       foldDepth: 0.42,
       // sqrt(1/2) keeps each approved 30° projected basis orthogonal in 3D,
       // so the canonical Prism starts as two true cubes rather than skewed boxes.
@@ -204,13 +197,15 @@ export function createDefaultRawStudioState(): RawStudioState {
       matte: cloneMatte("matte-reference"),
       prism: clonePrism("prism-clear"),
     },
-    lighting: cloneLightingPreset("reference-flat"),
+    lighting: cloneLightingPreset("softbox-studio"),
     camera: {
+      // The guide's 30-degree rays are defined in screen space. A locked
+      // orthographic front view preserves those exact projected directions.
       mode: "orthographic",
-      position: [0, 0, 5],
+      position: [0, 0, 8],
       target: [0, 0, 0],
       fov: 34,
-      orthoZoom: 1,
+      orthoZoom: 0.36,
       near: 0.01,
       far: 40,
       roll: 0,
@@ -244,8 +239,7 @@ export function createDefaultRawStudioState(): RawStudioState {
       freezeRender: false,
     },
     ui: {
-      tab: "geometry",
-      selectedCard: 0,
+      tab: "material",
       leftPanelOpen: true,
       rightPanelOpen: true,
     },
@@ -261,7 +255,8 @@ export function applyRawScenePreset(
   const next = structuredClone(state);
   next.scenePreset = preset.id;
   next.material.mode = preset.materialMode;
-  next.geometry.mode = preset.materialMode === "matte" ? "folded-surface" : "closed-optical-solid";
+  // Material changes must never replace the locked two-cube Axis identity.
+  next.geometry.mode = "closed-optical-solid";
   next.geometry.bevelEnabled = preset.materialMode === "prism";
   if (preset.materialMode === "prism") {
     next.geometry.axisFamily = "30deg";
@@ -296,7 +291,7 @@ export function applyRawMaterialPreset(
     next.material.mode = "matte";
     next.material.mattePreset = id;
     next.material.matte = cloneMatte(id);
-    next.geometry.mode = "folded-surface";
+    next.geometry.mode = "closed-optical-solid";
     next.geometry.bevelEnabled = false;
   } else {
     const id = presetId as PrismPresetId;

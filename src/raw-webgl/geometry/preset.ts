@@ -40,13 +40,13 @@ export const PLEOS_30_VARIATION_1: AxisGeometryPreset = Object.freeze({
   ]),
   cubes: Object.freeze([
     {
-      id: "cube-left" as const,
-      directionsDeg: [90, 150, 210] as const,
+      id: "cube-right" as const,
+      directionsDeg: [90, 30, -30] as const,
       depthSigns: [1, -1, 1] as const,
     },
     {
-      id: "cube-right" as const,
-      directionsDeg: [-90, 30, -30] as const,
+      id: "cube-left" as const,
+      directionsDeg: [-90, 150, 210] as const,
       depthSigns: [-1, -1, 1] as const,
     },
   ]),

@@ -45,7 +45,7 @@ export interface PrismState {
 export const MATTE_PRESETS: Record<MattePresetId, { name: string; state: MatteState }> = {
   "matte-reference": {
     name: "Matte Reference",
-    state: { baseColor: [0.074214, 0.074214, 0.074214], faceVariation: 0.2, roughness: 0.84, diffuseStrength: 1, specularStrength: 0.16, specularTint: [0.9, 0.9, 0.9], microStrength: 0.055, microScale: 310, ambientStrength: 0.28 },
+    state: { baseColor: [0.24, 0.24, 0.24], faceVariation: 0.34, roughness: 0.78, diffuseStrength: 1, specularStrength: 0.2, specularTint: [0.9, 0.9, 0.9], microStrength: 0.045, microScale: 310, ambientStrength: 0.42 },
   },
   "matte-graphite": {
     name: "Matte Graphite",
