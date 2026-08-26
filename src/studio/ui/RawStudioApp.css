@@ -161,6 +161,26 @@
 .raw-full-button { width: 100%; margin-top: 12px; color: #111; background: var(--raw-accent); border-color: var(--raw-accent); font-weight: 650; }
 .raw-inline-status,
 .raw-help { margin: 9px 0 0; color: var(--raw-dim); font-size: 9px; }
+.raw-light-help { margin: 0 0 12px; line-height: 1.55; }
+.raw-light-group { border-top: 1px solid var(--raw-line); }
+.raw-light-group:last-child { border-bottom: 1px solid var(--raw-line); }
+.raw-light-group summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 38px;
+  gap: 10px;
+  color: var(--raw-muted);
+  font-size: 10px;
+  cursor: pointer;
+  list-style: none;
+}
+.raw-light-group summary::-webkit-details-marker { display: none; }
+.raw-light-group summary::before { content: "+"; width: 10px; color: var(--raw-dim); }
+.raw-light-group[open] summary::before { content: "−"; }
+.raw-light-group summary > span { flex: 1; color: var(--raw-text); }
+.raw-light-group summary > small { color: var(--raw-dim); font-size: 8px; }
+.raw-light-controls { padding: 2px 0 12px 20px; }
 .raw-experimental-banner { margin: 12px; padding: 9px 10px; border: 1px solid rgba(255, 174, 91, 0.38); color: #ffc27f; background: rgba(255, 174, 91, 0.07); font-size: 9px; letter-spacing: 0.08em; text-align: center; }
 
 .raw-studio-status {

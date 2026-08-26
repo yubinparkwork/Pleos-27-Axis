@@ -16,6 +16,7 @@ export interface MattePassParameters {
   readonly near: number;
   readonly far: number;
   readonly debugMode: number;
+  readonly timeSeconds: number;
 }
 
 export class MattePass {
@@ -48,6 +49,36 @@ export class MattePass {
     uniform1f(this.gl, this.program, "uMicroStrength", parameters.material.microStrength);
     uniform1f(this.gl, this.program, "uMicroScale", parameters.material.microScale);
     uniform1f(this.gl, this.program, "uAmbientStrength", parameters.material.ambientStrength);
+    const texture = parameters.material.texture;
+    uniform1i(this.gl, this.program, "uTexturePattern", texture.pattern === "amber-flow" ? 1 : 0);
+    uniform1i(this.gl, this.program, "uTextureEnabled", texture.enabled ? 1 : 0);
+    uniform1f(this.gl, this.program, "uTextureStrength", texture.strength);
+    uniform1f(this.gl, this.program, "uTextureScale", texture.scale);
+    uniform1f(this.gl, this.program, "uTextureRotation", texture.rotation * Math.PI / 180);
+    uniform1f(this.gl, this.program, "uTextureFlow", texture.flow);
+    uniform1f(this.gl, this.program, "uTextureContrast", texture.contrast);
+    uniform1f(this.gl, this.program, "uTextureEdgeGlow", texture.edgeGlow);
+    uniform1f(this.gl, this.program, "uTextureEdgeWidth", texture.edgeWidth);
+    uniform1f(this.gl, this.program, "uTextureTime", texture.animationEnabled ? parameters.timeSeconds : 0);
+    uniform1f(this.gl, this.program, "uTextureAnimationSpeed", texture.animationSpeed);
+    uniform1f(this.gl, this.program, "uTextureAnimationTravel", texture.animationTravel);
+    uniform1f(this.gl, this.program, "uTextureWarpStrength", texture.warpStrength);
+    uniform1f(this.gl, this.program, "uTextureDetailStrength", texture.detailStrength);
+    uniform1f(this.gl, this.program, "uTextureSheenStrength", texture.sheenStrength);
+    uniform3f(this.gl, this.program, "uTextureDarkColor", texture.darkColor);
+    uniform3f(this.gl, this.program, "uTextureHotColor", texture.hotColor);
+    uniform3f(this.gl, this.program, "uTextureSoftColor", texture.softColor);
+    uniform3f(this.gl, this.program, "uTextureAccentColor", texture.accentColor);
+    uniform1i(this.gl, this.program, "uSoftAreaEnabled", parameters.lighting.softArea.enabled ? 1 : 0);
+    uniform1f(this.gl, this.program, "uSoftSourceSize", parameters.lighting.softArea.sourceSize);
+    uniform1f(this.gl, this.program, "uSoftFalloffExponent", parameters.lighting.softArea.falloffExponent);
+    uniform1f(this.gl, this.program, "uSoftPenumbraWidth", parameters.lighting.softArea.penumbraWidth);
+    uniform1f(this.gl, this.program, "uSoftEdgeSoftness", parameters.lighting.softArea.edgeSoftness);
+    uniform1f(this.gl, this.program, "uSoftAmbientIntensity", parameters.lighting.softArea.ambientIntensity);
+    uniform1f(this.gl, this.program, "uSoftGrazingStrength", parameters.lighting.softArea.grazingStrength);
+    uniform1f(this.gl, this.program, "uSoftContactDarkening", parameters.lighting.softArea.contactDarkening);
+    uniform1f(this.gl, this.program, "uSoftContactRadius", parameters.lighting.softArea.contactRadius);
+    uniform3f(this.gl, this.program, "uSoftLowerFaceBias", parameters.lighting.softArea.lowerFaceBias);
     uniform1i(this.gl, this.program, "uDebugMode", parameters.debugMode);
     this.lightingUniforms.upload(this.program, parameters.lighting);
     mesh.drawTriangles(this.state);

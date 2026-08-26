@@ -1,4 +1,5 @@
 export * from "./BackgroundPass";
+export * from "./BloomPass";
 export * from "./CompositePass";
 export * from "./ExportPass";
 export * from "./FxaaPass";

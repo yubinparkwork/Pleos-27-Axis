@@ -157,14 +157,14 @@ function addMainFace(
     localPoint(fixedAxis, fixed, free[0], high, free[1], high),
     localPoint(fixedAxis, fixed, free[0], low, free[1], high),
   ];
-  const normal = transformNormal(basis, axisVector(fixedAxis, side));
-  const vertices = localPoints.map((point) => accumulator.addVertex({
-    position: transformPoint(origin, basis, point),
-    normal,
+  const expected = transformNormal(basis, axisVector(fixedAxis, side));
+  const vertices = localPoints.map((local) => accumulator.addVertex({
+    position: transformPoint(origin, basis, local),
+    normal: expected,
     faceId,
   }));
-  accumulator.addTriangle(vertices[0], vertices[1], vertices[2], normal);
-  accumulator.addTriangle(vertices[0], vertices[2], vertices[3], normal);
+  accumulator.addTriangle(vertices[0], vertices[1], vertices[2], expected);
+  accumulator.addTriangle(vertices[0], vertices[2], vertices[3], expected);
 }
 
 function addEdgeBevels(
@@ -187,25 +187,33 @@ function addEdgeBevels(
         const faceId = faceBase + EDGE_FACE_START + edgeIndex;
         bevelIds.push(faceId);
         edgeIndex += 1;
-        const strip: number[][] = [];
-        for (let step = 0; step <= segments; step += 1) {
-          const weightA = 1 - step / segments;
-          const weightB = step / segments;
-          const localNormal = edgeNormal(axisA, sideA, axisB, sideB, weightA, weightB);
-          const normal = transformNormal(basis, localNormal);
-          strip.push([bevel, 1 - bevel].map((freeCoordinate) => {
-            const local = edgePoint(axisA, sideA, axisB, sideB, freeAxis, freeCoordinate, weightA, weightB, bevel, curvature);
-            return accumulator.addVertex({ position: transformPoint(origin, basis, local), normal, faceId });
-          }));
-        }
-        const expected = transformNormal(basis, edgeNormal(axisA, sideA, axisB, sideB, 0.5, 0.5));
         for (let step = 0; step < segments; step += 1) {
-          const a = strip[step][0];
-          const b = strip[step + 1][0];
-          const c = strip[step + 1][1];
-          const d = strip[step][1];
-          accumulator.addTriangle(a, b, c, expected);
-          accumulator.addTriangle(a, c, d, expected);
+          const startA = 1 - step / segments;
+          const startB = step / segments;
+          const endA = 1 - (step + 1) / segments;
+          const endB = (step + 1) / segments;
+          const expected = transformNormal(basis, edgeNormal(
+            axisA,
+            sideA,
+            axisB,
+            sideB,
+            (startA + endA) * 0.5,
+            (startB + endB) * 0.5,
+          ));
+          const point = (freeCoordinate: number, weightA: number, weightB: number): Vec3 => transformPoint(
+            origin,
+            basis,
+            edgePoint(axisA, sideA, axisB, sideB, freeAxis, freeCoordinate, weightA, weightB, bevel, curvature),
+          );
+          const a = point(bevel, startA, startB);
+          const b = point(bevel, endA, endB);
+          const c = point(1 - bevel, endA, endB);
+          const d = point(1 - bevel, startA, startB);
+          // Deliberately duplicate vertices per strip. Flat normals keep every
+          // micro bevel readable as a precision-cut facet instead of blending
+          // into the inflated silhouette of a rounded box.
+          accumulator.addFlatTriangle(a, b, c, faceId, expected);
+          accumulator.addFlatTriangle(a, c, d, faceId, expected);
         }
       }
     }
@@ -251,24 +259,23 @@ function addRoundedCorner(
   curvature: number,
   sides: readonly [-1 | 1, -1 | 1, -1 | 1],
 ): void {
-  const rows: number[][] = [];
+  const rows: Vec3[][] = [];
   for (let i = 0; i <= segments; i += 1) {
-    const row: number[] = [];
+    const row: Vec3[] = [];
     for (let j = 0; j <= segments - i; j += 1) {
       const k = segments - i - j;
       const weights: Vec3 = [i / segments, j / segments, k / segments];
       const local = cornerPoint(sides, weights, bevel, curvature);
-      const normal = transformNormal(basis, signedDirection(sides, weights));
-      row.push(accumulator.addVertex({ position: transformPoint(origin, basis, local), normal, faceId }));
+      row.push(transformPoint(origin, basis, local));
     }
     rows.push(row);
   }
   const expected = transformNormal(basis, normalize3(sides));
   for (let i = 0; i < segments; i += 1) {
     for (let j = 0; j < segments - i; j += 1) {
-      accumulator.addTriangle(rows[i][j], rows[i + 1][j], rows[i][j + 1], expected);
+      accumulator.addFlatTriangle(rows[i][j], rows[i + 1][j], rows[i][j + 1], faceId, expected);
       if (j < segments - i - 1) {
-        accumulator.addTriangle(rows[i + 1][j], rows[i + 1][j + 1], rows[i][j + 1], expected);
+        accumulator.addFlatTriangle(rows[i + 1][j], rows[i + 1][j + 1], rows[i][j + 1], faceId, expected);
       }
     }
   }
@@ -359,10 +366,6 @@ function edgeNormal(
   result[axisA] = sideA * weightA;
   result[axisB] = sideB * weightB;
   return normalize3(result);
-}
-
-function signedDirection(sides: readonly [-1 | 1, -1 | 1, -1 | 1], weights: Vec3): Vec3 {
-  return normalize3([sides[0] * weights[0], sides[1] * weights[1], sides[2] * weights[2]]);
 }
 
 function localPoint(

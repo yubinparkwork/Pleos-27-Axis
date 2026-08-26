@@ -20,6 +20,8 @@ export type RawGeometryMode = "folded-surface" | "closed-optical-solid";
 export type RawCameraMode = "orthographic" | "perspective";
 export type RawRenderQuality = "draft" | "balanced" | "high" | "final";
 export type RawToneMapping = "neutral" | "aces-fitted";
+export type RawEngineBackend = "auto" | "webgpu" | "webgl2";
+export type RawEngineQuality = "adaptive" | "performance" | "balanced" | "ultra";
 export type RawDebugMode =
   | "shaded"
   | "wireframe"
@@ -83,6 +85,10 @@ export interface RawPostState {
   contrast: number;
   whitePoint: number;
   blackLift: number;
+  bloomEnabled: boolean;
+  bloomStrength: number;
+  bloomRadius: number;
+  bloomThreshold: number;
   dither: boolean;
   fxaa: boolean;
   internalScale: number;
@@ -108,6 +114,51 @@ export interface RawDebugState {
   freezeRender: boolean;
 }
 
+export interface RawParticleState {
+  enabled: boolean;
+  count: number;
+  size: number;
+  opacity: number;
+  speed: number;
+  turbulence: number;
+  noiseScale: number;
+  lifespan: number;
+  spawnRadius: number;
+  attraction: number;
+  repulsion: number;
+  flowDirection: Vec3;
+  depthResponse: number;
+  cameraInteraction: number;
+}
+
+export interface RawGradientEngineState {
+  volumetricStrength: number;
+  directionalStrength: number;
+  fresnelStrength: number;
+  noiseStrength: number;
+  temporalSpeed: number;
+  ditherStrength: number;
+}
+
+export interface RawLineEngineState {
+  enabled: boolean;
+  width: number;
+  opacity: number;
+  flowSpeed: number;
+  glowStrength: number;
+}
+
+export interface RawEngineState {
+  backend: RawEngineBackend;
+  quality: RawEngineQuality;
+  adaptiveQuality: boolean;
+  targetFps: number;
+  animationPaused: boolean;
+  particles: RawParticleState;
+  gradient: RawGradientEngineState;
+  lines: RawLineEngineState;
+}
+
 export interface RawStudioUiState {
   tab: RawInspectorTab;
   leftPanelOpen: boolean;
@@ -122,14 +173,18 @@ export interface RawStudioState {
   lighting: LightingState;
   camera: RawCameraState;
   output: RawOutputState;
+  engine: RawEngineState;
   debug: RawDebugState;
   ui: RawStudioUiState;
 }
 
 export type RawScenePresetId =
   | "matte-reference"
+  | "matte-chromatic"
+  | "matte-amber-flow"
   | "matte-graphite"
   | "matte-pleos-blue"
+  | "prism-optical-cut"
   | "prism-clear"
   | "prism-smoked"
   | "prism-pleos-blue"
@@ -146,13 +201,10 @@ export interface RawScenePresetDefinition {
 }
 
 export const RAW_SCENE_PRESETS: readonly RawScenePresetDefinition[] = [
-  { id: "matte-reference", name: "Matte Reference", description: "Neutral Type B baseline", materialMode: "matte", materialPreset: "matte-reference", lightingPreset: "reference-flat", experimental: false },
-  { id: "matte-graphite", name: "Matte Graphite", description: "Dark product surface", materialMode: "matte", materialPreset: "matte-graphite", lightingPreset: "softbox-studio", experimental: false },
-  { id: "matte-pleos-blue", name: "Matte Pleos Blue", description: "Restrained tone-on-tone", materialMode: "matte", materialPreset: "matte-pleos-blue", lightingPreset: "softbox-studio", experimental: false },
-  { id: "prism-clear", name: "Clear Prism", description: "Neutral optical test", materialMode: "prism", materialPreset: "prism-clear", lightingPreset: "prism-studio", experimental: false },
-  { id: "prism-smoked", name: "Smoked Prism", description: "Deep neutral absorption", materialMode: "prism", materialPreset: "prism-smoked", lightingPreset: "dark-optical", experimental: false },
-  { id: "prism-pleos-blue", name: "Pleos Blue Prism", description: "Controlled blue attenuation", materialMode: "prism", materialPreset: "prism-pleos-blue", lightingPreset: "prism-studio", experimental: false },
-  { id: "prism-full-spectrum", name: "Full Spectrum Prism", description: "Color review required", materialMode: "prism", materialPreset: "prism-full-spectrum", lightingPreset: "prism-studio", experimental: true },
+  { id: "matte-reference", name: "Matte Reference", description: "Type B 고대비 축 기준", materialMode: "matte", materialPreset: "matte-reference", lightingPreset: "pleos-axis-contrast", experimental: false },
+  { id: "matte-chromatic", name: "Chromatic Texture", description: "컬러 글로우 표면 질감", materialMode: "matte", materialPreset: "matte-chromatic", lightingPreset: "pleos-axis-contrast", experimental: false },
+  { id: "matte-amber-flow", name: "Amber Flow", description: "골드 리브 유체 발광", materialMode: "matte", materialPreset: "matte-amber-flow", lightingPreset: "pleos-axis-contrast", experimental: false },
+  { id: "prism-optical-cut", name: "Optical Cut Glass", description: "미세 패싯 광학 프리즘", materialMode: "prism", materialPreset: "prism-optical-cut", lightingPreset: "prism-studio", experimental: false },
 ] as const;
 
 export interface RawStudioChange {
@@ -164,6 +216,10 @@ export type RawStudioListener = (
   state: Readonly<RawStudioState>,
   change: RawStudioChange,
 ) => void;
+
+export const RAW_STUDIO_STORAGE_KEY = "pleos-27-axis:studio-state:v1";
+
+type RawStudioStorage = Pick<Storage, "getItem" | "setItem">;
 
 const cloneMatte = (id: MattePresetId): MatteState => structuredClone(MATTE_PRESETS[id].state);
 const clonePrism = (id: PrismPresetId): PrismState => structuredClone(PRISM_PRESETS[id].state);
@@ -197,7 +253,7 @@ export function createDefaultRawStudioState(): RawStudioState {
       matte: cloneMatte("matte-reference"),
       prism: clonePrism("prism-clear"),
     },
-    lighting: cloneLightingPreset("softbox-studio"),
+    lighting: cloneLightingPreset("pleos-axis-contrast"),
     camera: {
       // The guide's 30-degree rays are defined in screen space. A locked
       // orthographic front view preserves those exact projected directions.
@@ -226,9 +282,51 @@ export function createDefaultRawStudioState(): RawStudioState {
         contrast: 1,
         whitePoint: 1,
         blackLift: 0,
+        bloomEnabled: true,
+        bloomStrength: 1.08,
+        bloomRadius: 4.1,
+        bloomThreshold: 0.32,
         dither: true,
         fxaa: true,
         internalScale: 1.25,
+      },
+    },
+    engine: {
+      backend: "auto",
+      quality: "adaptive",
+      adaptiveQuality: true,
+      targetFps: 60,
+      animationPaused: false,
+      particles: {
+        enabled: true,
+        count: 1536,
+        size: 0.005,
+        opacity: 0.14,
+        speed: 0.1,
+        turbulence: 0.28,
+        noiseScale: 0.72,
+        lifespan: 8,
+        spawnRadius: 2.7,
+        attraction: 0.08,
+        repulsion: 0.02,
+        flowDirection: [0.34, 0.82, -0.16],
+        depthResponse: 0.72,
+        cameraInteraction: 0,
+      },
+      gradient: {
+        volumetricStrength: 0.64,
+        directionalStrength: 0.72,
+        fresnelStrength: 0.46,
+        noiseStrength: 0.18,
+        temporalSpeed: 0.08,
+        ditherStrength: 0.012,
+      },
+      lines: {
+        enabled: false,
+        width: 0.006,
+        opacity: 0.24,
+        flowSpeed: 0.12,
+        glowStrength: 0.32,
       },
     },
     debug: {
@@ -246,6 +344,62 @@ export function createDefaultRawStudioState(): RawStudioState {
   };
 }
 
+function mergePersistedValue<T>(fallback: T, persisted: unknown): T {
+  if (Array.isArray(fallback)) {
+    return (Array.isArray(persisted) ? structuredClone(persisted) : structuredClone(fallback)) as T;
+  }
+  if (fallback !== null && typeof fallback === "object") {
+    if (persisted === null || typeof persisted !== "object" || Array.isArray(persisted)) {
+      return structuredClone(fallback);
+    }
+    const merged = structuredClone(fallback) as Record<string, unknown>;
+    const source = persisted as Record<string, unknown>;
+    Object.keys(merged).forEach((key) => {
+      merged[key] = mergePersistedValue(merged[key], source[key]);
+    });
+    return merged as T;
+  }
+  return (typeof persisted === typeof fallback ? persisted : fallback) as T;
+}
+
+export function loadPersistedRawStudioState(
+  storage: RawStudioStorage = window.localStorage,
+): RawStudioState {
+  const fallback = createDefaultRawStudioState();
+  try {
+    const serialized = storage.getItem(RAW_STUDIO_STORAGE_KEY);
+    if (!serialized) return fallback;
+    const parsed: unknown = JSON.parse(serialized);
+    const merged = mergePersistedValue(fallback, parsed);
+    // Upgrade the first bloom defaults without overwriting values the user has
+    // already customized away from that initial combination.
+    if (
+      merged.output.post.bloomStrength === 0.72
+      && merged.output.post.bloomRadius === 2.8
+      && merged.output.post.bloomThreshold === 0.52
+    ) {
+      merged.output.post.bloomStrength = fallback.output.post.bloomStrength;
+      merged.output.post.bloomRadius = fallback.output.post.bloomRadius;
+      merged.output.post.bloomThreshold = fallback.output.post.bloomThreshold;
+    }
+    return merged;
+  } catch {
+    return fallback;
+  }
+}
+
+export function persistRawStudioState(
+  state: Readonly<RawStudioState>,
+  storage: RawStudioStorage = window.localStorage,
+): boolean {
+  try {
+    storage.setItem(RAW_STUDIO_STORAGE_KEY, JSON.stringify(state));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function applyRawScenePreset(
   state: RawStudioState,
   presetId: RawScenePresetId,
@@ -258,11 +412,48 @@ export function applyRawScenePreset(
   // Material changes must never replace the locked two-cube Axis identity.
   next.geometry.mode = "closed-optical-solid";
   next.geometry.bevelEnabled = preset.materialMode === "prism";
+  if (preset.id === "matte-chromatic") {
+    next.geometry.bevelWidth = 0.042;
+    next.geometry.bevelSegments = 5;
+    next.geometry.bevelCurvature = 0.78;
+  }
   if (preset.materialMode === "prism") {
     next.geometry.axisFamily = "30deg";
     next.geometry.variation = "30-v1";
   }
   next.lighting = cloneLightingPreset(preset.lightingPreset);
+  if (preset.id === "prism-optical-cut") {
+    next.geometry.bevelEnabled = true;
+    next.geometry.bevelWidth = 0.03;
+    next.geometry.bevelSegments = 8;
+    next.geometry.bevelCurvature = 0.78;
+    next.geometry.edgeRoughness = 0.045;
+    next.geometry.edgeHighlightStrength = 1.28;
+    next.output.post.exposure = 0.72;
+    next.output.post.bloomEnabled = true;
+    next.output.post.bloomStrength = 0.34;
+    next.output.post.bloomRadius = 1.55;
+    next.output.post.bloomThreshold = 0.86;
+  }
+  if (preset.id === "matte-reference") {
+    next.output.post.exposure = 1.04;
+    next.output.post.bloomStrength = 0.24;
+    next.output.post.bloomRadius = 1.25;
+    next.output.post.bloomThreshold = 0.9;
+  }
+  if (preset.id === "matte-chromatic") {
+    next.output.post.exposure = 0.88;
+    next.output.post.bloomStrength = 0.62;
+    next.output.post.bloomRadius = 2.2;
+    next.output.post.bloomThreshold = 0.5;
+  }
+  if (preset.id === "matte-amber-flow") {
+    next.output.post.exposure = 0.76;
+    next.output.post.bloomEnabled = true;
+    next.output.post.bloomStrength = 0.78;
+    next.output.post.bloomRadius = 2.55;
+    next.output.post.bloomThreshold = 0.46;
+  }
   if (preset.id === "prism-pleos-blue") {
     const warmCard = next.lighting.cards[2];
     const coolCard = next.lighting.cards[3];
@@ -293,6 +484,11 @@ export function applyRawMaterialPreset(
     next.material.matte = cloneMatte(id);
     next.geometry.mode = "closed-optical-solid";
     next.geometry.bevelEnabled = false;
+    if (id === "matte-chromatic") {
+      next.geometry.bevelWidth = 0.042;
+      next.geometry.bevelSegments = 5;
+      next.geometry.bevelCurvature = 0.78;
+    }
   } else {
     const id = presetId as PrismPresetId;
     next.material.mode = "prism";
@@ -302,6 +498,13 @@ export function applyRawMaterialPreset(
     next.geometry.bevelEnabled = true;
     next.geometry.axisFamily = "30deg";
     next.geometry.variation = "30-v1";
+    if (id === "prism-optical-cut") {
+      next.geometry.bevelWidth = 0.03;
+      next.geometry.bevelSegments = 8;
+      next.geometry.bevelCurvature = 0.78;
+      next.geometry.edgeRoughness = 0.045;
+      next.geometry.edgeHighlightStrength = 1.28;
+    }
   }
   return next;
 }

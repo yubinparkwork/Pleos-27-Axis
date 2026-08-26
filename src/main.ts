@@ -1,19 +1,20 @@
 import "./style.css";
 import {
   RawStudioApp,
-  createDefaultRawStudioState,
+  loadPersistedRawStudioState,
+  persistRawStudioState,
   type RawStudioStatus,
 } from "./studio";
 import { LegacyArchiveView } from "./studio/ui/LegacyArchiveView";
 import {
-  RawStudioRendererController,
-  type RawRendererStatus,
-} from "./raw-webgl/renderer";
+  ThreeStudioRendererController,
+  type EngineRendererStatus,
+} from "./engine";
 
 const root = document.querySelector<HTMLElement>("#app");
 if (!root) throw new Error("Missing #app root");
 
-function studioStatus(status: RawRendererStatus): RawStudioStatus {
+function studioStatus(status: EngineRendererStatus): RawStudioStatus {
   return {
     renderer: status.renderer,
     gpuPreference: status.gpuPreference,
@@ -36,11 +37,11 @@ const rendererRoute = new URLSearchParams(window.location.search).get("renderer"
 if (rendererRoute === "legacy") {
   new LegacyArchiveView(root);
 } else {
-  const initialState = createDefaultRawStudioState();
+  const initialState = loadPersistedRawStudioState();
   let studio: RawStudioApp | null = null;
 
-  const controller = new RawStudioRendererController({
-    initialState,
+  const controller = new ThreeStudioRendererController({
+    state: initialState,
     onStatus: (status) => studio?.setStatus(studioStatus(status)),
     onError: (error) => studio?.setStatus({
       message: error.message,
@@ -54,12 +55,14 @@ if (rendererRoute === "legacy") {
     },
   });
 
-  studio = new RawStudioApp(root, controller, initialState);
+  studio = new RawStudioApp(root, controller, initialState, (state) => {
+    persistRawStudioState(state);
+  });
   studio.setStatus(studioStatus(controller.instance?.inspectStatus() ?? {
-    renderer: "Raw WebGL2",
-    gpuPreference: "Unavailable",
-    hdrEnabled: false,
-    floatColorBuffer: false,
+    renderer: "Three.js WebGPU",
+    gpuPreference: "WebGPU 우선 · WebGL2 자동 폴백",
+    hdrEnabled: true,
+    floatColorBuffer: true,
     maxTextureSize: null,
     maxRenderbufferSize: null,
     maxSamples: null,
@@ -67,11 +70,29 @@ if (rendererRoute === "legacy") {
     frameTimeMs: null,
     contextLost: false,
     effectiveGeometryMode: null,
-    message: "Raw WebGL2 renderer initialization pending.",
+    message: "Three.js WebGPU 렌더러 초기화를 기다리고 있습니다.",
     level: "warning",
   }));
 
+  const handleAnimationShortcut = (event: KeyboardEvent): void => {
+    if (event.code !== "Space" || event.repeat || !studio) return;
+    const target = event.target;
+    if (
+      target instanceof HTMLInputElement
+      || target instanceof HTMLTextAreaElement
+      || target instanceof HTMLSelectElement
+      || (target instanceof HTMLElement && target.isContentEditable)
+    ) return;
+    event.preventDefault();
+    const nextState = studio.getState();
+    nextState.engine.animationPaused = !nextState.engine.animationPaused;
+    nextState.material.matte.texture.animationPaused = nextState.engine.animationPaused;
+    studio.setState(nextState, { path: "engine.animationPaused", reason: "control" });
+  };
+  window.addEventListener("keydown", handleAnimationShortcut);
+
   window.addEventListener("beforeunload", () => {
+    window.removeEventListener("keydown", handleAnimationShortcut);
     studio?.destroy();
     controller.dispose();
   }, { once: true });

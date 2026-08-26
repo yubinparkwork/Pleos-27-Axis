@@ -42,7 +42,9 @@ export const PLEOS_30_VARIATION_1: AxisGeometryPreset = Object.freeze({
     {
       id: "cube-right" as const,
       directionsDeg: [90, 30, -30] as const,
-      depthSigns: [1, -1, 1] as const,
+      // The shared node is the visible 30-degree crease vertex: the two
+      // incident side faces and all three identity edges read at the junction.
+      depthSigns: [-1, 1, -1] as const,
     },
     {
       id: "cube-left" as const,

@@ -5,10 +5,15 @@ in vec2 vUv;
 layout(location = 0) out vec4 outColor;
 
 uniform sampler2D uSource;
+uniform sampler2D uBloom;
 uniform float uExposure;
 uniform float uContrast;
 uniform float uWhitePoint;
 uniform float uBlackLift;
+uniform int uBloomEnabled;
+uniform float uBloomStrength;
+uniform float uBloomRadius;
+uniform float uBloomThreshold;
 uniform int uToneMapping;
 uniform float uDitherStrength;
 
@@ -18,7 +23,8 @@ uniform float uDitherStrength;
 
 void main() {
   vec4 source = texture(uSource, vUv);
-  vec3 color = source.rgb * exp2(uExposure);
+  vec3 bloom = uBloomEnabled == 1 ? texture(uBloom, vUv).rgb * max(uBloomStrength, 0.0) : vec3(0.0);
+  vec3 color = (source.rgb + bloom) * exp2(uExposure);
   color = uToneMapping == 1 ? acesFitted(color) : neutralToneMap(color, uWhitePoint);
   color = (color - 0.5) * uContrast + 0.5 + uBlackLift;
   color = linearToSrgb(max(color, vec3(0.0)));
