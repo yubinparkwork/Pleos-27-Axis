@@ -1,6 +1,16 @@
 :root {
-  --control-panel-width: 348px;
+  --control-panel-width: 380px;
   --ui-accent: #2350ff;
+  --ui-bg: #111214;
+  --ui-panel: #17181b;
+  --ui-surface: #202126;
+  --ui-surface-hover: #282a30;
+  --ui-border: rgba(255,255,255,.09);
+  --ui-text: #f1f2f4;
+  --ui-text-muted: #969aa3;
+  --ui-danger: #ff5d69;
+  --ui-radius: 8px;
+  --ui-space: 8px;
   color-scheme: dark;
   font-family: Inter, "Helvetica Neue", Arial, sans-serif;
   background: #050607;
@@ -8,6 +18,110 @@
   font-synthesis: none;
   text-rendering: geometricPrecision;
 }
+
+/* Motion Studio V1 ------------------------------------------------------- */
+.motion-studio { background: var(--ui-bg); }
+.motion-studio .pasteboard {
+  position: absolute; inset: 56px var(--control-panel-width) 48px 0; display: grid; place-items: center;
+  overflow: hidden; background: radial-gradient(circle at 45% 38%, #202228, #101114 68%);
+  transition: right .2s ease;
+}
+.motion-studio .artboard-shell {
+  position: relative; min-width: 120px; min-height: 120px; overflow: hidden; background: #050607;
+  border: 1px solid rgba(255,255,255,.16); box-shadow: 0 22px 70px rgba(0,0,0,.48);
+}
+.motion-studio .artboard-shell.transparent { background-color: #111; background-image: linear-gradient(45deg,#18191d 25%,transparent 25%),linear-gradient(-45deg,#18191d 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#18191d 75%),linear-gradient(-45deg,transparent 75%,#18191d 75%); background-size: 18px 18px; background-position: 0 0,0 9px,9px -9px,-9px 0; }
+.motion-studio .crystal-stage { position: absolute; inset: 0; cursor: grab; }
+.motion-studio .artboard-meta { position: absolute; z-index: 4; left: 28px; top: 18px; display: flex; gap: 10px; align-items: center; color: var(--ui-text-muted); font-size: 12px; }
+.motion-studio .artboard-meta b { color: rgba(255,255,255,.7); font-weight: 500; font-variant-numeric: tabular-nums; }
+.motion-studio .safe-guide { position: absolute; z-index: 4; inset: 5%; display: none; border: 1px solid rgba(255,255,255,.28); pointer-events: none; }
+.motion-studio .safe-guide.visible { display: block; }
+.motion-studio .topbar { inset: 0 var(--control-panel-width) auto 0; height: 56px; padding: 0 22px; background: #141518; border-bottom: 1px solid var(--ui-border); }
+.motion-studio .wordmark { letter-spacing: 0; gap: 10px; }
+.motion-studio .wordmark strong { font-size: 13px; }
+.motion-studio .wordmark span, .motion-studio .render-status { font-size: 12px; letter-spacing: 0; text-transform: none; }
+.motion-studio .render-status::before { background: #67d591; box-shadow: none; }
+.motion-studio .control-dock { width: var(--control-panel-width); padding: 0; background: var(--ui-panel); border-left: 1px solid var(--ui-border); box-shadow: -12px 0 34px rgba(0,0,0,.2); }
+.motion-studio .inspector-header { position: sticky; z-index: 4; top: 0; height: 56px; padding: 0 16px; display: flex; align-items: center; gap: 8px; background: var(--ui-panel); border-bottom: 1px solid var(--ui-border); }
+.motion-studio .inspector-header > div { flex: 1; display: flex; justify-content: space-between; align-items: baseline; }
+.motion-studio .inspector-header strong { font-size: 15px; font-weight: 600; }
+.motion-studio .inspector-header span { color: #67d591; font-size: 11px; }
+.motion-studio .inspector-header button { width: 30px; height: 30px; border: 0; border-radius: 6px; color: var(--ui-text-muted); background: transparent; cursor: pointer; }
+.motion-studio .inspector-header button:hover { color: var(--ui-text); background: var(--ui-surface-hover); }
+.motion-studio .inspector-tabs { position: sticky; z-index: 3; top: 56px; height: 42px; padding: 0 10px; display: grid; grid-template-columns: repeat(5,1fr); background: var(--ui-panel); border-bottom: 1px solid var(--ui-border); }
+.motion-studio .inspector-tabs button { position: relative; border: 0; color: #858a94; background: transparent; cursor: pointer; font-size: 11px; letter-spacing: 0; }
+.motion-studio .inspector-tabs button.active { color: var(--ui-text); }
+.motion-studio .inspector-tabs button.active::after { content: ""; position: absolute; inset: auto 8px 0; height: 2px; background: var(--ui-accent); }
+.motion-studio .inspector-views { padding: 0 16px 28px; }
+.motion-studio .studio-section { padding: 22px 0; border-bottom: 1px solid var(--ui-border); }
+.motion-studio .studio-section > header { margin-bottom: 14px; }
+.motion-studio .studio-section h2 { margin: 0; color: var(--ui-text); font-size: 14px; font-weight: 600; }
+.motion-studio .studio-section header p { margin: 5px 0 0; color: var(--ui-text-muted); font-size: 12px; line-height: 1.45; }
+.motion-studio .property-row { min-height: 36px; display: grid; grid-template-columns: 108px minmax(70px,1fr) 68px; gap: 10px; align-items: center; }
+.motion-studio .property-row label, .motion-studio .select-row span { color: #b5b8bf; font-size: 12px; }
+.motion-studio input[type="range"] { min-width: 0; width: 100%; accent-color: var(--ui-accent); }
+.motion-studio input[type="number"], .motion-studio select, .motion-studio .dimension-grid input { width: 100%; height: 30px; padding: 0 8px; border: 1px solid var(--ui-border); border-radius: 6px; outline: none; color: var(--ui-text); background: var(--ui-surface); font-size: 12px; font-variant-numeric: tabular-nums; }
+.motion-studio input:focus, .motion-studio select:focus { border-color: var(--ui-accent); box-shadow: 0 0 0 2px rgba(35,80,255,.2); }
+.motion-studio .axis-status { display: grid; grid-template-columns: 1fr auto; gap: 10px 16px; padding: 14px; border-radius: var(--ui-radius); background: var(--ui-surface); font-size: 12px; }
+.motion-studio .axis-status span { color: var(--ui-text-muted); }
+.motion-studio .axis-status b { font-weight: 500; color: #d9dbe0; }
+.motion-studio .segmented { padding: 3px; display: grid; grid-template-columns: repeat(3,1fr); gap: 3px; border-radius: var(--ui-radius); background: #111216; }
+.motion-studio .segmented button, .motion-studio .button-grid button, .motion-studio .wide-button { min-height: 34px; border: 1px solid transparent; border-radius: 6px; color: var(--ui-text-muted); background: transparent; cursor: pointer; font-size: 12px; }
+.motion-studio .segmented button.active { color: white; background: var(--ui-surface-hover); }
+.motion-studio .button-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; margin-top: 12px; }
+.motion-studio .button-grid button, .motion-studio .wide-button { border-color: var(--ui-border); background: var(--ui-surface); }
+.motion-studio .wide-button { width: 100%; margin-top: 8px; }
+.motion-studio .wide-button:hover, .motion-studio .button-grid button:hover { color: white; background: var(--ui-surface-hover); }
+.motion-studio .wide-button.primary { color: white; border-color: var(--ui-accent); background: var(--ui-accent); }
+.motion-studio .toggle-row, .motion-studio .select-row { min-height: 38px; display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #b5b8bf; font-size: 12px; }
+.motion-studio .toggle-row input { accent-color: var(--ui-accent); }
+.motion-studio .primary-toggle { margin-bottom: 8px; padding: 0 10px; border-radius: 7px; background: rgba(35,80,255,.09); }
+.motion-studio .select-row select { width: 190px; }
+.motion-studio .dimension-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0; }
+.motion-studio .dimension-grid label { display: grid; grid-template-columns: 20px 1fr; align-items: center; gap: 5px; color: var(--ui-text-muted); font-size: 12px; }
+.motion-studio .export-summary { padding: 14px; display: flex; justify-content: space-between; border-radius: var(--ui-radius); background: var(--ui-surface); font-size: 12px; }
+.motion-studio .export-summary span { color: var(--ui-text-muted); }
+.motion-studio code { display: block; padding: 12px; overflow-wrap: anywhere; border-radius: var(--ui-radius); color: #c7cbd4; background: #101115; font: 11px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.motion-studio .empty-state { color: var(--ui-text-muted); font-size: 12px; }
+.motion-studio .advanced-drawer { position: absolute; z-index: 8; inset: 0; padding: 0 16px 30px; overflow-y: auto; background: var(--ui-panel); }
+.motion-studio .advanced-drawer > header { position: sticky; top: 0; z-index: 2; height: 56px; display: flex; align-items: center; justify-content: space-between; background: var(--ui-panel); border-bottom: 1px solid var(--ui-border); }
+.motion-studio .advanced-drawer > header button { width: 30px; height: 30px; border: 0; color: var(--ui-text-muted); background: transparent; cursor: pointer; }
+.motion-studio .render-quality-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.motion-studio .render-quality-grid button { min-height: 52px; padding: 7px 10px; border: 1px solid var(--ui-border); border-radius: 7px; color: var(--ui-text); background: var(--ui-surface); cursor: pointer; }
+.motion-studio .render-quality-grid button:last-child { border-color: rgba(35,80,255,.7); background: rgba(35,80,255,.13); }
+.motion-studio .render-quality-grid button:hover { background: var(--ui-surface-hover); }
+.motion-studio .render-quality-grid button.active { border-color: var(--ui-accent); background: var(--ui-accent); }
+.motion-studio .render-quality-grid button:disabled, .motion-studio .wide-button:disabled { cursor: default; opacity: .38; }
+.motion-studio .render-quality-grid strong, .motion-studio .render-quality-grid span { display: block; }
+.motion-studio .render-quality-grid strong { font-size: 12px; font-weight: 600; }
+.motion-studio .render-quality-grid span { margin-top: 4px; color: var(--ui-text-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.motion-studio .render-quality-grid button.active span { color: rgba(255,255,255,.72); }
+.motion-studio .render-region-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0 12px; }
+.motion-studio .render-region-actions button { height: 32px; border: 1px solid var(--ui-border); border-radius: 6px; color: var(--ui-text-muted); background: var(--ui-surface); cursor: pointer; font-size: 12px; }
+.motion-studio .render-region-actions button:hover { color: var(--ui-text); background: var(--ui-surface-hover); }
+.motion-studio .unit-value { width: 190px; display: grid; grid-template-columns: 1fr 28px; align-items: center; }
+.motion-studio .unit-value i, .motion-studio .motion-region-grid i { color: var(--ui-text-muted); font-size: 11px; font-style: normal; text-align: right; }
+.motion-studio .motion-region-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.motion-studio .motion-region-grid label { display: grid; grid-template-columns: 20px 1fr 22px; align-items: center; gap: 5px; color: var(--ui-text-muted); font-size: 12px; }
+.motion-studio .motion-region-grid input { min-width: 0; width: 100%; height: 30px; padding: 0 8px; border: 1px solid var(--ui-border); border-radius: 6px; outline: none; color: var(--ui-text); background: var(--ui-surface); font-size: 12px; font-variant-numeric: tabular-nums; }
+.motion-studio .region-help { margin: 10px 0 0; color: var(--ui-text-muted); font-size: 11px; line-height: 1.5; }
+.motion-studio .render-region-guide { display: none; border-color: rgba(70,100,255,.85); box-shadow: 0 0 0 9999px rgba(0,0,0,.16), inset 0 0 0 1px rgba(0,0,0,.2); }
+.motion-studio .render-region-guide.active { display: block; }
+.motion-studio .render-region-guide::before, .motion-studio .render-region-guide::after { border-color: #6f89ff; }
+.motion-studio .render-region-guide span { color: #a9b8ff; background: rgba(12,14,24,.88); }
+.motion-studio .motion-transport { position: absolute; z-index: 6; inset: auto var(--control-panel-width) 0 0; height: 48px; padding: 0 16px; display: grid; grid-template-columns: auto 150px 1fr auto auto; gap: 14px; align-items: center; background: #15161a; border-top: 1px solid var(--ui-border); transition: right .2s ease; }
+.motion-studio .motion-transport.disabled { opacity: .48; }
+.motion-studio .transport-buttons { display: flex; gap: 3px; }
+.motion-studio .transport-buttons button { width: 30px; height: 30px; border: 0; border-radius: 6px; color: #c8cbd1; background: var(--ui-surface); cursor: pointer; }
+.motion-studio .transport-buttons .play-button { color: white; background: var(--ui-accent); }
+.motion-studio .motion-transport time, .motion-studio .motion-transport label, .motion-studio .motion-transport span { color: var(--ui-text-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.motion-studio .pathtrace-canvas, .motion-studio .preview-canvas { inset: 0; width: 100%; height: 100%; opacity: 0; }
+.motion-studio canvas.visible, .motion-studio .preview-canvas { opacity: 1; }
+.motion-studio .pathtrace-canvas.visible { opacity: 1; z-index: 3; }
+.motion-studio.controls-hidden .pasteboard { right: 0; }
+.motion-studio.controls-hidden .topbar, .motion-studio.controls-hidden .motion-transport { right: 0; }
+.motion-studio .inspector-toggle { z-index: 10; }
+@media (max-width: 900px) { :root { --control-panel-width: min(380px,88vw); } .motion-studio .property-row { grid-template-columns: 100px 1fr 64px; } }
 
 * { box-sizing: border-box; }
 html, body, #app { width: 100%; height: 100%; margin: 0; overflow: hidden; }
@@ -477,3 +591,24 @@ input[type="range"]:focus::-webkit-slider-thumb, input[type="range"]:active::-we
   .inspector-view { padding-inline: 12px; }
   .inspector-tabs button { font-size: 6px; }
 }
+
+/* SPECTRAL FLOW Look ---------------------------------------------------- */
+.motion-studio .look-segmented { grid-template-columns: repeat(4, 1fr); }
+.motion-studio .look-segmented button { min-width: 0; padding-inline: 4px; font-size: 10px; }
+.motion-studio [hidden] { display: none !important; }
+.motion-studio .spectral-flow-controls { position: relative; }
+.motion-studio .spectral-flow-controls::before {
+  content: "REALTIME RASTER";
+  position: absolute; z-index: 1; top: 22px; right: 0;
+  color: rgba(119,148,255,.82); font-size: 8px; font-weight: 650; letter-spacing: .11em;
+}
+.motion-studio .spectral-preset-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+.motion-studio .spectral-preset-grid button {
+  height: 31px; border: 1px solid rgba(255,255,255,.1); border-radius: 6px;
+  color: rgba(255,255,255,.52); background: rgba(255,255,255,.035); cursor: pointer;
+  font-size: 9px; font-weight: 650; letter-spacing: .06em;
+}
+.motion-studio .spectral-preset-grid button:hover { color: #fff; border-color: rgba(255,255,255,.25); }
+.motion-studio .spectral-preset-grid button.active { color: #fff; border-color: #4664ff; background: #2350ff; }
+.motion-studio .spectral-flow-controls .studio-section > header h2 { letter-spacing: .08em; }
+.motion-studio .spectral-flow-controls .select-row select { width: min(190px, 58%); }

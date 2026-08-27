@@ -1,6 +1,6 @@
-export type InspectorTab = "object" | "material" | "light" | "render" | "export";
+export type InspectorTab = "setup" | "look" | "motion" | "format" | "export" | "object" | "material" | "light" | "render";
 
-const TABS: InspectorTab[] = ["object", "material", "light", "render", "export"];
+const TABS: InspectorTab[] = ["setup", "look", "motion", "format", "export"];
 
 export class InspectorPanel {
   private readonly appRoot: HTMLElement;
@@ -15,7 +15,7 @@ export class InspectorPanel {
     this.dock = this.require<HTMLElement>(".control-dock");
     this.toggleButton = this.require<HTMLButtonElement>("[data-action='inspector-toggle']");
     this.onStateChange = onStateChange;
-    this.activeTab = TABS.includes(activeTab) ? activeTab : "material";
+    this.activeTab = TABS.includes(activeTab) ? activeTab : "motion";
     this.collapsed = collapsed;
     this.dock.querySelectorAll<HTMLButtonElement>("[data-inspector-tab]").forEach((button) => {
       button.addEventListener("click", () => this.setTab(button.dataset.inspectorTab as InspectorTab));
@@ -33,6 +33,9 @@ export class InspectorPanel {
   }
 
   toggle(): void { this.setCollapsed(!this.collapsed); }
+
+  get tab(): InspectorTab { return this.activeTab; }
+  get isCollapsed(): boolean { return this.collapsed; }
 
   setCollapsed(value: boolean): void {
     this.collapsed = value; this.apply(); this.onStateChange(this.activeTab, this.collapsed);

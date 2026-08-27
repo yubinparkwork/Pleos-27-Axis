@@ -1,0 +1,713 @@
+{
+  "project": "PLEOS 27 Axis",
+  "generatedAt": "2026-08-27T08:46:15.465Z",
+  "git": {
+    "root": ".",
+    "projectPath": ".",
+    "branch": "main",
+    "commit": "3376dc2bdcb60b676b85aa93be9bff462275dd14",
+    "remote": "https://github.com/yubinparkwork/Pleos-27-Axis.git",
+    "dirtyBeforeHandoff": true,
+    "changedBeforeHandoff": [
+      {
+        "status": "M",
+        "file": ".gitignore"
+      },
+      {
+        "status": "M",
+        "file": "PROGRESS.md"
+      },
+      {
+        "status": "M",
+        "file": "README.md"
+      },
+      {
+        "status": "M",
+        "file": "package.json"
+      },
+      {
+        "status": "M",
+        "file": "scripts/verify-pathtracer.mjs"
+      },
+      {
+        "status": "M",
+        "file": "src/crystal/CrystalApp.css"
+      },
+      {
+        "status": "M",
+        "file": "src/crystal/CrystalAssembly.ts"
+      },
+      {
+        "status": "M",
+        "file": "src/crystal/InspectorPanel.ts"
+      },
+      {
+        "status": "M",
+        "file": "src/crystal/LightingSystem.ts"
+      },
+      {
+        "status": "M",
+        "file": "src/crystal/StudioEnvironment.ts"
+      },
+      {
+        "status": "M",
+        "file": "src/main.ts"
+      },
+      {
+        "status": "??",
+        "file": "AGENTS.md"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/latest/preview-4x5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/latest/preview-9x16.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/latest/preview-main.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/latest/runtime-state.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/motion-v1/after/artboard-4x5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/motion-v1/after/artboard-9x16.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/motion-v1/after/current-frame-high-quality.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/motion-v1/after/explode-rejoin.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/motion-v1/after/inspector-hidden.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/motion-v1/after/motion-off-prism.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/motion-v1/after/motion-studio-final.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/motion-v1/after/panel-export.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/motion-v1/after/panel-format.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/motion-v1/after/panel-look.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/motion-v1/after/panel-motion.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/motion-v1/after/panel-setup.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/motion-v1/after/render-region-restored.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/motion-v1/after/render-tools-restored.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/motion-v1/after/sequence-smoke/frame-000000.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/motion-v1/after/sequence-smoke/frame-000001.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/motion-v1/after/sequence-smoke/frame-000002.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/motion-v1/after/shared-vertex-pulse.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/motion-v1/after/spectral-axis-sweep.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/motion-v1/before/current-replaced-site.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/motion-v1/before/prism-static.png"
+      },
+      {
+        "status": "??",
+        "file": "docs/AI_HANDOFF.md"
+      },
+      {
+        "status": "??",
+        "file": "docs/motion-v1-current-state.md"
+      },
+      {
+        "status": "??",
+        "file": "node_modules"
+      },
+      {
+        "status": "??",
+        "file": "scripts/capture-spectral-flow.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/render-motion-sequence.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/update-ai-handoff.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-motion-v1.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-retained-rendering.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-spectral-flow.mjs"
+      },
+      {
+        "status": "??",
+        "file": "src/artboard/ArtboardState.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/artboard/CompositionAdapter.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/artboard/FormatPresetRegistry.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/crystal/MotionStudioApp.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/crystal/PrismMotionAdapter.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/crystal/materials/SpectralFlowMaterial.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/crystal/ui/MotionPanel.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/crystal/ui/StudioPanel.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/crystal/ui/TransportBar.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/motion/MotionClock.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/motion/MotionEngine.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/motion/MotionPresetRegistry.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/motion/constraints/AxisConstraintService.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/motion/easing.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/motion/modules/ExplodeRejoinMotion.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/motion/modules/SharedVertexPulseMotion.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/motion/modules/SpectralAxisSweepMotion.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/motion/presets/explodeRejoin.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/motion/presets/sharedVertexPulse.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/motion/presets/spectralAxisSweep.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/motion/types.ts"
+      }
+    ]
+  },
+  "app": {
+    "entryPoint": "src/main.ts",
+    "defaultRoute": "/",
+    "activeApplication": "MotionStudioApp",
+    "renderer": "Three.js WebGLRenderer + three-gpu-pathtracer",
+    "previewRenderer": "Three.js raster + EffectComposer + UnrealBloomPass",
+    "projection": "orthographic",
+    "camera": {
+      "type": "OrthographicCamera",
+      "position": [
+        1.4695761589768238e-15,
+        7.347880794884119e-16,
+        -12
+      ],
+      "target": [
+        0,
+        0,
+        0
+      ],
+      "zoom": 1
+    },
+    "sceneStructure": "3 closed optical solids meeting at one shared vertex"
+  },
+  "runtime": {
+    "ready": true,
+    "project": "PLEOS 27 Axis",
+    "app": {
+      "entryPoint": "src/main.ts",
+      "defaultRoute": "/",
+      "activeApplication": "MotionStudioApp",
+      "renderer": "Three.js WebGLRenderer + three-gpu-pathtracer",
+      "previewRenderer": "Three.js raster + EffectComposer + UnrealBloomPass",
+      "projection": "orthographic",
+      "camera": {
+        "type": "OrthographicCamera",
+        "position": [
+          1.4695761589768238e-15,
+          7.347880794884119e-16,
+          -12
+        ],
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "zoom": 1
+      },
+      "sceneStructure": "3 closed optical solids meeting at one shared vertex"
+    },
+    "renderer": "Three.js + three-gpu-pathtracer",
+    "motion": {
+      "preset": "spectral-axis-sweep",
+      "enabled": true,
+      "playing": false,
+      "time": 3,
+      "frame": 90,
+      "duration": 6,
+      "fps": 30,
+      "seed": 27,
+      "patch": {
+        "solidPhase": [
+          0,
+          0.12,
+          0.24
+        ],
+        "originPulse": 0,
+        "spectralSweep": 0.49932760730744163,
+        "dispersionOffset": 0.039946208584595334,
+        "reflectionOffset": 0.016941599999999928,
+        "bloomOffset": 0.006776639999999971,
+        "lightRig": {
+          "whitePulse": 0.03764799999999984,
+          "spectralIntensity": 0.2746301840190929,
+          "direction": -90
+        },
+        "microRotation": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "motionPresets": [
+      {
+        "id": "spectral-axis-sweep",
+        "label": "Spectral Axis Sweep",
+        "duration": 6,
+        "constraint": "strict"
+      },
+      {
+        "id": "shared-vertex-pulse",
+        "label": "Shared Vertex Pulse",
+        "duration": 4,
+        "constraint": "strict"
+      },
+      {
+        "id": "explode-rejoin",
+        "label": "Explode & Rejoin",
+        "duration": 4.5,
+        "constraint": "anchored"
+      }
+    ],
+    "artboard": {
+      "id": "custom",
+      "width": 1080,
+      "height": 1080,
+      "fitMode": "contain",
+      "axisAnchor": {
+        "gridX": 0.5,
+        "gridY": 0.5
+      },
+      "scale": 0.82,
+      "background": "#050607",
+      "transparent": false,
+      "safeGuide": false,
+      "previewZoom": 1
+    },
+    "artboardPresets": [
+      {
+        "id": "square",
+        "label": "Square 1:1",
+        "width": 1080,
+        "height": 1080
+      },
+      {
+        "id": "instagram-portrait",
+        "label": "Instagram 4:5",
+        "width": 1080,
+        "height": 1350
+      },
+      {
+        "id": "portrait-3-4",
+        "label": "Portrait 3:4",
+        "width": 1080,
+        "height": 1440
+      },
+      {
+        "id": "landscape-16-9",
+        "label": "Landscape 16:9",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "id": "vertical-9-16",
+        "label": "Vertical 9:16",
+        "width": 1080,
+        "height": 1920
+      },
+      {
+        "id": "custom",
+        "label": "Custom",
+        "width": 1080,
+        "height": 1080
+      }
+    ],
+    "renderRegion": {
+      "enabled": false,
+      "x": 220,
+      "y": 300,
+      "width": 640,
+      "height": 480,
+      "unitPpi": 96
+    },
+    "export": {
+      "ppi": 300,
+      "rasterPng": true,
+      "pathTracedStill": true,
+      "fixedTimestepSequence": true,
+      "transparency": true
+    },
+    "pathTracing": {
+      "active": false,
+      "samples": 0,
+      "quality": null,
+      "output": null
+    },
+    "assembly": {
+      "look": "prism",
+      "supportedLooks": [
+        "clear",
+        "prism",
+        "spectral-flow",
+        "smoked"
+      ],
+      "renderStrategies": {
+        "clear": "path-traced-still+raster-preview",
+        "prism": "path-traced-still+raster-preview",
+        "spectral-flow": "high-resolution-raster",
+        "smoked": "path-traced-still+raster-preview"
+      },
+      "solids": 3,
+      "gap": 0,
+      "bevelRadius": 0.018,
+      "sharedCorner": [
+        0,
+        0,
+        0
+      ],
+      "cornerPositions": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "projectedAxisAngles": [
+        30,
+        90,
+        150,
+        210,
+        270,
+        330
+      ],
+      "linePrimitives": 0,
+      "material": [
+        {
+          "ior": 1.52,
+          "transmission": 0.96,
+          "roughness": 0.04,
+          "thickness": 2.45,
+          "dispersion": 0.19994620858459533
+        },
+        {
+          "ior": 1.52,
+          "transmission": 0.96,
+          "roughness": 0.04,
+          "thickness": 2.45,
+          "dispersion": 0.19994620858459533
+        },
+        {
+          "ior": 1.52,
+          "transmission": 0.96,
+          "roughness": 0.04,
+          "thickness": 2.45,
+          "dispersion": 0.19994620858459533
+        }
+      ],
+      "spectralFlow": {
+        "preset": "balanced",
+        "flowPosition": 0,
+        "flowDirection": "axis-30",
+        "flowSpeed": 0.82,
+        "flowWidth": 0.66,
+        "flowSoftness": 0.58,
+        "spectrumSpread": 0.92,
+        "spectrumSeparation": 0.42,
+        "saturation": 1.04,
+        "spectralLag": 0.13,
+        "coreIntensity": 2.15,
+        "coreWidth": 0.19,
+        "falloff": 1.65,
+        "edgeAttraction": 1.18,
+        "reflection": 1.38,
+        "darkness": 0.47,
+        "bloom": 0.42
+      }
+    },
+    "sharedVertexValid": true,
+    "inspector": {
+      "tabs": [
+        "setup",
+        "look",
+        "motion",
+        "format",
+        "export"
+      ],
+      "advancedDrawer": true
+    },
+    "storageVersion": 2
+  },
+  "axis": {
+    "family": "30deg",
+    "sharedOrigin": true,
+    "projectionAngles": [
+      30,
+      90,
+      150,
+      210,
+      270,
+      330
+    ]
+  },
+  "artboard": {
+    "id": "square",
+    "width": 1080,
+    "height": 1080,
+    "fitMode": "contain",
+    "axisAnchor": {
+      "gridX": 0.5,
+      "gridY": 0.5
+    },
+    "scale": 0.82,
+    "background": "#050607",
+    "transparent": false,
+    "safeGuide": false,
+    "previewZoom": 1
+  },
+  "looks": [
+    "clear",
+    "prism",
+    "spectral-flow",
+    "smoked"
+  ],
+  "motionPresets": [
+    {
+      "id": "spectral-axis-sweep",
+      "label": "Spectral Axis Sweep",
+      "duration": 6,
+      "constraint": "strict"
+    },
+    {
+      "id": "shared-vertex-pulse",
+      "label": "Shared Vertex Pulse",
+      "duration": 4,
+      "constraint": "strict"
+    },
+    {
+      "id": "explode-rejoin",
+      "label": "Explode & Rejoin",
+      "duration": 4.5,
+      "constraint": "anchored"
+    }
+  ],
+  "activeExpression": "prism",
+  "motion": {
+    "preset": "spectral-axis-sweep",
+    "enabled": true,
+    "playing": false,
+    "time": 3,
+    "frame": 90,
+    "duration": 6,
+    "fps": 30,
+    "seed": 27,
+    "patch": {
+      "solidPhase": [
+        0,
+        0.12,
+        0.24
+      ],
+      "originPulse": 0,
+      "spectralSweep": 0.49932760730744163,
+      "dispersionOffset": 0.039946208584595334,
+      "reflectionOffset": 0.016941599999999928,
+      "bloomOffset": 0.006776639999999971,
+      "lightRig": {
+        "whitePulse": 0.03764799999999984,
+        "spectralIntensity": 0.2746301840190929,
+        "direction": -90
+      },
+      "microRotation": [
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "previews": [
+    {
+      "id": "main",
+      "file": "artifacts/latest/preview-main.png",
+      "width": 1080,
+      "height": 1080,
+      "heroTime": 3,
+      "look": "prism",
+      "motionPreset": "spectral-axis-sweep"
+    },
+    {
+      "id": "4x5",
+      "file": "artifacts/latest/preview-4x5.png",
+      "width": 1080,
+      "height": 1350,
+      "heroTime": 3,
+      "look": "prism",
+      "motionPreset": "spectral-axis-sweep"
+    },
+    {
+      "id": "9x16",
+      "file": "artifacts/latest/preview-9x16.png",
+      "width": 1080,
+      "height": 1920,
+      "heroTime": 3,
+      "look": "prism",
+      "motionPreset": "spectral-axis-sweep"
+    }
+  ],
+  "validation": {
+    "typecheck": "pass",
+    "verify": "pass",
+    "build": "pass",
+    "browserConsole": "pass"
+  },
+  "validationRuns": [
+    {
+      "name": "typecheck",
+      "command": "npm run typecheck",
+      "status": "pass",
+      "durationMs": 1265,
+      "exitCode": 0,
+      "outputTail": "> pleos-27-axis@1.0.0 typecheck\n> tsc -b --pretty false"
+    },
+    {
+      "name": "verify",
+      "command": "npm run verify",
+      "status": "pass",
+      "durationMs": 59088,
+      "exitCode": 0,
+      "outputTail": "    \"physical-unit-input\",\n    \"ppi-print-output\"\n  ],\n  \"raster\": [\n    160,\n    120\n  ],\n  \"fastPath\": [\n    160,\n    120\n  ]\n}"
+    },
+    {
+      "name": "build",
+      "command": "npm run build",
+      "status": "pass",
+      "durationMs": 2670,
+      "exitCode": 0,
+      "outputTail": "dist/assets/LegacyArchiveView-CxfvYwCh.js    0.71 kB │ gzip:   0.41 kB\ndist/assets/index-C1ODiNjH.js                3.66 kB │ gzip:   1.62 kB\ndist/assets/index-Bgm4ANIy.js               33.37 kB │ gzip:   9.99 kB\ndist/assets/index-BJOUBGGp.js              119.59 kB │ gzip:  33.76 kB\ndist/assets/MotionStudioApp-BXpZhwNg.js    844.28 kB │ gzip: 221.56 kB\n✓ built in 1.08s\n\n\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit."
+    }
+  ],
+  "browser": {
+    "url": "http://127.0.0.1:5173/",
+    "consoleErrors": []
+  }
+}

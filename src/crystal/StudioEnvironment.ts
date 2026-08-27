@@ -42,7 +42,10 @@ export function installStudioEnvironment(scene: THREE.Scene): PathTracingStudioE
   });
   const rearGeometry = new THREE.PlaneGeometry(24, 15);
   const rear = new THREE.Mesh(rearGeometry, rearMaterial);
-  rear.position.set(0, 1.6, -5.2);
+  // The main camera lives at -Z and looks toward +Z. Keep the cyclorama
+  // behind the object from that view and face its front side toward camera.
+  rear.position.set(0, 1.6, 5.2);
+  rear.rotation.y = Math.PI;
   objects.push(rear);
   resources.push(rearGeometry, rearMaterial);
 

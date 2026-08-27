@@ -1,9 +1,25 @@
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
+import { createSpectralFlowState, SpectralFlowMaterial, type SpectralFlowState } from "./materials/SpectralFlowMaterial";
 
-export type CrystalLook = "clear" | "prism" | "smoked";
+export const CRYSTAL_LOOKS = ["clear", "prism", "spectral-flow", "smoked"] as const;
+export type CrystalLook = (typeof CRYSTAL_LOOKS)[number];
+export const CRYSTAL_LOOK_RENDER_STRATEGY: Readonly<Record<CrystalLook, "path-traced-still+raster-preview" | "high-resolution-raster">> = {
+  clear: "path-traced-still+raster-preview",
+  prism: "path-traced-still+raster-preview",
+  "spectral-flow": "high-resolution-raster",
+  smoked: "path-traced-still+raster-preview",
+};
+type PhysicalCrystalLook = Exclude<CrystalLook, "spectral-flow">;
 type CrystalMaterial = THREE.MeshPhysicalMaterial & { dispersion: number };
+
+export interface PrismRestPose {
+  gap: number;
+  scales: Array<[number, number, number]>;
+  rotations: Array<[number, number, number]>;
+  positions: Array<[number, number, number]>;
+}
 
 interface BasisDefinition {
   directions: [number, number, number];
@@ -21,7 +37,7 @@ const TOUCH_CORNERS: Array<[number, number, number]> = [
   [0, 1, 1],
 ];
 
-const LOOKS: Record<CrystalLook, {
+const LOOKS: Record<PhysicalCrystalLook, {
   color: number; attenuation: number; roughness: number; transmission: number;
   thickness: number; dispersion: number; iridescence: number;
   attenuationDistance: number; envMapIntensity: number;
@@ -31,7 +47,7 @@ const LOOKS: Record<CrystalLook, {
   smoked: { color: 0x9da5a4, attenuation: 0x25302f, roughness: 0.08, transmission: 0.82, thickness: 2.8, dispersion: 0.055, iridescence: 0.035, attenuationDistance: 1.25, envMapIntensity: 2.65 },
 };
 
-function makeOpticalMaterial(look: CrystalLook): CrystalMaterial {
+function makeOpticalMaterial(look: PhysicalCrystalLook): CrystalMaterial {
   const preset = LOOKS[look];
   const material = new THREE.MeshPhysicalMaterial({
     color: preset.color,
@@ -64,10 +80,12 @@ function makeBasis(definition: BasisDefinition, span: number): THREE.Vector3[] {
   });
 }
 
-function transformOpticalCube(definition: BasisDefinition, span: number): THREE.BufferGeometry {
+function transformOpticalCube(definition: BasisDefinition, span: number, bevelRadius: number): THREE.BufferGeometry {
   // Keep a physically useful micro bevel for optical highlights without
   // cutting a visible triangular void where the three contact vertices meet.
-  let geometry: THREE.BufferGeometry = new RoundedBoxGeometry(1, 1, 1, 10, 0.018);
+  let geometry: THREE.BufferGeometry = bevelRadius <= 1e-5
+    ? new THREE.BoxGeometry(1, 1, 1)
+    : new RoundedBoxGeometry(1, 1, 1, 10, bevelRadius);
   geometry.translate(0.5, 0.5, 0.5);
   geometry = mergeVertices(geometry, 1e-5);
 
@@ -138,22 +156,28 @@ function nearestGeometryVertex(geometry: THREE.BufferGeometry, target: THREE.Vec
 
 export class CrystalAssembly extends THREE.Group {
   private readonly materials: CrystalMaterial[] = [];
+  private readonly spectralMaterials: SpectralFlowMaterial[] = [];
   private readonly solids: THREE.Group[] = [];
+  private readonly meshes: THREE.Mesh[] = [];
+  private readonly span = 1.35;
   private look: CrystalLook = "prism";
   private gap = 0;
+  private bevelRadius = 0.018;
   private reflectionStrength = 1;
   private refractionStrength = 1;
 
   constructor() {
     super();
     this.name = "Pleos27AxisPathTracedSolids";
-    const span = 1.35;
-    const basis = makeBasis(CUBE_BASIS, span);
+    const basis = makeBasis(CUBE_BASIS, this.span);
     TOUCH_CORNERS.forEach((corner, index) => {
-      const material = makeOpticalMaterial(this.look);
-      const geometry = transformOpticalCube(CUBE_BASIS, span);
+      const material = makeOpticalMaterial("prism");
+      const spectralMaterial = new SpectralFlowMaterial(createSpectralFlowState());
+      const geometry = transformOpticalCube(CUBE_BASIS, this.span, this.bevelRadius);
+      const pivot = new THREE.Group();
+      pivot.name = `SharedVertexPivot${index + 1}`;
       const solid = new THREE.Group();
-      solid.name = `AxisCrystal${index + 1}`;
+      solid.name = `AxisCrystal${index + 1}Offset`;
       const idealTouchCorner = new THREE.Vector3()
         .addScaledVector(basis[0], corner[0])
         .addScaledVector(basis[1], corner[1])
@@ -166,17 +190,22 @@ export class CrystalAssembly extends THREE.Group {
       const projectedCenter = geometry.boundingBox?.getCenter(new THREE.Vector3()).add(basePosition)
         ?? basis.reduce((sum, vector) => sum.add(vector), new THREE.Vector3()).multiplyScalar(0.5).add(basePosition);
       const gapDirection = new THREE.Vector3(projectedCenter.x, projectedCenter.y, 0).normalize();
-      solid.userData.gapDirection = gapDirection;
-      solid.userData.basePosition = basePosition;
-      solid.userData.touchCorner = touchCorner;
+      pivot.userData.gapDirection = gapDirection;
+      pivot.userData.basePosition = new THREE.Vector3();
+      pivot.userData.touchCorner = touchCorner;
+      pivot.userData.offsetGroup = solid;
+      solid.position.copy(basePosition);
       const mesh = new THREE.Mesh(geometry, material);
       mesh.name = "ClosedOpticalSolid";
       mesh.castShadow = true;
       mesh.receiveShadow = true;
       solid.add(mesh);
       this.materials.push(material);
-      this.solids.push(solid);
-      this.add(solid);
+      this.spectralMaterials.push(spectralMaterial);
+      this.meshes.push(mesh);
+      this.solids.push(pivot);
+      pivot.add(solid);
+      this.add(pivot);
     });
   }
 
@@ -184,15 +213,93 @@ export class CrystalAssembly extends THREE.Group {
     this.gap = THREE.MathUtils.clamp(value, 0, 0.45);
     this.solids.forEach((solid) => {
       const direction = solid.userData.gapDirection as THREE.Vector3;
-      const basePosition = solid.userData.basePosition as THREE.Vector3;
-      solid.position.copy(basePosition).addScaledVector(direction, this.gap);
+      solid.position.copy(direction).multiplyScalar(this.gap);
     });
     this.updateMatrixWorld(true);
   }
 
+  setBevelRadius(value: number): void {
+    const next = THREE.MathUtils.clamp(value, 0, 0.15);
+    if (Math.abs(next - this.bevelRadius) < 1e-6) return;
+    this.bevelRadius = next;
+    const basis = makeBasis(CUBE_BASIS, this.span);
+
+    this.solids.forEach((pivot, index) => {
+      const mesh = this.meshes[index];
+      const offsetGroup = pivot.userData.offsetGroup as THREE.Group;
+      const geometry = transformOpticalCube(CUBE_BASIS, this.span, this.bevelRadius);
+      const corner = TOUCH_CORNERS[index];
+      const idealTouchCorner = new THREE.Vector3()
+        .addScaledVector(basis[0], corner[0])
+        .addScaledVector(basis[1], corner[1])
+        .addScaledVector(basis[2], corner[2]);
+      const touchCorner = nearestGeometryVertex(geometry, idealTouchCorner);
+      const basePosition = touchCorner.clone().negate();
+      const projectedCenter = geometry.boundingBox?.getCenter(new THREE.Vector3()).add(basePosition)
+        ?? basis.reduce((sum, vector) => sum.add(vector), new THREE.Vector3()).multiplyScalar(0.5).add(basePosition);
+
+      mesh.geometry.dispose();
+      mesh.geometry = geometry;
+      offsetGroup.position.copy(basePosition);
+      pivot.userData.touchCorner = touchCorner;
+      pivot.userData.gapDirection = new THREE.Vector3(projectedCenter.x, projectedCenter.y, 0).normalize();
+    });
+
+    // Re-apply the radial gap after each topology rebuild. At gap 0 every
+    // rebuilt rounded corner is realigned to the exact shared world vertex.
+    this.setGap(this.gap);
+  }
+
+  captureRestPose(): PrismRestPose {
+    return {
+      gap: this.gap,
+      scales: this.solids.map((solid) => solid.scale.toArray() as [number, number, number]),
+      rotations: this.solids.map((solid) => [solid.rotation.x, solid.rotation.y, solid.rotation.z]),
+      positions: this.solids.map((solid) => solid.position.toArray() as [number, number, number]),
+    };
+  }
+
+  applyRuntimeScale(values: [number, number, number]): void {
+    this.solids.forEach((solid, index) => solid.scale.setScalar(values[index]));
+    this.updateMatrixWorld(true);
+  }
+
+  applyRuntimeGap(value: number): void {
+    const runtimeGap = THREE.MathUtils.clamp(this.gap + value, 0, 0.65);
+    this.solids.forEach((solid) => {
+      const direction = solid.userData.gapDirection as THREE.Vector3;
+      solid.position.copy(direction).multiplyScalar(runtimeGap);
+    });
+    this.updateMatrixWorld(true);
+  }
+
+  applyRuntimeRotation(values: [number, number, number]): void {
+    this.solids.forEach((solid, index) => { solid.rotation.z = THREE.MathUtils.degToRad(values[index]); });
+    this.updateMatrixWorld(true);
+  }
+
+  restoreRestPose(restPose?: PrismRestPose): void {
+    if (restPose) this.gap = restPose.gap;
+    this.solids.forEach((solid, index) => {
+      solid.scale.fromArray(restPose?.scales[index] ?? [1, 1, 1]);
+      const rotation = restPose?.rotations[index] ?? [0, 0, 0];
+      solid.rotation.set(rotation[0], rotation[1], rotation[2]);
+    });
+    this.setGap(this.gap);
+  }
+
+  getSharedCornerPositions(): THREE.Vector3[] {
+    return this.solids.map((solid) => solid.getWorldPosition(new THREE.Vector3()));
+  }
+
   setLook(look: CrystalLook): void {
     this.look = look;
+    if (look === "spectral-flow") {
+      this.meshes.forEach((mesh, index) => { mesh.material = this.spectralMaterials[index]; });
+      return;
+    }
     const preset = LOOKS[look];
+    this.meshes.forEach((mesh, index) => { mesh.material = this.materials[index]; });
     this.materials.forEach((material) => {
       material.color.setHex(preset.color);
       material.attenuationColor.setHex(preset.attenuation);
@@ -219,7 +326,8 @@ export class CrystalAssembly extends THREE.Group {
   setOpticalLighting(reflectionStrength: number, refractionStrength: number): void {
     this.reflectionStrength = THREE.MathUtils.clamp(reflectionStrength, 0, 3);
     this.refractionStrength = THREE.MathUtils.clamp(refractionStrength, 0, 1.25);
-    const preset = LOOKS[this.look];
+    const physicalLook: PhysicalCrystalLook = this.look === "spectral-flow" ? "prism" : this.look;
+    const preset = LOOKS[physicalLook];
     this.materials.forEach((material) => {
       material.envMapIntensity = preset.envMapIntensity * this.reflectionStrength;
       material.transmission = THREE.MathUtils.clamp(preset.transmission * this.refractionStrength, 0, 1);
@@ -228,13 +336,28 @@ export class CrystalAssembly extends THREE.Group {
     });
   }
 
+  setSpectralFlowState(state: SpectralFlowState): void {
+    this.spectralMaterials.forEach((material) => material.setState(state));
+  }
+
+  setSpectralFlowRuntime(time: number, duration: number, motionEnabled: boolean, motionOffset = 0): void {
+    this.spectralMaterials.forEach((material) => material.setRuntime(time, duration, motionEnabled, motionOffset));
+  }
+
+  getSpectralFlowState(): SpectralFlowState {
+    return this.spectralMaterials[0]?.spectralState ?? createSpectralFlowState();
+  }
+
   inspect(): object {
     return {
       look: this.look,
+      supportedLooks: [...CRYSTAL_LOOKS],
+      renderStrategies: { ...CRYSTAL_LOOK_RENDER_STRATEGY },
       solids: this.children.length,
       gap: this.gap,
+      bevelRadius: this.bevelRadius,
       sharedCorner: this.gap === 0 ? [0, 0, 0] : null,
-      cornerPositions: this.solids.map((solid) => solid.position.clone().add(solid.userData.touchCorner as THREE.Vector3).toArray()),
+      cornerPositions: this.getSharedCornerPositions().map((position) => position.toArray()),
       projectedAxisAngles: [30, 90, 150, 210, 270, 330],
       linePrimitives: 0,
       material: this.materials.map((material) => ({
@@ -244,6 +367,7 @@ export class CrystalAssembly extends THREE.Group {
         thickness: material.thickness,
         dispersion: material.dispersion,
       })),
+      spectralFlow: this.getSpectralFlowState(),
     };
   }
 
@@ -254,5 +378,6 @@ export class CrystalAssembly extends THREE.Group {
     });
     geometries.forEach((geometry) => geometry.dispose());
     this.materials.forEach((material) => material.dispose());
+    this.spectralMaterials.forEach((material) => material.dispose());
   }
 }

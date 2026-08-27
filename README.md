@@ -1,10 +1,8 @@
-# Pleos 27 Axis
+# PLEOS 27 Axis — Motion Studio V1
 
-PLEOS Axis의 승인된 30° 구조를 선분이 아니라 세 폐쇄형 광학 솔리드의 공유 꼭짓점으로 구성한 브라우저 기반 GPU path tracing study입니다. 기본 renderer는 Three.js와 [`gkjohnson/three-gpu-pathtracer`](https://github.com/gkjohnson/three-gpu-pathtracer)를 사용합니다.
+Three.js와 `three-gpu-pathtracer`를 사용하는 PLEOS Axis 제작 도구입니다. 세 optical solid가 하나의 공유 꼭짓점에서 만나는 30° 구조를 정적 rest pose로 유지하면서, 결정론적 모션·virtual artboard·고품질 현재 프레임 렌더를 제공합니다.
 
 ## 실행
-
-Node.js 22 이상과 WebGL2를 지원하는 최신 데스크톱 브라우저를 권장합니다.
 
 ```bash
 npm install
@@ -14,116 +12,188 @@ npm run dev
 브라우저에서 `http://127.0.0.1:5173/`을 엽니다.
 
 ```bash
+npm run typecheck
 npm run verify
+npm run verify:motion
 npm run build
 npm run qa
 ```
 
-## 기본 화면
+## Motion Studio
 
-- `/`: Three.js `WebGLPathTracer` 기반 기본 production study
-- `?renderer=raw`: 이전 Raw WebGL2 studio 비교 경로
-- `?renderer=legacy`: 이전 checkpoint 캡처 경로
+Inspector는 `SETUP / LOOK / MOTION / FORMAT / EXPORT`로 구성됩니다. 개별 light와 path-tracing 물리 파라미터는 우측 상단 톱니바퀴의 Advanced drawer에 있습니다.
 
-## Path tracing 구조
+SETUP의 `모델링 → 베벨 반경`에서 `0–0.15` 범위로 세 광학 육면체의 모서리를 조절합니다. 값 변경 시 폐쇄형 geometry를 재생성하고 실제 bevel 꼭지점을 원점에 재정렬하므로, `큐브 간격 0`에서는 베벨 값과 관계없이 세 모델이 정확히 맞닿습니다.
 
-```text
-Three.js scene
-  → 세 개의 indexed rounded optical solid
-  → 동일한 방사 방향 offset을 갖는 세 개의 corner
-  → MeshPhysicalMaterial transmission / IOR / dispersion
-  → 동적 Pleos brand light array + procedural equirect environment
-  → three-mesh-bvh scene acceleration
-  → Render 버튼으로 시작하는 WebGLPathTracer sample accumulation
-  → subtle bloom → ACES filmic tone mapping → sRGB canvas
+기본 카메라는 `Z = -12`에서 원점을 바라보며, 조명 프리셋과 studio rear plane도 같은 시점을 기준으로 배치됩니다. 이전 `+Z` 카메라 기준으로 저장된 lighting state는 로드 시 한 번만 `-Z` 메인 카메라 기준으로 자동 변환됩니다.
+
+Motion preset:
+
+- Spectral Axis Sweep — 중심 white pulse와 canonical 30° Axis 방향의 optical sweep
+- Shared Vertex Pulse — 공유 꼭짓점을 원점에 고정한 미세 scale pulse
+- Explode & Rejoin — radial 방향으로 분리된 후 정확한 rest pose로 복귀
+
+모든 모션은 이전 프레임 값을 누적하지 않고 `time`, `duration`, `fps`, `seed`로 절대 평가합니다. fixed mode의 시간은 `frameIndex / fps`입니다.
+
+키보드:
+
+- `Space`: 재생/일시정지
+- `← / →`: 1 frame 이동
+- `Shift + ← / →`: 10 frame 이동
+- `Home / End`: 첫/마지막 frame
+- `R`: motion reset
+- `Tab` 또는 `H`: Inspector 표시/숨김
+
+입력 필드에 focus가 있을 때 shortcut은 실행되지 않습니다.
+
+## Virtual Artboard
+
+FORMAT에서 출력 구도를 viewport와 독립적으로 설정합니다.
+
+- Square 1:1 — 1080 × 1080
+- Instagram Portrait 4:5 — 1080 × 1350
+- Portrait 3:4 — 1080 × 1440
+- Landscape 16:9 — 1920 × 1080
+- Vertical 9:16 — 1080 × 1920
+- Custom
+
+Inspector를 접거나 창 크기를 변경해도 출력 pixel dimension과 artboard framing은 유지됩니다. PPI는 화질 제어와 분리된 print metadata 값이며, 기존 Still Studio의 물리 크기 유지 출력은 별도 `PPI 기준 최종 렌더·저장` 버튼으로 남아 있습니다.
+
+## Render와 Export
+
+- 재생과 scrub: raster preview만 사용
+- 빠른 렌더링: 16spp · 50% render scale · 4 bounce
+- 고품질 렌더링: Advanced의 sample / render scale / bounce 사용
+- Raster PNG: 현재 time의 artboard를 정확한 pixel dimension으로 출력
+- High Quality PNG: 재생을 멈추고 현재 time을 path tracer에 한 번 동기화한 후 sample을 누적
+- 부분 렌더링: Advanced에서 artboard pixel 기준 X / Y / W / H 설정, 가운데/전체 정렬, `px/mm/cm/in` 입력
+- 인쇄용 PNG: `Output PPI / 단위 변환 기준 PPI` 비율로 부분 영역 pixel을 확장하고 PNG pHYs metadata 기록. 인쇄 출력은 설정된 미리보기 Render Scale과 무관하게 100% 네이티브 해상도, 최소 512 spp, 12 bounces, firefly 억제와 edge-aware denoise로 저장
+- Motion sequence: Playwright 기반 fixed-timestep PNG sequence
+
+부분 렌더링 입력에서는 `↑ / ↓`로 1px, `Shift + ↑ / ↓`로 10px씩 조절합니다. 예를 들어 단위 기준이 96ppi일 때 `50mm`는 189px로 변환됩니다.
+
+```bash
+npm run render:motion -- \
+  --preset spectral-axis-sweep \
+  --width 1080 \
+  --height 1350 \
+  --fps 30 \
+  --duration 6 \
+  --quality raster \
+  --out artifacts/motion/spectral-axis-sweep-4x5 \
+  --seed 27 \
+  --strength 0.65
 ```
 
-기본값:
+PNG sequence를 영상으로 변환하는 예:
 
-- general bounces: `8`
-- transmissive bounces: `12`
-- render scale: `0.75`
-- tiles: `2 × 2`
-- dynamic low-resolution interaction preview: enabled
-- default camera: orthographic isometric projection, no perspective convergence
-- material modes: Clear / Prism / Smoked
-- projected Axis angles: `30°, 90°, 150°, 210°, 270°, 330°`
-- line primitives: `0`
-- optical solids: `3`
-- cube gap: `0` (세 육면체의 중심 꼭짓점이 정확히 접촉)
-- target samples: `128 spp`
+```bash
+ffmpeg -framerate 30 -i frame-%06d.png -c:v libx264 -pix_fmt yuv420p pleos-axis.mp4
+```
 
-평상시에는 빠른 raster preview만 표시합니다. `빠른 렌더링`은 50% 내부 해상도, 4 bounces, 16 spp로 구도와 재질의 느낌을 빠르게 확인합니다. `고품질 렌더링`은 패널의 render scale, bounces, target spp 값을 그대로 사용합니다. 목표 spp에 도달하면 자동으로 멈추며, 카메라·재질·간격·렌더 설정을 바꾸면 진행 중인 렌더가 중단되고 미리보기 상태로 돌아갑니다.
+`ffmpeg`는 프로젝트 dependency에 포함하지 않습니다.
 
-기본 카메라는 원근 수렴이 없는 정면 직교 아이소메트릭 프리셋입니다. 화면에 투영되는 주요 축은 수직과 `±30°`를 유지하며 세 육면체의 윗면과 양 측면이 함께 보입니다. `OBJECT → CAMERA → 기준 아이소메트릭 시점`으로 언제든 이 구도를 복원할 수 있습니다.
+## Browser Automation API
 
-패널 설정과 카메라 시점은 변경 즉시 브라우저 `localStorage`의 `pleos-27-axis-settings-v1` 항목에 저장됩니다. 개발 서버가 중단되거나 페이지를 닫은 뒤에도 같은 주소로 다시 접속하면 마지막 설정이 자동 복원됩니다.
+```ts
+window.__pleos27Axis.inspect();
+window.__pleos27Axis.setLook("prism");
+window.__pleos27Axis.setMotionPreset("spectral-axis-sweep");
+window.__pleos27Axis.setMotionStrength("balanced");
+window.__pleos27Axis.configureMotion({ fps: 30, duration: 6, seed: 27 });
+window.__pleos27Axis.play();
+window.__pleos27Axis.pause();
+window.__pleos27Axis.seek(1.5);
+window.__pleos27Axis.stepFrame(1);
+window.__pleos27Axis.setArtboard({ id: "instagram-portrait" });
+window.__pleos27Axis.setRenderRegion({ enabled: true, x: 120, y: 160, width: 640, height: 480, unitPpi: 96 });
+await window.__pleos27Axis.renderPreview("fast");
+await window.__pleos27Axis.exportPng(false);
+await window.__pleos27Axis.renderCurrentFrame(false);
+await window.__pleos27Axis.renderPrintFrame(false);
+```
 
-## Pleos Lighting System
+## State migration
 
-`LIGHTING`은 재질에 RGB를 칠하지 않고 무채색 optical glass 주변에 실제 광원을 배치합니다. 기본 `Pleos RGB` 장면은 White key/fill, Pleos Blue·Red·Green rim/side/back light 등 9개 광원으로 시작합니다. Rect Area, Physical Spot, Point, Directional light를 함께 지원하며 각 광원은 배열로 관리되어 개수 제한 없이 추가·복제·삭제·이름 변경·비활성화할 수 있습니다.
+현재 설정은 `pleos-27-axis-settings-v2`에 저장됩니다. V2가 없을 때 기존 `pleos-27-axis-settings-v1`의 look, roughness, dispersion, gap, lighting, render scale, bounce, sample, 부분 렌더 영역, 단위 기준 PPI, 출력 PPI와 Inspector 접힘 상태를 가져옵니다. 재생 timestamp와 per-frame override는 저장하지 않습니다.
 
-- Presets: `Pleos RGB`, `Pleos Blue`, `Pleos Prism`, `Dark Studio`, `Soft Glass`
-- Global: master/environment intensity, exposure, bloom, reflection/refraction, saturation
-- Per-light: transform, type, Pleos 공식 컬러 swatch, intensity/exposure, area size, spot falloff, shadow controls
-- Gizmo: 선택 광원의 이동·회전, Rect plane 및 Spot cone 방향 표시
-- Persistence: 조명 배열, 선택값, 프리셋 수정 결과까지 기존 자동 저장에 포함
+## 구조
 
-패스 트레이서는 광원을 float texture에 패킹하고 MIS로 직접광을 샘플링합니다. 광원 값 변경은 BVH와 geometry를 다시 만들지 않고 `updateLights()`만 호출합니다. 편집 Gizmo는 별도의 overlay scene에 존재하므로 빠른 미리보기에서만 보이고 패스 트레이싱 및 PNG 출력에는 포함되지 않습니다. Bloom은 preview와 최종 path-traced canvas에 동일하게 합성됩니다.
+```text
+src/axis       canonical Axis direction과 graph
+src/motion     deterministic clock, engine, constraint, preset
+src/artboard   virtual format과 composition
+src/crystal    Prism adapter, renderer lifecycle, professional UI
+scripts        검증과 fixed-timestep sequence 출력
+```
 
-## 조작
+기본 route는 Motion Studio만 동적으로 불러옵니다. 과거 raw renderer와 legacy UI는 각각 `?renderer=raw`, `?renderer=legacy`에서 필요할 때만 lazy-load됩니다.
 
-- 드래그: orbit
-- 휠: zoom
-- `Tab` 또는 `H`: Inspector 숨기기/표시
-- Roughness / Dispersion: 광학 재질 변경
-- Render scale: 패스 트레이싱 내부 해상도
-- Bounces: 일반 및 투과 bounce budget
-- Cube gap: 세 육면체를 중심에서 동일한 거리만큼 벌림
-- Target spp: 수동 렌더의 종료 sample 수
-- 빠른 렌더링: 고정된 경량 설정으로 짧은 확인 렌더
-- 고품질 렌더링: 현재 패널 설정으로 최종 패스 트레이싱 시작/중지
-- Save current frame: 현재 누적 결과 PNG 저장
+## SPECTRAL FLOW Look
 
-모든 수치 항목은 우측 설정 패널에서 슬라이더로 조절하거나 숫자 입력칸에 직접 입력할 수 있으며, 두 값은 자동으로 동기화됩니다.
+`LOOK → Spectral Flow`는 CLEAR / PRISM / SMOKED와 같은 세 육면체, shared vertex, 30° Axis, 기준 카메라를 그대로 사용하고 광학 표현만 교체합니다. 기존 PRISM 물리 재질과 분리된 `SpectralFlowMaterial`이 `MeshPhysicalMaterial.onBeforeCompile`에서 world/local position, world normal, view/camera, canonical Axis 방향과 MotionClock time을 사용합니다.
 
-## Inspector UI
+- `FLOW`: 위치, Axis 방향, 속도, 폭, 부드러움
+- `SPECTRUM`: 확산, 파장 분리, 채도, 지연
+- `LIGHT`: white core 강도/폭, falloff, bloom
+- `SURFACE`: edge 반응, 반사, optical black 깊이
+- 프리셋: `SUBTLE`, `BALANCED`, `ACTIVE`
 
-오른쪽 Inspector는 `OBJECT / MATERIAL / LIGHT / RENDER / EXPORT` 다섯 탭으로 분리됩니다. 각 탭의 설정은 얇은 divider 기반의 접이식 section으로 구성되어 필요한 정보만 열어둘 수 있습니다. Inspector를 닫으면 viewport와 카메라 렌더 영역이 자동으로 전체 폭에 맞춰 다시 계산됩니다.
+Motion은 기존 MOTION 탭과 6초 fixed-time 루프를 사용합니다. Motion이 꺼져 있을 때는 `Flow Position`으로 정적 상태를 직접 확인할 수 있습니다. Motion이 켜지면 0초와 6초의 spectral envelope가 동일하게 0으로 수렴합니다.
 
-숫자 입력은 키보드 입력과 좌우 드래그 scrub을 모두 지원합니다. 숫자 위에서 좌우로 드래그하면 해당 step 단위로 값이 변하고, `Shift + Drag`는 1/10 step으로 정밀 조정합니다. 활성 탭과 Inspector 열림 상태도 다른 렌더 설정과 함께 자동 저장됩니다.
+SPECTRAL FLOW의 빠른/고품질/인쇄/시퀀스 출력은 path tracing 누적 대신 같은 custom shader를 artboard 또는 부분 렌더 영역의 정확한 pixel dimension으로 다시 그립니다. 따라서 viewport와 device pixel ratio에 독립적이고 Monte Carlo 노이즈가 없습니다. CLEAR / PRISM / SMOKED의 고품질 출력은 기존 path tracer를 유지합니다.
 
-`부분 렌더링 영역`의 X, Y, 너비, 높이는 현재 렌더 화면을 기준으로 픽셀 단위로 지정합니다. 패스 트레이서는 선택 프레임 크기만큼의 별도 캔버스와 camera view offset을 사용하므로 프레임 밖은 계산하지 않습니다. 부분 렌더 캔버스는 DPR 1로 고정되어 입력한 너비·높이와 저장되는 PNG 픽셀이 1:1로 일치합니다. `전체 화면` 버튼으로 언제든 전체 영역으로 복구할 수 있습니다.
+```bash
+npm run render:motion -- \
+  --look spectral-flow \
+  --preset spectral-axis-sweep \
+  --width 1080 --height 1920 --fps 30 --duration 6 \
+  --quality raster --out artifacts/motion/spectral-flow-9x16
 
-영역 입력칸은 단위 없는 숫자와 `px`, `mm`, `cm`, `in`을 인식합니다. 예를 들어 기본 96 ppi에서 `100mm`는 약 `378px`로 변환됩니다. 변환 기준은 `단위 변환 기준`에서 36–1200 ppi로 변경할 수 있습니다. 변환 결과가 현재 화면 경계를 넘으면 가능한 최대 픽셀 값으로 맞춥니다. 새 버전에서 영역 위치를 처음 불러올 때는 프레임이 화면 정중앙에 배치되며, 이후 좌표는 자동 저장됩니다. `가운데` 버튼으로 언제든 다시 중앙 정렬할 수 있습니다.
+npm run verify:spectral-flow
+npm run capture:spectral-flow
+```
 
-영역 입력칸에 포커스한 상태에서 `↑`와 `↓`는 값을 1px씩, `Shift + ↑`와 `Shift + ↓`는 10px씩 증감합니다. 물리 단위가 입력된 상태라면 먼저 현재 PPI 기준 픽셀로 환산한 뒤 증감합니다.
+Browser API:
 
-## 72 / 150 / 300ppi 최종 출력
+```ts
+window.__pleos27Axis.setLook("spectral-flow");
+window.__pleos27Axis.setSpectralFlowPreset("balanced");
+window.__pleos27Axis.setSpectralFlow({ flowDirection: "axis-150", edgeAttraction: 1.6 });
+```
 
-`부분 영역 PNG 출력`에서 72, 150, 300ppi를 선택할 수 있습니다. 출력 크기는 현재 영역의 물리 크기를 유지한 채 `출력 ppi ÷ 단위 변환 기준 ppi` 비율로 다시 계산합니다. 예를 들어 `640 × 480px @ 96ppi` 영역은 300ppi에서 `2000 × 1500px`로 렌더링됩니다.
+## AI Collaboration / Handoff
 
-최종 출력은 화면용 렌더와 달리 내부 render scale을 항상 100%로 사용합니다. 최소 품질은 72ppi `128 spp / 8 bounces`, 150ppi `192 spp / 10 bounces`, 300ppi `256 spp / 12 bounces`이며, 사용자가 설정한 고품질 값이 더 높으면 그 값을 우선합니다. 투과 반사는 일반 bounce보다 4회 더 계산합니다. 저장 PNG에는 `pHYs` 청크를 삽입해 선택한 실제 PPI 메타데이터를 기록합니다. 출력 크기가 GPU의 최대 texture 크기를 넘으면 렌더를 시작하지 않고 제한값을 안내합니다.
+이 기능은 production 렌더 결과가 아니라 개발자·ChatGPT·Codex 사이에서 현재 프로젝트 상태를 공유하기 위한 infrastructure입니다.
 
-## 구현 위치
+작업 중 빠른 handoff:
 
-- `src/crystal/NewAxisCrystalApp.ts`: renderer, path tracer, accumulation, camera, UI
-- `src/crystal/CrystalAssembly.ts`: 세 광학 솔리드와 material presets
-- `src/crystal/LightingSystem.ts`: Pleos 팔레트, 동적 light data, presets, runtime lights와 gizmo helper
-- `src/crystal/LightingPanel.ts`: LIGHTING 편집 UI
-- `src/crystal/InspectorPanel.ts`: 상위 탭, view 전환, collapse 상태 관리
-- `src/crystal/InspectorScrub.ts`: 재사용 가능한 숫자 입력 drag/scrub 동작
-- `src/crystal/StudioEnvironment.ts`: path-traced neutral environment와 studio surfaces
-- `scripts/verify-pathtracer.mjs`: active renderer와 geometry contract 검증
-- `src/raw-webgl/`: 이전 직접 WebGL2 renderer; 비교 route에서만 사용
+```bash
+npm run handoff
+```
 
-## 디자인 근거와 가정
+작업 완료 검증 + handoff:
 
-- `Pleos 25 Design Guidelines.pdf`: PLEOS color, tone-on-tone, Axis 30°/45°, 20 × 20 grid 규칙의 근거
-- `Pleos 27 Design Kickoff.pdf`: Axis DNA를 유지하면서 Material·Layer·Interaction·Motion을 확장하는 전략의 근거
+```bash
+npm run handoff:full
+```
 
-PDF는 실행 asset이나 texture로 포함하지 않습니다. Z-depth, rounded bevel, IOR, bounce 수, 카메라와 조명 위치는 문서에 없는 구현 가정이며 `docs/implementation-assumptions.md`에서 분리 관리합니다.
+생성 결과:
 
-## GitHub Pages
+- `docs/AI_HANDOFF.md` — 사람이 읽는 현재 상태와 최신 작업 요약
+- `artifacts/latest/runtime-state.json` — 실제 production runtime의 machine-readable inspect 결과
+- `artifacts/latest/preview-main.png`
+- `artifacts/latest/preview-4x5.png`
+- `artifacts/latest/preview-9x16.png`
 
-`main`에 push하면 `.github/workflows/deploy-pages.yml`이 검증과 production build를 실행한 뒤 GitHub Pages를 자동 갱신합니다.
+두 명령 모두 실제 `window.__pleos27Axis.inspect()`와 `exportPng(false)`를 사용합니다. 빠른 handoff는 검증 상태를 `not-run`으로 명시하며, `handoff:full`만 typecheck·verify·build 결과를 PASS/FAIL로 기록합니다. 최신 작업 문맥을 더 정확히 남기려면 다음처럼 설명을 함께 전달할 수 있습니다.
+
+```bash
+npm run handoff:full -- \
+  --task "요청 요약" \
+  --changed "구현 내용" \
+  --why "구현 이유" \
+  --decisions "핵심 결정" \
+  --files "src/example.ts:역할|README.md:문서" \
+  --visual "No intentional visual changes"
+```

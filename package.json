@@ -9,8 +9,15 @@
     "typecheck": "tsc -b --pretty false",
     "lint": "tsc -b --pretty false",
     "preview": "vite preview",
-    "verify": "npm run typecheck && npm run verify:pathtracer",
+    "verify": "npm run typecheck && npm run verify:pathtracer && npm run verify:motion && npm run verify:spectral-flow && npm run verify:render-tools",
     "verify:pathtracer": "node scripts/verify-pathtracer.mjs",
+    "verify:motion": "node scripts/verify-motion-v1.mjs",
+    "verify:render-tools": "node scripts/verify-retained-rendering.mjs",
+    "verify:spectral-flow": "node scripts/verify-spectral-flow.mjs",
+    "capture:spectral-flow": "node scripts/capture-spectral-flow.mjs",
+    "handoff": "node scripts/update-ai-handoff.mjs",
+    "handoff:full": "node scripts/update-ai-handoff.mjs --full",
+    "render:motion": "node scripts/render-motion-sequence.mjs",
     "verify:raw": "node scripts/verify-raw-webgl2.mjs",
     "verify:axis": "node scripts/verify-axis-core.mjs",
     "verify:solid": "node scripts/verify-solid-axis.mjs",
@@ -18,7 +25,7 @@
     "verify:runtime": "node scripts/verify-runtime.mjs",
     "verify:spectral": "node scripts/verify-spectral-artifacts.mjs",
     "compare:legacy": "node scripts/compare-legacy-rebuild.mjs",
-    "qa": "npm run lint && npm run verify:pathtracer && npm run build"
+    "qa": "npm run verify && npm run build"
   },
   "devDependencies": {
     "@types/pngjs": "^6.0.5",

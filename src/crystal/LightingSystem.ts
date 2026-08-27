@@ -92,6 +92,29 @@ function makeLight(name: string, type: PleosLightType, color: string, position: 
   };
 }
 
+function rotationTowardOrigin(position: [number, number, number], rollDegrees = 0): [number, number, number] {
+  const matrix = new THREE.Matrix4().lookAt(
+    new THREE.Vector3().fromArray(position),
+    new THREE.Vector3(),
+    new THREE.Vector3(0, 1, 0),
+  );
+  const quaternion = new THREE.Quaternion().setFromRotationMatrix(matrix);
+  if (rollDegrees !== 0) quaternion.multiply(
+    new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), THREE.MathUtils.degToRad(rollDegrees)),
+  );
+  const euler = new THREE.Euler().setFromQuaternion(quaternion, "XYZ");
+  return [euler.x, euler.y, euler.z].map(THREE.MathUtils.radToDeg) as [number, number, number];
+}
+
+function mirrorLightForMainCamera(light: PleosLightData): PleosLightData {
+  const position: [number, number, number] = [light.position[0], light.position[1], -light.position[2]];
+  return {
+    ...light,
+    position,
+    rotation: light.type === "point" ? [...light.rotation] : rotationTowardOrigin(position, light.rotation[2]),
+  };
+}
+
 const PRESET_BUILDERS: Record<Exclude<LightingPresetName, "custom">, () => PleosLightData[]> = {
   "pleos-rgb": () => [
     makeLight("White Key", "rect", "#FFFFFF", [-4.8, 4.6, 5.5], [-28, -35, 0], 28, { width: 4.2, height: 6.2 }),
@@ -138,12 +161,23 @@ function cloneLight(light: PleosLightData): PleosLightData {
 }
 
 export function createLightingPreset(name: Exclude<LightingPresetName, "custom"> = "pleos-rgb"): LightingState {
-  const lights = PRESET_BUILDERS[name]();
+  // Preset coordinates were originally authored for a +Z camera. The
+  // production camera is fixed at -Z, so mirror the complete rig into the
+  // visible hemisphere and aim every directional emitter back at the origin.
+  const lights = PRESET_BUILDERS[name]().map(mirrorLightForMainCamera);
   const globals = { ...DEFAULT_GLOBALS };
   if (name === "dark-studio") Object.assign(globals, { environmentIntensity: 0.22, exposure: 1.1, bloomIntensity: 0.18 });
   if (name === "soft-glass") Object.assign(globals, { environmentIntensity: 0.9, exposure: 1.02, bloomIntensity: 0.07, colorSaturation: 0.65 });
   if (name === "pleos-prism") Object.assign(globals, { environmentIntensity: 0.62, bloomIntensity: 0.1, colorSaturation: 0.78 });
   return { globals, lights, selectedId: lights[0]?.id ?? null, preset: name };
+}
+
+export function migrateLightingRigToMainCamera(state: LightingState): LightingState {
+  return {
+    ...state,
+    globals: { ...state.globals },
+    lights: state.lights.map(mirrorLightForMainCamera),
+  };
 }
 
 export function sanitizeLightingState(value: unknown): LightingState {
@@ -233,7 +267,8 @@ export class LightingSystem {
 
   add(): void {
     const index = this.state.lights.length + 1;
-    const light = makeLight(`Light ${String(index).padStart(2, "0")}`, "rect", "#FFFFFF", [3.5, 3.5, 4.5], [-25, 45, 0], 12);
+    const position: [number, number, number] = [3.5, 3.5, -4.5];
+    const light = makeLight(`Light ${String(index).padStart(2, "0")}`, "rect", "#FFFFFF", position, rotationTowardOrigin(position), 12);
     this.state.lights.push(light); this.state.selectedId = light.id; this.state.preset = "custom";
     this.createRuntime(light); this.updateHelpers(); this.onChange("lights");
   }

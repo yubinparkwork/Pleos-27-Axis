@@ -1,79 +1,72 @@
 import "./style.css";
-import { NewAxisCrystalApp } from "./crystal/NewAxisCrystalApp";
-import {
-  RawStudioApp,
-  createDefaultRawStudioState,
-  type RawStudioStatus,
-} from "./studio";
-import { LegacyArchiveView } from "./studio/ui/LegacyArchiveView";
-import {
-  RawStudioRendererController,
-  type RawRendererStatus,
-} from "./raw-webgl/renderer";
+import type { ArtboardState } from "./artboard/ArtboardState";
+import type { MotionPresetId, MotionStrengthMode } from "./motion/types";
+import type { CrystalLook } from "./crystal/CrystalAssembly";
+import type { SpectralFlowPresetId, SpectralFlowState } from "./crystal/materials/SpectralFlowMaterial";
 
 const root = document.querySelector<HTMLElement>("#app");
 if (!root) throw new Error("Missing #app root");
-const appRoot: HTMLElement = root;
 
-function studioStatus(status: RawRendererStatus): RawStudioStatus {
-  return {
-    renderer: status.renderer,
-    gpuPreference: status.gpuPreference,
-    hdr: status.hdrEnabled ? "Enabled" : "Disabled",
-    floatColorBuffer: status.floatColorBuffer ? "Supported" : "Unsupported",
-    maxTextureSize: status.maxTextureSize,
-    maxRenderbufferSize: status.maxRenderbufferSize,
-    maxSamples: status.maxSamples,
-    drawingBuffer: status.drawingBuffer === null ? null : [status.drawingBuffer[0], status.drawingBuffer[1]],
-    frameTimeMs: status.frameTimeMs,
-    message: status.message,
-    level: status.level,
-  };
-}
-
-function mountRawStudio(): void {
-  const initialState = createDefaultRawStudioState();
-  let studio: RawStudioApp | null = null;
-  const controller = new RawStudioRendererController({
-    initialState,
-    onStatus: (status) => studio?.setStatus(studioStatus(status)),
-    onError: (error) => studio?.setStatus({ message: error.message, level: "error" }),
-    onCameraChange: (camera) => {
-      if (!studio) return;
-      const nextState = studio.getState();
-      nextState.camera = structuredClone(camera);
-      studio.setState(nextState, { path: "camera", reason: "external" });
-    },
-  });
-  studio = new RawStudioApp(appRoot, controller, initialState);
-  window.addEventListener("beforeunload", () => {
-    studio?.destroy();
-    controller.dispose();
-  }, { once: true });
-}
-
-const rendererRoute = new URLSearchParams(window.location.search).get("renderer");
-
-if (rendererRoute === "raw") {
-  mountRawStudio();
-} else if (rendererRoute === "legacy") {
-  new LegacyArchiveView(appRoot);
-} else {
-  const app = new NewAxisCrystalApp(appRoot);
-  window.addEventListener("beforeunload", () => app.dispose(), { once: true });
+async function mount(): Promise<void> {
+  const route = new URLSearchParams(location.search).get("renderer");
+  if (route === "raw") {
+    const [{ RawStudioApp, createDefaultRawStudioState }, { RawStudioRendererController }] = await Promise.all([
+      import("./studio"), import("./raw-webgl/renderer"),
+    ]);
+    const initialState = createDefaultRawStudioState();
+    const controller = new RawStudioRendererController({ initialState });
+    const studio = new RawStudioApp(root!, controller, initialState);
+    addEventListener("beforeunload", () => { studio.destroy(); controller.dispose(); }, { once: true });
+    return;
+  }
+  if (route === "legacy") {
+    const { LegacyArchiveView } = await import("./studio/ui/LegacyArchiveView");
+    new LegacyArchiveView(root!);
+    return;
+  }
+  const { MotionStudioApp } = await import("./crystal/MotionStudioApp");
+  const app = new MotionStudioApp(root!);
+  addEventListener("beforeunload", () => app.dispose(), { once: true });
   window.__pleos27Axis = {
     inspect: () => app.inspect(),
     setLook: (look) => app.setLook(look),
-    exportPng: () => app.exportPng(),
+    setSpectralFlow: (settings) => app.setSpectralFlow(settings),
+    setSpectralFlowPreset: (preset) => app.setSpectralFlowPreset(preset),
+    setMotionPreset: (preset) => app.setMotionPreset(preset),
+    setMotionStrength: (strength) => app.setMotionStrength(strength),
+    configureMotion: (settings) => app.configureMotion(settings),
+    play: () => app.play(), pause: () => app.pause(), resetMotion: () => app.resetMotion(),
+    seek: (time) => app.seek(time), stepFrame: (frames = 1) => app.stepFrame(frames),
+    setArtboard: (state) => app.setArtboard(state),
+    setRenderRegion: (state) => app.setRenderRegion(state),
+    renderPreview: (quality = "fast") => app.renderPreview(quality),
+    renderCurrentFrame: (download = false) => app.renderCurrentFrame(download),
+    renderPrintFrame: (download = false) => app.renderPrintFrame(download),
+    exportPng: (download = false) => app.exportPng(download),
+    getMotionState: () => app.getMotionState(),
   };
 }
+
+void mount();
 
 declare global {
   interface Window {
     __pleos27Axis?: {
       inspect(): object;
-      setLook(look: "clear" | "prism" | "smoked"): void;
-      exportPng(): Promise<void>;
+      setLook(look: CrystalLook): void;
+      setSpectralFlow(settings: Partial<SpectralFlowState>): void;
+      setSpectralFlowPreset(preset: SpectralFlowPresetId): void;
+      setMotionPreset(preset: MotionPresetId): void;
+      setMotionStrength(strength: MotionStrengthMode | number): void;
+      configureMotion(settings: { duration?: number; fps?: number; seed?: number; speed?: number; loop?: boolean; constraint?: "strict" | "anchored" | "experimental" }): void;
+      play(): void; pause(): void; resetMotion(): void; seek(time: number): void; stepFrame(frames?: number): void;
+      setArtboard(state: Partial<ArtboardState>): void;
+      setRenderRegion(state: Partial<{ enabled: boolean; x: number; y: number; width: number; height: number; unitPpi: number }>): void;
+      renderPreview(quality?: "fast" | "high"): Promise<string>;
+      renderCurrentFrame(download?: boolean): Promise<string>;
+      renderPrintFrame(download?: boolean): Promise<string>;
+      exportPng(download?: boolean): Promise<string>;
+      getMotionState(): object;
     };
   }
 }
