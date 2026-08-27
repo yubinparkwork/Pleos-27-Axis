@@ -10,10 +10,6 @@ export {
   applyRawMaterialPreset,
   applyRawScenePreset,
   createDefaultRawStudioState,
-  loadPersistedRawStudioState,
-  persistRawStudioState,
-  RAW_STUDIO_STORAGE_KEY,
   type RawStudioChange,
-  type RawStudioListener,
   type RawStudioState,
 } from "./state/RawStudioState";

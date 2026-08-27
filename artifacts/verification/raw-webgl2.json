@@ -1,7 +1,7 @@
 {
   "status": "pass",
   "renderer": "raw-webgl2",
-  "productionFilesScanned": 75,
+  "productionFilesScanned": 74,
   "forbiddenSourceHits": [],
   "forbiddenDependencyHits": [],
   "requiredImplementationFiles": 22,
@@ -44,7 +44,6 @@
       "src/raw-webgl/math/mat4.ts",
       "src/raw-webgl/math/vec3.ts",
       "src/raw-webgl/passes/BackgroundPass.ts",
-      "src/raw-webgl/passes/BloomPass.ts",
       "src/raw-webgl/passes/CompositePass.ts",
       "src/raw-webgl/passes/ExportPass.ts",
       "src/raw-webgl/passes/FxaaPass.ts",
@@ -77,7 +76,6 @@
       "src/raw-webgl/shaders/matte/matte.frag.glsl",
       "src/raw-webgl/shaders/matte/matte.vert.glsl",
       "src/raw-webgl/shaders/post/background.frag.glsl",
-      "src/raw-webgl/shaders/post/bloom.frag.glsl",
       "src/raw-webgl/shaders/post/copy.frag.glsl",
       "src/raw-webgl/shaders/post/fullscreen.vert.glsl",
       "src/raw-webgl/shaders/post/fxaa.frag.glsl",
@@ -443,30 +441,6 @@
         "src/raw-webgl/shaders/post/fullscreen.vert.glsl"
       ],
       [
-        "src/raw-webgl/passes/BloomPass.ts",
-        "src/raw-webgl/core/index.ts"
-      ],
-      [
-        "src/raw-webgl/passes/BloomPass.ts",
-        "src/raw-webgl/passes/PassProgram.ts"
-      ],
-      [
-        "src/raw-webgl/passes/BloomPass.ts",
-        "src/raw-webgl/passes/PassSurface.ts"
-      ],
-      [
-        "src/raw-webgl/passes/BloomPass.ts",
-        "src/raw-webgl/renderer/Uniforms.ts"
-      ],
-      [
-        "src/raw-webgl/passes/BloomPass.ts",
-        "src/raw-webgl/shaders/post/bloom.frag.glsl"
-      ],
-      [
-        "src/raw-webgl/passes/BloomPass.ts",
-        "src/raw-webgl/shaders/post/fullscreen.vert.glsl"
-      ],
-      [
         "src/raw-webgl/passes/CompositePass.ts",
         "src/raw-webgl/core/index.ts"
       ],
@@ -825,10 +799,6 @@
       [
         "src/raw-webgl/renderer/RawWebGLRenderer.ts",
         "src/raw-webgl/passes/BackgroundPass.ts"
-      ],
-      [
-        "src/raw-webgl/renderer/RawWebGLRenderer.ts",
-        "src/raw-webgl/passes/BloomPass.ts"
       ],
       [
         "src/raw-webgl/renderer/RawWebGLRenderer.ts",
@@ -1221,7 +1191,7 @@
       "valid": true,
       "errors": [],
       "warnings": [],
-      "vertexCount": 912,
+      "vertexCount": 434,
       "triangleCount": 312,
       "weldedVertexCount": 159,
       "componentCount": 2,

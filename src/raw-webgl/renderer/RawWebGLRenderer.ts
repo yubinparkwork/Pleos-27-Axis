@@ -26,7 +26,6 @@ import {
   type CameraState,
 } from "../math";
 import { BackgroundPass } from "../passes/BackgroundPass";
-import { BloomPass } from "../passes/BloomPass";
 import { CompositePass } from "../passes/CompositePass";
 import { ExportPass } from "../passes/ExportPass";
 import { FxaaPass } from "../passes/FxaaPass";
@@ -61,7 +60,6 @@ const QUALITY_SCALE = Object.freeze({
 
 interface RendererPasses {
   readonly background: BackgroundPass;
-  readonly bloom: BloomPass;
   readonly matte: MattePass;
   readonly prismBackface: PrismBackfacePass;
   readonly prismFrontface: PrismFrontfacePass;
@@ -149,15 +147,12 @@ export class RawWebGLRenderer {
   private disposed = false;
   private lastMeasurement: ResizeMeasurement | null = null;
   private effectiveGeometryMode: GeometryMode | null = null;
-  private lastAnimatedStatusTime = 0;
-  private animationTimeSeconds = performance.now() / 1000;
-  private lastAnimationTickSeconds = performance.now() / 1000;
 
   constructor(options: RawWebGLRendererOptions) {
     this.studioState = structuredClone(options.state);
     this.canvas = options.canvas ?? document.createElement("canvas");
     this.canvas.classList.add("raw-webgl-canvas");
-    this.canvas.setAttribute("aria-label", "PLEOS Axis WebGL2 렌더러");
+    this.canvas.setAttribute("aria-label", "PLEOS Axis raw WebGL2 renderer");
     this.onStatus = options.onStatus ?? (() => undefined);
     this.onError = options.onError ?? ((error) => console.error(error));
     this.onCameraChange = options.onCameraChange ?? (() => undefined);
@@ -175,14 +170,14 @@ export class RawWebGLRenderer {
       this.stateCache = new GLStateCache(this.context.gl);
       this.detachContextLost = this.context.onContextLost(() => {
         this.renderLoop.cancel();
-        this.emitStatus("WebGL 연결이 끊어져 복구를 기다리고 있습니다.", "error");
+        this.emitStatus("WebGL context lost; waiting for browser restoration.", "error");
       });
       this.detachContextRestored = this.context.onContextRestored(() => {
         try {
           this.rebuildGpuResources();
           this.applyLastResize();
           this.requestRender(true);
-          this.emitStatus("WebGL 연결과 렌더링 자원이 복구되었습니다.", "ok");
+          this.emitStatus("WebGL context restored and resources rebuilt.", "ok");
         } catch (error) {
           this.reportError(error);
         }
@@ -196,7 +191,7 @@ export class RawWebGLRenderer {
       });
       this.resizeManager = new ResizeManager(host, (measurement) => this.resize(measurement));
       this.resizeManager.start();
-      this.emitStatus("WebGL2 렌더러가 준비되었습니다.", this.context.capabilities.hdrColorBuffer ? "ok" : "warning");
+      this.emitStatus("Raw WebGL2 renderer ready.", this.context.capabilities.hdrColorBuffer ? "ok" : "warning");
     } catch (error) {
       this.contextError = toError(error);
       if (error instanceof WebGL2UnavailableError) this.showUnsupportedMessage(error.message);
@@ -207,9 +202,6 @@ export class RawWebGLRenderer {
   updateState(state: Readonly<RawStudioState>, change: RawStudioChange = { path: "*", reason: "external" }): void {
     if (this.disposed) return;
     this.studioState = structuredClone(state);
-    // Reset the wall-clock reference on every state transition so resuming
-    // never includes the time spent paused or away from the render loop.
-    this.lastAnimationTickSeconds = performance.now() / 1000;
     const cameraChanged = change.path === "*" || change.path.startsWith("camera") || change.reason === "initialize";
     const geometryChanged = change.path === "*"
       || change.path.startsWith("geometry")
@@ -347,7 +339,7 @@ export class RawWebGLRenderer {
         ? "Prism uses the canonical 30° Variation 1 closed optical solid."
         : capabilities && !capabilities.hdrColorBuffer
           ? "RGBA8 compatibility pipeline active; HDR highlight range is reduced."
-          : "WebGL2 렌더러가 준비되었습니다.");
+          : "Raw WebGL2 renderer ready.");
     const level: RawRendererStatusLevel = this.contextError
       ? "error"
       : mismatch || (capabilities !== undefined && !capabilities.hdrColorBuffer)
@@ -388,7 +380,6 @@ export class RawWebGLRenderer {
     if (!this.dirty || this.disposed || !this.context || this.context.isContextLost || !this.targets || !this.passes) return;
     this.dirty = false;
     try {
-      this.updateAnimationClock();
       this.performance?.begin();
       this.renderPipeline(this.targets, false, [0, 0]);
       this.passes.composite.render(this.targets.final.colorTexture, {
@@ -397,16 +388,7 @@ export class RawWebGLRenderer {
         height: this.context.gl.drawingBufferHeight,
       }, false);
       this.performance?.end();
-      const animated = this.textureAnimationActive();
-      const now = performance.now();
-      if (!animated || now - this.lastAnimatedStatusTime > 500) {
-        this.emitStatus();
-        this.lastAnimatedStatusTime = now;
-      }
-      if (animated) {
-        this.dirty = true;
-        this.renderLoop.request();
-      }
+      this.emitStatus();
     } catch (error) {
       this.performance?.end();
       this.reportError(error);
@@ -467,7 +449,6 @@ export class RawWebGLRenderer {
           near: this.camera.near,
           far: this.camera.far,
           debugMode: mode,
-          timeSeconds: this.animationTimeSeconds,
         });
       }
     }
@@ -491,16 +472,7 @@ export class RawWebGLRenderer {
           blackLift: 0,
           dither: false,
         };
-    const bloomASurface: PassSurface = { target: targets.bloomA, width: targets.bloomA.width, height: targets.bloomA.height };
-    const bloomBSurface: PassSurface = { target: targets.bloomB, width: targets.bloomB.width, height: targets.bloomB.height };
-    if (post.bloomEnabled) {
-      passes.bloom.prefilter(hdrTarget.colorTexture, bloomASurface, post.bloomThreshold);
-      passes.bloom.blur(targets.bloomA.colorTexture, bloomBSurface, true, post.bloomRadius);
-      passes.bloom.blur(targets.bloomB.colorTexture, bloomASurface, false, post.bloomRadius);
-      passes.bloom.blur(targets.bloomA.colorTexture, bloomBSurface, true, post.bloomRadius * 1.45);
-      passes.bloom.blur(targets.bloomB.colorTexture, bloomASurface, false, post.bloomRadius * 1.45);
-    }
-    passes.toneMap.render(hdrTarget.colorTexture, targets.bloomA.colorTexture, {
+    passes.toneMap.render(hdrTarget.colorTexture, {
       target: targets.ldr,
       width: targets.width,
       height: targets.height,
@@ -508,25 +480,6 @@ export class RawWebGLRenderer {
     const finalSurface: PassSurface = { target: targets.final, width: targets.width, height: targets.height };
     if (this.studioState.output.post.fxaa) passes.fxaa.render(targets.ldr.colorTexture, finalSurface);
     else passes.composite.render(targets.ldr.colorTexture, finalSurface, false);
-  }
-
-  private textureAnimationActive(): boolean {
-    const texture = this.studioState.material.matte.texture;
-    return this.studioState.material.mode === "matte"
-      && texture.enabled
-      && texture.animationEnabled
-      && !texture.animationPaused
-      && Math.abs(texture.animationSpeed) > 1e-5
-      && !this.studioState.debug.freezeRender;
-  }
-
-  private updateAnimationClock(): void {
-    const now = performance.now() / 1000;
-    const texture = this.studioState.material.matte.texture;
-    if (texture.enabled && texture.animationEnabled && !texture.animationPaused) {
-      this.animationTimeSeconds += Math.min(Math.max(now - this.lastAnimationTickSeconds, 0), 0.1);
-    }
-    this.lastAnimationTickSeconds = now;
   }
 
   private updateCameraBlock(aspect: number, jitterNdc: readonly [number, number]): void {
@@ -562,7 +515,6 @@ export class RawWebGLRenderer {
     this.debugRenderer.updateMesh(this.mesh.data);
     this.passes = {
       background: new BackgroundPass(gl, this.stateCache, lightingUniforms),
-      bloom: new BloomPass(gl, this.stateCache),
       matte: new MattePass(gl, this.stateCache, lightingUniforms),
       prismBackface: new PrismBackfacePass(gl, this.stateCache),
       prismFrontface: new PrismFrontfacePass(gl, this.stateCache, lightingUniforms),
@@ -610,7 +562,7 @@ export class RawWebGLRenderer {
       foldDepth: geometry.foldDepth,
       depthRatio: Math.max(0.02, geometry.solidThickness),
       bevel: {
-        enabled: mode === "closed-optical-solid" && geometry.bevelEnabled,
+        enabled: prism && geometry.bevelEnabled,
         width: geometry.bevelWidth,
         segments: Math.max(1, Math.round(geometry.bevelSegments)),
         curvature: geometry.bevelCurvature,
@@ -635,7 +587,6 @@ export class RawWebGLRenderer {
     this.mesh = null;
     if (this.passes) {
       this.passes.background.dispose();
-      this.passes.bloom.dispose();
       this.passes.matte.dispose();
       this.passes.prismBackface.dispose();
       this.passes.prismFrontface.dispose();

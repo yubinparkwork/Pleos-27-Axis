@@ -5,8 +5,6 @@ export class PipelineTargets {
   readonly scene: RenderTarget;
   readonly backface: RenderTarget | null;
   readonly composite: RenderTarget | null;
-  readonly bloomA: RenderTarget;
-  readonly bloomB: RenderTarget;
   readonly ldr: RenderTarget;
   readonly final: RenderTarget;
   readonly backfacePrecision: "rgba16f" | "encoded-rgba8" | "not-used";
@@ -38,10 +36,6 @@ export class PipelineTargets {
     this.composite = mode === "prism"
       ? new RenderTarget(gl, capabilities, { width, height, hdr: true, depth: true, label: `${label} Composite HDR` })
       : null;
-    const bloomWidth = Math.max(1, Math.ceil(width / 3));
-    const bloomHeight = Math.max(1, Math.ceil(height / 3));
-    this.bloomA = new RenderTarget(gl, capabilities, { width: bloomWidth, height: bloomHeight, hdr: true, depth: false, label: `${label} Bloom A` });
-    this.bloomB = new RenderTarget(gl, capabilities, { width: bloomWidth, height: bloomHeight, hdr: true, depth: false, label: `${label} Bloom B` });
     this.ldr = new RenderTarget(gl, capabilities, { width, height, hdr: false, depth: false, label: `${label} Tone Mapped` });
     this.final = new RenderTarget(gl, capabilities, { width, height, hdr: false, depth: false, label: `${label} Final` });
   }
@@ -55,8 +49,6 @@ export class PipelineTargets {
     this.scene.resize(width, height);
     this.backface?.resize(width, height);
     this.composite?.resize(width, height);
-    this.bloomA.resize(Math.max(1, Math.ceil(width / 3)), Math.max(1, Math.ceil(height / 3)));
-    this.bloomB.resize(Math.max(1, Math.ceil(width / 3)), Math.max(1, Math.ceil(height / 3)));
     this.ldr.resize(width, height);
     this.final.resize(width, height);
     return true;
@@ -66,8 +58,6 @@ export class PipelineTargets {
     this.scene.dispose();
     this.backface?.dispose();
     this.composite?.dispose();
-    this.bloomA.dispose();
-    this.bloomB.dispose();
     this.ldr.dispose();
     this.final.dispose();
   }

@@ -9,8 +9,8 @@
     "typecheck": "tsc -b --pretty false",
     "lint": "tsc -b --pretty false",
     "preview": "vite preview",
-    "verify": "npm run typecheck && npm run verify:engine",
-    "verify:engine": "node scripts/verify-premium-engine.mjs",
+    "verify": "npm run typecheck && npm run verify:pathtracer",
+    "verify:pathtracer": "node scripts/verify-pathtracer.mjs",
     "verify:raw": "node scripts/verify-raw-webgl2.mjs",
     "verify:axis": "node scripts/verify-axis-core.mjs",
     "verify:solid": "node scripts/verify-solid-axis.mjs",
@@ -18,17 +18,20 @@
     "verify:runtime": "node scripts/verify-runtime.mjs",
     "verify:spectral": "node scripts/verify-spectral-artifacts.mjs",
     "compare:legacy": "node scripts/compare-legacy-rebuild.mjs",
-    "qa": "npm run lint && npm run verify:engine && npm run build"
+    "qa": "npm run lint && npm run verify:pathtracer && npm run build"
   },
   "devDependencies": {
     "@types/pngjs": "^6.0.5",
-    "@types/three": "^0.185.4",
+    "@types/three": "^0.180.0",
     "playwright": "^1.55.0",
     "pngjs": "^7.0.0",
     "typescript": "~5.9.3",
     "vite": "^7.1.7"
   },
   "dependencies": {
-    "three": "^0.185.1"
+    "three": "^0.180.0",
+    "three-gpu-pathtracer": "^0.0.24",
+    "three-mesh-bvh": "^0.9.14",
+    "xatlas-web": "^0.1.0"
   }
 }

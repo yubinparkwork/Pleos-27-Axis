@@ -17,8 +17,8 @@ import {
   applyRawMaterialPreset,
   applyRawScenePreset,
   createDefaultRawStudioState,
+  type RawAxisFamily,
   type RawStudioChange,
-  type RawStudioListener,
   type RawStudioState,
 } from "../state/RawStudioState";
 
@@ -53,8 +53,8 @@ export interface RawStudioStatus {
 }
 
 const DEFAULT_STATUS: RawStudioStatus = {
-  renderer: "Three.js WebGPU",
-  gpuPreference: "WebGPU 우선 · WebGL2 자동 폴백",
+  renderer: "Raw WebGL2",
+  gpuPreference: "High Performance Requested",
   hdr: "Checking",
   floatColorBuffer: "Checking",
   maxTextureSize: null,
@@ -62,27 +62,51 @@ const DEFAULT_STATUS: RawStudioStatus = {
   maxSamples: null,
   drawingBuffer: null,
   frameTimeMs: null,
-  message: "렌더러를 준비하고 있습니다",
+  message: "Renderer initialization pending",
   level: "warning",
 };
 
+const AXIS_VARIATIONS: Record<RawAxisFamily, Array<{ value: string; label: string }>> = {
+  "30deg": [
+    { value: "30-basic", label: "30° Basic" },
+    { value: "30-v1", label: "30° Variation 1" },
+    { value: "30-v2", label: "30° Variation 2" },
+    { value: "30-v3", label: "30° Variation 3" },
+  ],
+  "45deg": [
+    { value: "45-basic", label: "45° Basic" },
+    { value: "45-v1", label: "45° Variation 1" },
+    { value: "45-v2", label: "45° Variation 2" },
+    { value: "45-v3", label: "45° Variation 3" },
+  ],
+};
+
 const OUTPUT_PRESETS = [
-  { value: "1400x1040", label: "레퍼런스 절반", width: 1400, height: 1040 },
-  { value: "2000x1486", label: "레퍼런스 중간", width: 2000, height: 1486 },
-  { value: "2800x2080", label: "레퍼런스 원본", width: 2800, height: 2080 },
+  { value: "1400x1040", label: "Reference half", width: 1400, height: 1040 },
+  { value: "2000x1486", label: "Reference medium", width: 2000, height: 1486 },
+  { value: "2800x2080", label: "Reference master", width: 2800, height: 2080 },
   { value: "3840x2160", label: "4K 16:9", width: 3840, height: 2160 },
-  { value: "4096x4096", label: "정사각형 4K", width: 4096, height: 4096 },
-  { value: "5600x4160", label: "레퍼런스 2배", width: 5600, height: 4160 },
+  { value: "4096x4096", label: "Square 4K", width: 4096, height: 4096 },
+  { value: "5600x4160", label: "Reference 2×", width: 5600, height: 4160 },
 ] as const;
 
 const TABS = [
-  ["material", "스타일"],
-  ["lighting", "조명"],
-  ["output", "내보내기"],
+  ["geometry", "Geometry"],
+  ["material", "Material"],
+  ["prism", "Prism"],
+  ["lighting", "Lighting"],
+  ["cards", "Cards"],
+  ["camera", "Camera"],
+  ["output", "Output"],
+  ["debug", "Debug"],
 ] as const;
 
 function option(value: string, label: string): string {
   return `<option value="${value}">${label}</option>`;
+}
+
+function selectField(label: string, path: string, options: string): string {
+  return `<label class="raw-field"><span>${label}</span><select data-state-path="${path}">${options}</select></label>`;
 }
 
 function rangeField(label: string, path: string, min: number, max: number, step: number): string {
@@ -107,27 +131,27 @@ function colorField(label: string, path: string): string {
   return `<label class="raw-field raw-color-field"><span>${label}</span><input type="color" data-state-path="${path}" data-value-type="color"></label>`;
 }
 
+function vectorField(label: string, path: string, min: number, max: number, step: number): string {
+  return `<fieldset class="raw-vector-field"><legend>${label}</legend><div>
+    ${["X", "Y", "Z"].map((axis, index) => `<label><span>${axis}</span><input type="number" min="${min}" max="${max}" step="${step}" data-state-path="${path}.${index}" data-value-type="number"></label>`).join("")}
+  </div></fieldset>`;
+}
+
 function section(title: string, content: string, note = ""): string {
   return `<section class="raw-inspector-section"><header><h3>${title}</h3>${note ? `<small>${note}</small>` : ""}</header>${content}</section>`;
 }
 
-function directLightControls(
-  label: string,
-  path: "key" | "fill" | "rim" | "upperLeft" | "lowerRight",
-  open = false,
-): string {
-  return `<details class="raw-light-group"${open ? " open" : ""}>
-    <summary><span>${label}</span><small>방향 · 높이 · 색감</small></summary>
-    <div class="raw-light-controls">
-      ${toggleField("사용", `lighting.${path}.enabled`)}
-      ${rangeField("수평 각도", `lighting.${path}.azimuth`, -180, 180, 1)}
-      ${rangeField("높이", `lighting.${path}.elevation`, -90, 90, 1)}
-      ${rangeField("조명 거리", `lighting.${path}.distance`, 1, 20, 0.1)}
-      ${rangeField("밝기", `lighting.${path}.intensity`, 0, 12, 0.05)}
-      ${rangeField("빛 범위", `lighting.${path}.influenceRadius`, 0, 5, 0.01)}
-      ${colorField("색상", `lighting.${path}.color`)}
-    </div>
-  </details>`;
+function lightControls(id: "key" | "fill" | "rim", label: string): string {
+  const path = `lighting.${id}`;
+  return section(label, `
+    ${toggleField("Enabled", `${path}.enabled`)}
+    ${colorField("Color", `${path}.color`)}
+    ${rangeField("Intensity", `${path}.intensity`, 0, 12, 0.05)}
+    ${rangeField("Azimuth", `${path}.azimuth`, -180, 180, 1)}
+    ${rangeField("Elevation", `${path}.elevation`, -90, 90, 1)}
+    ${rangeField("Distance", `${path}.distance`, 1, 30, 0.1)}
+    ${vectorField("Target", `${path}.target`, -10, 10, 0.05)}
+  `, "Independent direct light");
 }
 
 function getPath(root: unknown, path: string): unknown {
@@ -183,12 +207,12 @@ export class RawStudioApp {
   private readonly abortController = new AbortController();
   private readonly unsubscribe: () => void;
   private status: RawStudioStatus = { ...DEFAULT_STATUS };
+  private renderedCard = -1;
 
   constructor(
     private readonly root: HTMLElement,
     private readonly controller: RawStudioController,
     initialState: RawStudioState = createDefaultRawStudioState(),
-    private readonly onStateChange?: RawStudioListener,
   ) {
     this.store = new RawStudioStore(initialState);
     this.root.innerHTML = this.template();
@@ -197,13 +221,12 @@ export class RawStudioApp {
     this.unsubscribe = this.store.subscribe((state, change) => {
       this.sync(state);
       this.controller.update(state, change);
-      this.onStateChange?.(state, change);
     });
     this.controller.mount(this.stageHost);
+    this.renderCardInspector(initialState);
     this.sync(initialState);
     this.syncStatus();
     this.controller.update(initialState, { path: "*", reason: "initialize" });
-    this.onStateChange?.(initialState, { path: "*", reason: "initialize" });
   }
 
   getState(): RawStudioState {
@@ -234,217 +257,235 @@ export class RawStudioApp {
         <span>${String(index + 1).padStart(2, "0")}</span>
         <strong>${preset.name}</strong>
         <small>${preset.description}</small>
-        ${preset.experimental ? "<em>실험용</em>" : ""}
+        ${preset.experimental ? "<em>Experimental</em>" : ""}
       </button>`).join("");
     const materialOptions = `
-      <optgroup label="매트">${Object.entries(MATTE_PRESETS).map(([id, preset]) => option(id, preset.name)).join("")}</optgroup>
-      <optgroup label="프리즘">${Object.entries(PRISM_PRESETS).map(([id, preset]) => option(id, preset.name)).join("")}</optgroup>`;
+      <optgroup label="Matte">${Object.entries(MATTE_PRESETS).map(([id, preset]) => option(id, preset.name)).join("")}</optgroup>
+      <optgroup label="Prism">${Object.entries(PRISM_PRESETS).map(([id, preset]) => option(id, preset.name)).join("")}</optgroup>`;
     const lightingOptions = Object.entries(LIGHTING_PRESETS).map(([id, preset]) => option(id, preset.name)).join("");
 
     return `<div class="raw-studio-shell" data-left-open="true" data-right-open="true">
       <header class="raw-studio-topbar">
         <div class="raw-brand"><strong>PLEOS</strong><span>27 AXIS</span></div>
-        <div class="raw-material-switch" role="group" aria-label="재질 모드">
-          <button data-material-mode="matte">매트</button><button data-material-mode="prism">프리즘</button>
+        <div class="raw-material-switch" role="group" aria-label="Material mode">
+          <button data-material-mode="matte">Matte</button><button data-material-mode="prism">Prism</button>
         </div>
+        <label class="raw-top-select"><span>Quality</span><select data-state-path="output.quality">
+          ${option("draft", "Draft")}${option("balanced", "Balanced")}${option("high", "High")}${option("final", "Final")}
+        </select></label>
         <span class="raw-top-spacer"></span>
-        <button class="raw-utility-button" data-toggle-panel="left" aria-label="프리셋 패널 열기와 닫기">프리셋</button>
-        <button class="raw-utility-button" data-toggle-panel="right" aria-label="설정 패널 열기와 닫기">설정</button>
-        <button class="raw-primary-button" data-command="export">PNG 내보내기</button>
+        <button class="raw-utility-button" data-toggle-panel="left" aria-label="Toggle preset panel">Presets</button>
+        <button class="raw-utility-button" data-toggle-panel="right" aria-label="Toggle inspector">Inspector</button>
+        <button class="raw-primary-button" data-command="export">Export PNG</button>
       </header>
 
-      <aside class="raw-studio-left" aria-label="장면 프리셋">
-        <header><span>PLEOS 27 / AXIS</span><h1>렌더링 스터디</h1><p>축은 고정하고 재질과 조명을 확장합니다.</p></header>
+      <aside class="raw-studio-left" aria-label="Scene presets">
+        <header><span>PLEOS 27 / AXIS</span><h1>Rendering studies</h1><p>Axis DNA fixed. Material and light expand.</p></header>
         <div class="raw-preset-list">${sceneCards}</div>
+        <section class="raw-left-note"><strong>Brand boundary</strong><p>Full Spectrum is experimental and requires color review before final use.</p></section>
       </aside>
 
-      <main class="raw-studio-stage" aria-label="고품질 3D 렌더링 화면">
+      <main class="raw-studio-stage" aria-label="Raw WebGL2 render stage">
         <div class="raw-stage-host" data-raw-stage-host></div>
       </main>
 
-      <aside class="raw-studio-right" aria-label="렌더링 설정">
-        <nav class="raw-inspector-tabs" aria-label="설정 탭">
+      <aside class="raw-studio-right" aria-label="Render inspector">
+        <nav class="raw-inspector-tabs" aria-label="Inspector tabs">
           ${TABS.map(([id, label]) => `<button data-tab="${id}">${label}</button>`).join("")}
         </nav>
         <div class="raw-inspector-scroll">
+          <div data-tab-panel="geometry">${this.geometryPanel()}</div>
           <div data-tab-panel="material">${this.materialPanel(materialOptions)}</div>
+          <div data-tab-panel="prism">${this.prismPanel()}</div>
           <div data-tab-panel="lighting">${this.lightingPanel(lightingOptions)}</div>
+          <div data-tab-panel="cards"><div data-card-inspector></div></div>
+          <div data-tab-panel="camera">${this.cameraPanel()}</div>
           <div data-tab-panel="output">${this.outputPanel()}</div>
+          <div data-tab-panel="debug">${this.debugPanel()}</div>
         </div>
       </aside>
 
       <footer class="raw-studio-status" data-status-level="warning">
-        <strong data-status="message"></strong>
+        <span data-status="renderer"></span><span data-status="gpu"></span><span data-status="hdr"></span>
+        <span data-status="float"></span><span data-status="limits"></span><span data-status="buffer"></span>
+        <span data-status="frame"></span><strong data-status="message"></strong>
       </footer>
     </div>`;
   }
 
+  private geometryPanel(): string {
+    return `
+      ${section("Axis topology", `
+        ${selectField("Angle family", "geometry.axisFamily", option("30deg", "30°") + option("45deg", "45°"))}
+        ${selectField("Approved variation", "geometry.variation", "")}
+        ${numberField("Origin grid X", "geometry.originGrid.0", 0, 20, 1)}
+        ${numberField("Origin grid Y", "geometry.originGrid.1", 0, 20, 1)}
+      `, "20 × 20 grid anchor")}
+      ${section("Volume", `
+        ${selectField("Geometry mode", "geometry.mode", option("folded-surface", "Folded Surface") + option("closed-optical-solid", "Closed Optical Solid"))}
+        ${rangeField("Fold depth", "geometry.foldDepth", 0, 1.5, 0.01)}
+        ${rangeField("Solid depth ratio", "geometry.solidThickness", 0.02, 1.5, 0.001)}
+      `)}
+      ${section("Bevel", `
+        ${toggleField("Enable bevel", "geometry.bevelEnabled")}
+        ${rangeField("Width", "geometry.bevelWidth", 0, 0.16, 0.001)}
+        ${rangeField("Segments", "geometry.bevelSegments", 1, 12, 1)}
+        ${rangeField("Curvature", "geometry.bevelCurvature", 0, 1, 0.01)}
+        ${rangeField("Edge roughness", "geometry.edgeRoughness", 0, 1, 0.01)}
+        ${rangeField("Highlight strength", "geometry.edgeHighlightStrength", 0, 3, 0.01)}
+      `, "Narrow bevel must preserve projected rays")}`;
+  }
+
   private materialPanel(materialOptions: string): string {
     return `
-      ${section("스타일", `
-        <label class="raw-field"><span>프리셋</span><select data-action="material-preset">${materialOptions}</select></label>
+      ${section("Material", `
+        <label class="raw-field"><span>Preset</span><select data-action="material-preset">${materialOptions}</select></label>
         <p class="raw-inline-status" data-material-summary></p>
       `)}
-      ${section("형태 디테일", `
-        <p class="raw-help">큰 면과 중앙 수렴점은 그대로 두고, 모서리에만 정밀한 커팅 면을 추가합니다.</p>
-        ${toggleField("베벨 사용", "geometry.bevelEnabled")}
-        ${rangeField("베벨 폭", "geometry.bevelWidth", 0.001, 0.12, 0.001)}
-        ${rangeField("베벨 단계", "geometry.bevelSegments", 1, 12, 1)}
-        ${rangeField("모서리 곡률", "geometry.bevelCurvature", 0, 1, 0.01)}
-      `, "축 보호")}
-      <div data-material-section="matte">${section("매트 표면", `
-        ${colorField("기본 색상", "material.matte.baseColor")}
-        ${rangeField("면 변화", "material.matte.faceVariation", 0, 0.5, 0.01)}
-        ${rangeField("거칠기", "material.matte.roughness", 0.04, 1, 0.01)}
-        ${rangeField("환경광", "material.matte.ambientStrength", 0, 1, 0.01)}
+      ${section("Matte BRDF", `
+        ${colorField("Base color", "material.matte.baseColor")}
+        ${colorField("Specular tint", "material.matte.specularTint")}
+        ${rangeField("Face variation", "material.matte.faceVariation", 0, 0.5, 0.01)}
+        ${rangeField("Roughness", "material.matte.roughness", 0.04, 1, 0.01)}
+        ${rangeField("Diffuse strength", "material.matte.diffuseStrength", 0, 2, 0.01)}
+        ${rangeField("Specular strength", "material.matte.specularStrength", 0, 2, 0.01)}
+        ${rangeField("Micro surface", "material.matte.microStrength", 0, 0.5, 0.005)}
+        ${rangeField("Micro scale", "material.matte.microScale", 8, 1200, 1)}
+        ${rangeField("Ambient strength", "material.matte.ambientStrength", 0, 1, 0.01)}
+      `, "GGX + diffuse, linear-space inputs")}`;
+  }
+
+  private prismPanel(): string {
+    return `
+      <div class="raw-experimental-banner" data-experimental-banner hidden>EXPERIMENTAL — COLOR REVIEW REQUIRED</div>
+      ${section("Optical transport", `
+        ${rangeField("Base IOR", "material.prism.baseIor", 1, 2.5, 0.005)}
+        ${rangeField("Dispersion", "material.prism.dispersion", 0, 0.8, 0.005)}
+        ${selectField("Spectral samples", "material.prism.spectralSamples", option("3", "3 / Preview") + option("5", "5 / High") + option("7", "7 / Final"))}
+        ${rangeField("Spectrum strength", "material.prism.spectrumStrength", 0, 2, 0.01)}
+        ${rangeField("Edge spectrum", "material.prism.edgeSpectrumStrength", 0, 3, 0.01)}
+        ${rangeField("Internal spectrum", "material.prism.internalSpectrumStrength", 0, 2, 0.01)}
+        ${rangeField("Saturation", "material.prism.spectrumSaturation", 0, 2, 0.01)}
+        ${rangeField("Softness", "material.prism.spectrumSoftness", 0, 1, 0.01)}
       `)}
-      ${section("표면 컬러 텍스처", `
-        <p class="raw-help">기존 육면체의 형태는 유지하면서 면 내부에 컬러 그라데이션과 발광 경계를 입힙니다.</p>
-        <label class="raw-field"><span>질감 유형</span><select data-state-path="material.matte.texture.pattern">
-          ${option("soft-caustic", "소프트 카우스틱")}
-          ${option("amber-flow", "앰버 플로우")}
-        </select></label>
-        ${toggleField("사용", "material.matte.texture.enabled")}
-        ${rangeField("적용 강도", "material.matte.texture.strength", 0, 1, 0.01)}
-        ${rangeField("무늬 크기", "material.matte.texture.scale", 0.2, 8, 0.01)}
-        ${rangeField("무늬 회전", "material.matte.texture.rotation", -180, 180, 1)}
-        ${rangeField("흐름 방향", "material.matte.texture.flow", 0, 1, 0.01)}
-        ${rangeField("색상 대비", "material.matte.texture.contrast", 0.2, 2.5, 0.01)}
-        ${rangeField("모서리 발광", "material.matte.texture.edgeGlow", 0, 2, 0.01)}
-        ${rangeField("발광 폭", "material.matte.texture.edgeWidth", 0.005, 0.2, 0.001)}
-        ${toggleField("그라데이션 애니메이션", "material.matte.texture.animationEnabled")}
-        ${toggleField("애니메이션 일시정지", "material.matte.texture.animationPaused")}
-        ${rangeField("애니메이션 속도", "material.matte.texture.animationSpeed", -1, 1, 0.01)}
-        ${rangeField("이동량", "material.matte.texture.animationTravel", 0, 2, 0.01)}
-        ${rangeField("흐름 왜곡", "material.matte.texture.warpStrength", 0, 1.5, 0.01)}
-        ${rangeField("미세 질감", "material.matte.texture.detailStrength", 0, 1, 0.01)}
-        ${rangeField("쉬머 광택", "material.matte.texture.sheenStrength", 0, 1.5, 0.01)}
-        ${colorField("어두운 색", "material.matte.texture.darkColor")}
-        ${colorField("강조 색", "material.matte.texture.hotColor")}
-        ${colorField("밝은 색", "material.matte.texture.softColor")}
-        ${colorField("보조 색", "material.matte.texture.accentColor")}
-      `, "참고 이미지 질감")}</div>
-      <div data-material-section="prism">
-        <div class="raw-experimental-banner" data-experimental-banner hidden>실험용 — 색상 검토 필요</div>
-        ${section("프리즘 표면", `
-        ${colorField("흡수 색상", "material.prism.absorptionColor")}
-        ${rangeField("밀도", "material.prism.absorptionDensity", 0, 3, 0.01)}
-        ${rangeField("스펙트럼", "material.prism.spectrumStrength", 0, 2, 0.01)}
-        ${rangeField("거칠기", "material.prism.surfaceRoughness", 0, 0.8, 0.005)}
-        ${rangeField("굴절", "material.prism.refractionStrength", 0, 3, 0.01)}
+      ${section("Reflection / refraction", `
+        ${rangeField("Fresnel", "material.prism.fresnelStrength", 0, 3, 0.01)}
+        ${rangeField("Reflection", "material.prism.reflectionStrength", 0, 3, 0.01)}
+        ${rangeField("Refraction", "material.prism.refractionStrength", 0, 3, 0.01)}
+        ${rangeField("Surface roughness", "material.prism.surfaceRoughness", 0, 0.8, 0.005)}
+        ${rangeField("Refraction roughness", "material.prism.refractionRoughness", 0, 1, 0.005)}
+        ${rangeField("Refraction blur", "material.prism.refractionBlur", 0, 1, 0.005)}
       `)}
-      </div>
-      ${section("공간 그래픽", `
-        <p class="raw-help">축을 방해하지 않는 GPU 흐름장 파티클과 깊이 라인을 조절합니다.</p>
-        ${toggleField("파티클 사용", "engine.particles.enabled")}
-        ${rangeField("파티클 수", "engine.particles.count", 512, 16384, 256)}
-        ${rangeField("크기", "engine.particles.size", 0.004, 0.08, 0.001)}
-        ${rangeField("불투명도", "engine.particles.opacity", 0, 1, 0.01)}
-        ${rangeField("이동 속도", "engine.particles.speed", 0, 1, 0.01)}
-        ${rangeField("난류", "engine.particles.turbulence", 0, 1.5, 0.01)}
-        ${rangeField("노이즈 크기", "engine.particles.noiseScale", 0.05, 3, 0.01)}
-        ${rangeField("수명", "engine.particles.lifespan", 0.5, 20, 0.1)}
-        ${rangeField("발생 반경", "engine.particles.spawnRadius", 0.5, 6, 0.05)}
-        ${rangeField("중심 끌림", "engine.particles.attraction", 0, 1, 0.01)}
-        ${rangeField("중심 반발", "engine.particles.repulsion", 0, 1, 0.01)}
-        ${rangeField("깊이 반응", "engine.particles.depthResponse", 0, 1, 0.01)}
-        ${rangeField("카메라 반응", "engine.particles.cameraInteraction", 0, 1, 0.01)}
-        ${rangeField("흐름 X", "engine.particles.flowDirection.0", -1, 1, 0.01)}
-        ${rangeField("흐름 Y", "engine.particles.flowDirection.1", -1, 1, 0.01)}
-        ${rangeField("흐름 Z", "engine.particles.flowDirection.2", -1, 1, 0.01)}
-        ${toggleField("공간 라인", "engine.lines.enabled")}
-        ${rangeField("라인 두께", "engine.lines.width", 0.001, 0.03, 0.001)}
-        ${rangeField("라인 불투명도", "engine.lines.opacity", 0, 1, 0.01)}
-        ${rangeField("라인 속도", "engine.lines.flowSpeed", 0, 1, 0.01)}
-        ${rangeField("라인 발광", "engine.lines.glowStrength", 0, 1, 0.01)}
-      `, "GPU")}`;
+      ${section("Absorption", `
+        ${colorField("Absorption color", "material.prism.absorptionColor")}
+        ${rangeField("Density", "material.prism.absorptionDensity", 0, 3, 0.01)}
+        ${rangeField("Distance", "material.prism.absorptionDistance", 0.05, 12, 0.01)}
+        ${rangeField("Internal darkness", "material.prism.internalDarkness", 0, 1, 0.01)}
+        ${rangeField("Thickness influence", "material.prism.thicknessInfluence", 0, 3, 0.01)}
+      `)}
+      ${section("Thin film", `
+        ${toggleField("Iridescence", "material.prism.iridescenceEnabled")}
+        ${rangeField("Strength", "material.prism.iridescenceStrength", 0, 1, 0.01)}
+        ${rangeField("Film IOR", "material.prism.filmIor", 1, 2.5, 0.01)}
+        ${rangeField("Thickness nm", "material.prism.filmThickness", 80, 1200, 1)}
+        ${rangeField("Variation", "material.prism.filmThicknessVariation", 0, 1, 0.01)}
+      `, "Independent from dispersion")}`;
   }
 
   private lightingPanel(lightingOptions: string): string {
     return `
-      ${section("조명 설정", `
-        <label class="raw-field"><span>조명 프리셋</span><select data-action="lighting-preset">${lightingOptions}</select></label>
-        ${colorField("배경", "lighting.backgroundColor")}
-        ${rangeField("환경광 밝기", "lighting.environmentIntensity", 0, 6, 0.01)}
-        ${rangeField("환경광 회전", "lighting.environmentRotation", -180, 180, 1)}
+      ${section("Studio environment", `
+        <label class="raw-field"><span>Lighting preset</span><select data-action="lighting-preset">${lightingOptions}</select></label>
+        ${colorField("Background", "lighting.backgroundColor")}
+        ${rangeField("Background exposure", "lighting.backgroundExposure", 0, 4, 0.01)}
+        ${rangeField("Environment intensity", "lighting.environmentIntensity", 0, 6, 0.01)}
+        ${rangeField("Environment rotation", "lighting.environmentRotation", -180, 180, 1)}
       `)}
-      ${section("3D 조명", `
-        <p class="raw-help raw-light-help">고정된 축 주위로 조명을 움직입니다. 수평 각도는 오브젝트 주위를 회전하고, 높이는 조명을 위아래로 이동합니다. 빛 범위가 0이면 전체를 비춥니다.</p>
-        ${directLightControls("주 조명", "key", true)}
-        ${directLightControls("보조 조명", "fill")}
-        ${directLightControls("윤곽 조명", "rim")}
-        ${directLightControls("좌상단 조명", "upperLeft", true)}
-        ${directLightControls("우하단 조명", "lowerRight", true)}
-      `, "카메라 고정")}
-      ${section("소프트 영역광", `
-        <p class="raw-help raw-light-help">중심점에서 바깥쪽으로 사라지는 넓은 영역광입니다. 왼쪽 아래 면의 경계를 그림자 속으로 부드럽게 녹입니다.</p>
-        ${toggleField("사용", "lighting.softArea.enabled")}
-        ${rangeField("광원 크기", "lighting.softArea.sourceSize", 0, 3, 0.01)}
-        ${rangeField("감쇠 지수", "lighting.softArea.falloffExponent", 0.25, 4, 0.01)}
-        ${rangeField("페넘브라 폭", "lighting.softArea.penumbraWidth", 0.05, 1, 0.01)}
-        ${rangeField("경계 부드러움", "lighting.softArea.edgeSoftness", 0, 1, 0.01)}
-        ${rangeField("환경 밝기", "lighting.softArea.ambientIntensity", 0, 0.2, 0.001)}
-        ${rangeField("스침광 강도", "lighting.softArea.grazingStrength", 0, 2, 0.01)}
-        ${rangeField("접점 어둡기", "lighting.softArea.contactDarkening", 0, 1, 0.01)}
-        ${rangeField("접점 범위", "lighting.softArea.contactRadius", 0.01, 0.5, 0.01)}
-        ${rangeField("왼쪽 면 밝기", "lighting.softArea.lowerFaceBias.0", 0, 2, 0.01)}
-        ${rangeField("아래 면 밝기", "lighting.softArea.lowerFaceBias.1", 0, 2, 0.01)}
-        ${rangeField("바깥 면 밝기", "lighting.softArea.lowerFaceBias.2", 0, 2, 0.01)}
-      `, "Pleos 전용")}
-      ${section("화면 구성", `
-        <p class="raw-help">30° 축 카메라는 고정되어 있습니다. 캔버스 위에서 마우스 휠로 확대·축소할 수 있습니다.</p>
-      `, "축 보호")}`;
+      ${lightControls("key", "Key Light")}${lightControls("fill", "Fill Light")}${lightControls("rim", "Rim Light")}`;
+  }
+
+  private cameraPanel(): string {
+    return `
+      ${section("Projection", `
+        ${selectField("Camera mode", "camera.mode", option("orthographic", "Orthographic") + option("perspective", "Perspective"))}
+        ${toggleField("Lock camera", "camera.locked")}
+        ${rangeField("FOV", "camera.fov", 10, 100, 0.1)}
+        ${rangeField("Ortho zoom", "camera.orthoZoom", 0.2, 4, 0.01)}
+        ${rangeField("Roll", "camera.roll", -180, 180, 0.1)}
+        ${numberField("Near", "camera.near", 0.001, 20, 0.001)}
+        ${numberField("Far", "camera.far", 1, 500, 0.1)}
+      `)}
+      ${section("Transform", `${vectorField("Position", "camera.position", -30, 30, 0.01)}${vectorField("Target", "camera.target", -10, 10, 0.01)}
+        <div class="raw-button-row"><button data-command="reset-camera">Reset</button><button data-command="fit-camera">Fit</button></div>
+      `, "Drag orbit and wheel zoom remain renderer-owned")}`;
   }
 
   private outputPanel(): string {
     return `
-      ${section("렌더링 엔진", `
-        <label class="raw-field"><span>백엔드</span><select data-state-path="engine.backend">
-          ${option("auto", "WebGPU 우선 · WebGL2 자동 폴백")}
-          ${option("webgpu", "WebGPU 우선")}
-          ${option("webgl2", "WebGL2 강제")}
+      ${section("Final image", `
+        <label class="raw-field"><span>Resolution preset</span><select data-action="output-preset">
+          ${OUTPUT_PRESETS.map((preset) => option(preset.value, `${preset.label} / ${preset.width} × ${preset.height}`)).join("")}${option("custom", "Custom")}
         </select></label>
-        <label class="raw-field"><span>품질</span><select data-state-path="engine.quality">
-          ${option("adaptive", "자동")}
-          ${option("performance", "성능 우선")}
-          ${option("balanced", "균형")}
-          ${option("ultra", "최고 품질")}
-        </select></label>
-        ${toggleField("적응형 품질", "engine.adaptiveQuality")}
-        ${rangeField("목표 FPS", "engine.targetFps", 30, 120, 1)}
-        ${toggleField("모션 일시정지", "engine.animationPaused")}
-        ${rangeField("볼륨 그라데이션", "engine.gradient.volumetricStrength", 0, 1.5, 0.01)}
-        ${rangeField("방향성 그라데이션", "engine.gradient.directionalStrength", 0, 1.5, 0.01)}
-        ${rangeField("프레넬 컬러", "engine.gradient.fresnelStrength", 0, 1.5, 0.01)}
-        ${rangeField("그라데이션 노이즈", "engine.gradient.noiseStrength", 0, 0.8, 0.01)}
-        ${rangeField("그라데이션 속도", "engine.gradient.temporalSpeed", 0, 1, 0.01)}
-        ${rangeField("밴딩 억제", "engine.gradient.ditherStrength", 0, 0.05, 0.001)}
-      `, "Three.js · WebGPU")}
-      ${section("최종 이미지", `
-        <label class="raw-field"><span>해상도 프리셋</span><select data-action="output-preset">
-          ${OUTPUT_PRESETS.map((preset) => option(preset.value, `${preset.label} / ${preset.width} × ${preset.height}`)).join("")}${option("custom", "직접 설정")}
-        </select></label>
-        ${numberField("가로", "output.width", 64, 16384, 1)}
-        ${numberField("세로", "output.height", 64, 16384, 1)}
-        ${toggleField("비율 고정", "output.aspectLock")}
-        ${toggleField("투명 배경", "output.transparent")}
-        <label class="raw-field"><span>파일 이름</span><input type="text" data-state-path="output.filename"></label>
-        ${rangeField("노출", "output.post.exposure", -6, 6, 0.01)}
-        <label class="raw-field"><span>톤 매핑</span><select data-state-path="output.post.toneMapping">
-          ${option("neutral", "AgX 중립")}
-          ${option("aces-fitted", "ACES 시네마틱")}
-        </select></label>
-        ${rangeField("대비", "output.post.contrast", 0.5, 1.8, 0.01)}
-        ${rangeField("블랙 리프트", "output.post.blackLift", 0, 0.2, 0.001)}
-        ${rangeField("화이트 포인트", "output.post.whitePoint", 0.4, 2, 0.01)}
-        ${toggleField("밴딩 억제", "output.post.dither")}
-        ${toggleField("광학 블룸", "output.post.bloomEnabled")}
-        ${rangeField("블룸 강도", "output.post.bloomStrength", 0, 2, 0.01)}
-        ${rangeField("블룸 반경", "output.post.bloomRadius", 0.5, 6, 0.01)}
-        ${rangeField("발광 임계값", "output.post.bloomThreshold", 0.05, 3, 0.01)}
-        <button class="raw-full-button" data-command="export">PNG 렌더링 및 내보내기</button>
+        ${numberField("Width", "output.width", 64, 16384, 1)}
+        ${numberField("Height", "output.height", 64, 16384, 1)}
+        ${toggleField("Aspect lock", "output.aspectLock")}
+        ${selectField("Supersampling", "output.supersampling", option("1", "1×") + option("2", "2×"))}
+        ${selectField("Accumulation", "output.accumulationSamples", option("8", "8 samples") + option("16", "16 samples") + option("32", "32 samples"))}
+        ${toggleField("Transparent background", "output.transparent")}
+        <label class="raw-field"><span>Filename</span><input type="text" data-state-path="output.filename"></label>
+      `)}
+      ${section("Display transform", `
+        ${selectField("Tone mapping", "output.post.toneMapping", option("neutral", "Neutral") + option("aces-fitted", "ACES fitted"))}
+        ${rangeField("Exposure", "output.post.exposure", -6, 6, 0.01)}
+        ${rangeField("Contrast", "output.post.contrast", 0.5, 2, 0.01)}
+        ${rangeField("White point", "output.post.whitePoint", 0.2, 8, 0.01)}
+        ${rangeField("Black lift", "output.post.blackLift", 0, 0.25, 0.001)}
+        ${rangeField("Preview render scale", "output.post.internalScale", 0.5, 2, 0.05)}
+        ${toggleField("Dither", "output.post.dither")}${toggleField("FXAA", "output.post.fxaa")}
+        <button class="raw-full-button" data-command="export">Render and export PNG</button>
       `)}
     `;
+  }
+
+  private debugPanel(): string {
+    return `
+      ${section("Visualization", `
+        ${selectField("Debug mode", "debug.mode", [
+          ["shaded", "Shaded"], ["wireframe", "Wireframe"], ["vertices", "Vertices"], ["face-normal", "Face Normal"],
+          ["face-id", "Face ID"], ["axis-ray", "Axis Ray"], ["center-node", "Center Node"], ["depth", "Depth"], ["thickness", "Thickness"],
+        ].map(([value, label]) => option(value, label)).join(""))}
+        ${toggleField("Axis guides", "debug.showAxisGuides")}
+        ${toggleField("Center node", "debug.showCenterNode")}
+        ${toggleField("Bounds", "debug.showBounds")}
+        ${toggleField("Freeze render", "debug.freezeRender")}
+      `)}
+      ${section("Diagnostics", `
+        <div class="raw-button-column"><button data-command="recompile-shaders">Recompile shaders</button><button data-copy-state>Copy state JSON</button></div>
+        <p class="raw-help">Shader failures must be reported with source line numbers. Debug controls are renderer state, not visual decoration.</p>
+      `)}
+    `;
+  }
+
+  private renderCardInspector(state: Readonly<RawStudioState>): void {
+    const host = this.require<HTMLElement>("[data-card-inspector]");
+    const index = Math.min(state.lighting.cards.length - 1, Math.max(0, state.ui.selectedCard));
+    const names = ["Large Softbox", "Narrow Strip", "Warm Spectral", "Cool Spectral", "Rim Card"];
+    const path = `lighting.cards.${index}`;
+    host.innerHTML = `
+      ${section("Reflection cards", `<div class="raw-card-selector">${state.lighting.cards.map((_, cardIndex) => `<button data-card-index="${cardIndex}">${cardIndex + 1}<small>${names[cardIndex] ?? `Card ${cardIndex + 1}`}</small></button>`).join("")}</div>`, "Direction-dependent environment")}
+      ${section(names[index] ?? `Card ${index + 1}`, `
+        ${toggleField("Enabled", `${path}.enabled`)}
+        ${colorField("Color", `${path}.color`)}
+        ${rangeField("Intensity", `${path}.intensity`, 0, 10, 0.01)}
+        ${rangeField("Azimuth", `${path}.azimuth`, -180, 180, 1)}
+        ${rangeField("Elevation", `${path}.elevation`, -90, 90, 1)}
+        ${rangeField("Rotation", `${path}.rotation`, -180, 180, 1)}
+        ${rangeField("Width", `${path}.width`, 0.01, 1.5, 0.01)}
+        ${rangeField("Height", `${path}.height`, 0.01, 1.5, 0.01)}
+        ${rangeField("Softness", `${path}.softness`, 0, 1, 0.01)}
+      `)}
+    `;
+    this.renderedCard = index;
   }
 
   private bindEvents(): void {
@@ -476,6 +517,11 @@ export class RawStudioApp {
       this.store.replace(applyRawMaterialPreset(this.getState(), preset), { path: "material.mode", reason: "control" });
       return;
     }
+    const cardIndex = target.dataset.cardIndex;
+    if (cardIndex !== undefined) {
+      this.store.update((draft) => { draft.ui.selectedCard = Number(cardIndex); }, { path: "ui.selectedCard", reason: "control" });
+      return;
+    }
     const panel = target.dataset.togglePanel;
     if (panel === "left" || panel === "right") {
       const path = panel === "left" ? "ui.leftPanelOpen" : "ui.rightPanelOpen";
@@ -489,6 +535,16 @@ export class RawStudioApp {
     if (command) {
       void this.runCommand({ type: command });
       return;
+    }
+    if (target.hasAttribute("data-copy-state")) {
+      if (!navigator.clipboard) {
+        this.setStatus({ message: "Clipboard API unavailable", level: "error" });
+        return;
+      }
+      void navigator.clipboard.writeText(JSON.stringify(this.store.snapshot, null, 2)).then(
+        () => this.setStatus({ message: "State JSON copied", level: "ok" }),
+        () => this.setStatus({ message: "Clipboard write failed", level: "error" }),
+      );
     }
   }
 
@@ -529,17 +585,34 @@ export class RawStudioApp {
 
     this.store.update((draft) => {
       setPath(draft, path, value);
+      if (path === "geometry.axisFamily") {
+        const family = value as RawAxisFamily;
+        draft.geometry.variation = family === "30deg" ? "30-basic" : "45-basic";
+      }
+      if (path === "geometry.mode" && draft.material.mode === "prism") {
+        draft.geometry.mode = "closed-optical-solid";
+      }
+      if (path === "geometry.originGrid.0" || path === "geometry.originGrid.1") {
+        draft.geometry.originGrid[0] = Math.round(Math.min(20, Math.max(0, draft.geometry.originGrid[0])));
+        draft.geometry.originGrid[1] = Math.round(Math.min(20, Math.max(0, draft.geometry.originGrid[1])));
+      }
+      if (path === "geometry.bevelSegments") draft.geometry.bevelSegments = Math.round(draft.geometry.bevelSegments);
+      if (path === "material.prism.spectralSamples") draft.material.prism.spectralSamples = Number(value) as 3 | 5 | 7;
+      if (path === "output.supersampling") draft.output.supersampling = Number(value) as 1 | 2;
+      if (path === "output.accumulationSamples") draft.output.accumulationSamples = Number(value) as 8 | 16 | 32;
       if (path === "output.width" && draft.output.aspectLock) draft.output.height = Math.max(1, Math.round(draft.output.width / previous.output.width * previous.output.height));
       if (path === "output.height" && draft.output.aspectLock) draft.output.width = Math.max(1, Math.round(draft.output.height / previous.output.height * previous.output.width));
+      if (path === "camera.near" && draft.camera.near >= draft.camera.far) draft.camera.far = draft.camera.near + 1;
+      if (path === "camera.far" && draft.camera.far <= draft.camera.near) draft.camera.near = Math.max(0.001, draft.camera.far - 1);
     }, { path, reason: "control" });
   }
 
   private async runCommand(command: RawStudioCommand): Promise<void> {
     try {
-      this.setStatus({ message: command.type === "export" ? "내보내기 이미지를 렌더링하고 있습니다…" : `${command.type} 실행 중…`, level: "warning" });
+      this.setStatus({ message: command.type === "export" ? "Rendering export…" : `Running ${command.type}…`, level: "warning" });
       const next = await this.controller.command(command, this.store.snapshot);
       if (next) this.store.replace(next, { path: command.type, reason: "command" });
-      this.setStatus({ message: command.type === "export" ? "내보내기가 완료되었습니다" : `${command.type} 완료`, level: "ok" });
+      this.setStatus({ message: command.type === "export" ? "Export complete" : `${command.type} complete`, level: "ok" });
     } catch (error) {
       this.setStatus({ message: error instanceof Error ? error.message : String(error), level: "error" });
     }
@@ -549,6 +622,20 @@ export class RawStudioApp {
     const shell = this.require<HTMLElement>(".raw-studio-shell");
     shell.dataset.leftOpen = String(state.ui.leftPanelOpen);
     shell.dataset.rightOpen = String(state.ui.rightPanelOpen);
+
+    const variation = this.require<HTMLSelectElement>("[data-state-path='geometry.variation']");
+    const family = state.geometry.axisFamily;
+    if (variation.dataset.family !== family) {
+      variation.innerHTML = AXIS_VARIATIONS[family].map((item) => option(item.value, item.label)).join("");
+      variation.dataset.family = family;
+    }
+    const familyControl = this.require<HTMLSelectElement>("[data-state-path='geometry.axisFamily']");
+    const modeControl = this.require<HTMLSelectElement>("[data-state-path='geometry.mode']");
+    familyControl.disabled = state.material.mode === "prism";
+    variation.disabled = state.material.mode === "prism";
+    modeControl.disabled = state.material.mode === "prism";
+
+    if (this.renderedCard !== state.ui.selectedCard) this.renderCardInspector(state);
     this.root.querySelectorAll<HTMLInputElement | HTMLSelectElement>("[data-state-path]").forEach((control) => {
       const path = control.dataset.statePath;
       if (!path) return;
@@ -569,9 +656,7 @@ export class RawStudioApp {
     this.root.querySelectorAll<HTMLElement>("[data-tab-panel]").forEach((panel) => { panel.hidden = panel.dataset.tabPanel !== state.ui.tab; });
     this.root.querySelectorAll<HTMLElement>("[data-material-mode]").forEach((button) => button.dataset.active = String(button.dataset.materialMode === state.material.mode));
     this.root.querySelectorAll<HTMLElement>("[data-scene-preset]").forEach((button) => button.dataset.active = String(button.dataset.scenePreset === state.scenePreset));
-    this.root.querySelectorAll<HTMLElement>("[data-material-section]").forEach((panel) => {
-      panel.hidden = panel.dataset.materialSection !== state.material.mode;
-    });
+    this.root.querySelectorAll<HTMLElement>("[data-card-index]").forEach((button) => button.dataset.active = String(Number(button.dataset.cardIndex) === state.ui.selectedCard));
 
     const materialSelect = this.require<HTMLSelectElement>("[data-action='material-preset']");
     materialSelect.value = state.material.mode === "matte" ? state.material.mattePreset : state.material.prismPreset;
@@ -580,15 +665,23 @@ export class RawStudioApp {
     const outputPreset = this.require<HTMLSelectElement>("[data-action='output-preset']");
     outputPreset.value = OUTPUT_PRESETS.find((preset) => preset.width === state.output.width && preset.height === state.output.height)?.value ?? "custom";
     const summary = this.require<HTMLElement>("[data-material-summary]");
-    summary.textContent = state.material.mode === "matte" ? "두 정육면체 축 고정 · 매트" : "두 정육면체 축 고정 · 프리즘";
+    summary.textContent = state.material.mode === "matte" ? "Folded surface · opaque PBR" : "Closed solid · multi-pass optics";
     const banner = this.require<HTMLElement>("[data-experimental-banner]");
     banner.hidden = state.material.mode !== "prism" || !state.material.prism.experimental;
   }
 
   private syncStatus(): void {
+    const value = (name: string, text: string): void => { this.require<HTMLElement>(`[data-status='${name}']`).textContent = text; };
     const status = this.status;
     this.require<HTMLElement>(".raw-studio-status").dataset.statusLevel = status.level;
-    this.require<HTMLElement>("[data-status='message']").textContent = status.message;
+    value("renderer", `Renderer: ${status.renderer}`);
+    value("gpu", `GPU: ${status.gpuPreference}`);
+    value("hdr", `HDR: ${status.hdr}`);
+    value("float", `Float: ${status.floatColorBuffer}`);
+    value("limits", `Limits: ${status.maxTextureSize ?? "—"} / ${status.maxRenderbufferSize ?? "—"} / ${status.maxSamples ?? "—"}`);
+    value("buffer", `Buffer: ${status.drawingBuffer ? `${status.drawingBuffer[0]} × ${status.drawingBuffer[1]}` : "—"}`);
+    value("frame", `GPU: ${status.frameTimeMs === null ? "—" : `${status.frameTimeMs.toFixed(2)} ms`}`);
+    value("message", status.message);
   }
 
   private require<T extends Element>(selector: string): T {

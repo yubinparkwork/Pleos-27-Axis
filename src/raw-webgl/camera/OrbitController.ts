@@ -12,12 +12,6 @@ export interface OrbitControllerOptions {
   readonly zoomSpeed?: number;
 }
 
-// Matches the Camera panel's approved 0.2–4.0 orthographic zoom range for
-// the 2.08-unit Pleos design frame.
-const MIN_ORTHOGRAPHIC_HEIGHT = 2.08 / 4;
-const MAX_ORTHOGRAPHIC_HEIGHT = 2.08 / 0.2;
-const MAX_WHEEL_DELTA_PER_EVENT = 120;
-
 /** Small pointer controller kept deliberately outside the renderer. */
 export class OrbitController {
   private readonly element: HTMLElement;
@@ -42,7 +36,7 @@ export class OrbitController {
     this.onChange = options.onChange ?? (() => undefined);
     this.rotateSpeed = options.rotateSpeed ?? 1;
     this.panSpeed = options.panSpeed ?? 1;
-    this.zoomSpeed = options.zoomSpeed ?? 0.00055;
+    this.zoomSpeed = options.zoomSpeed ?? 0.0015;
     const listenerOptions = { signal: this.abortController.signal };
     element.addEventListener("pointerdown", this.handlePointerDown, listenerOptions);
     element.addEventListener("pointermove", this.handlePointerMove, listenerOptions);
@@ -102,21 +96,9 @@ export class OrbitController {
   };
 
   private readonly handleWheel = (event: WheelEvent): void => {
+    if (this.camera.locked) return;
     event.preventDefault();
-    const wheelDelta = Math.max(
-      -MAX_WHEEL_DELTA_PER_EVENT,
-      Math.min(MAX_WHEEL_DELTA_PER_EVENT, event.deltaY),
-    );
-    if (this.camera.mode === "orthographic") {
-      dollyCamera(
-        this.camera,
-        wheelDelta * this.zoomSpeed,
-        MIN_ORTHOGRAPHIC_HEIGHT,
-        MAX_ORTHOGRAPHIC_HEIGHT,
-      );
-    } else {
-      dollyCamera(this.camera, wheelDelta * this.zoomSpeed);
-    }
+    dollyCamera(this.camera, event.deltaY * this.zoomSpeed);
     this.onChange();
   };
 

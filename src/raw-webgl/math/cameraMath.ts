@@ -185,8 +185,7 @@ export function dollyCamera(
   minimumDistance = 0.05,
   maximumDistance = 1_000,
 ): void {
-  // Camera lock protects the brand axis from orbit and pan. Zoom changes only
-  // framing, so it remains available while the identity camera is locked.
+  if (camera.locked) return;
   const factor = Math.exp(logarithmicDelta);
   if (camera.mode === "orthographic") {
     camera.orthoHeight = Math.min(maximumDistance, Math.max(minimumDistance, camera.orthoHeight * factor));

@@ -38,12 +38,9 @@ uniform float uRefractionRoughness;
 uniform float uRefractionBlur;
 uniform float uEdgeRoughness;
 uniform float uEdgeHighlightStrength;
-uniform vec3 uLightPosition[5];
-uniform vec3 uLightTarget[5];
-uniform vec3 uLightColor[5];
-uniform float uLightIntensity[5];
-uniform float uLightFalloff[5];
-uniform float uLightInfluenceRadius[5];
+uniform vec3 uLightPosition[3];
+uniform vec3 uLightColor[3];
+uniform vec3 uLightIntensity;
 uniform int uIridescenceEnabled;
 uniform float uIridescenceStrength;
 uniform float uFilmIor;
@@ -194,16 +191,9 @@ void main() {
 
   float cosTheta = max(dot(normal, viewDirection), 0.0);
   float edge = pow(1.0 - cosTheta, 2.2);
-  uint localFaceId = vFaceId % 32u;
-  float facetMask = localFaceId >= 6u ? 1.0 : 0.0;
   float internalPath = 1.0 - exp(-thickness * 0.7);
   float dispersionEnvelope = max(uSpectrumStrength, 0.0)
-    * (
-      0.1
-      + max(uInternalSpectrumStrength, 0.0) * internalPath
-      + max(uEdgeSpectrumStrength, 0.0) * edge
-      + facetMask * max(uEdgeSpectrumStrength, 0.0) * (0.52 + edge * 0.68)
-    );
+    * (0.35 + max(uInternalSpectrumStrength, 0.0) * internalPath + max(uEdgeSpectrumStrength, 0.0) * edge);
   float spectralBlend = saturate(dispersionEnvelope * max(uSpectrumSaturation, 0.0));
 
   vec3 baseRay = refract(incident, normal, 1.0 / max(uIor, 1.0001));
@@ -245,18 +235,12 @@ void main() {
     clamp(uEdgeRoughness, 0.0, 1.0),
     edge
   );
-  reflectionRoughness = mix(
-    reflectionRoughness,
-    max(min(reflectionRoughness, uSurfaceRoughness * 0.72), 0.018),
-    facetMask
-  );
   vec3 reflected = environmentColorRough(reflectedDirection, reflectionRoughness);
   if (uIridescenceEnabled != 0 && uIridescenceStrength > 0.0) {
     float faceVariation = float(vFaceId % 11u) / 10.0 - 0.5;
     float filmThickness = uFilmThickness * (1.0 + faceVariation * uFilmThicknessVariation);
     vec3 film = thinFilmReflectance(cosTheta, filmThickness, uFilmIor);
-    float filmLocation = mix(0.06, 1.0, facetMask) * (0.22 + edge * 0.78);
-    float filmBlend = saturate(uIridescenceStrength) * filmLocation;
+    float filmBlend = saturate(uIridescenceStrength) * (0.3 + edge * 0.7);
     reflected *= mix(vec3(1.0), vec3(0.62) + film * 0.76, filmBlend);
   }
 
@@ -267,7 +251,7 @@ void main() {
     vec3(1.0)
   );
   vec3 directSpecular = vec3(0.0);
-  for (int lightIndex = 0; lightIndex < 5; lightIndex += 1) {
+  for (int lightIndex = 0; lightIndex < 3; lightIndex += 1) {
     vec3 toLight = uLightPosition[lightIndex] - vWorldPosition;
     float lightDistance = max(length(toLight), 1e-4);
     vec3 lightDirection = toLight / lightDistance;
@@ -280,22 +264,13 @@ void main() {
     lightFresnel = clamp(lightFresnel * max(uFresnelStrength, 0.0), vec3(0.0), vec3(1.0));
     vec3 specularBrdf = distribution * geometry * lightFresnel
       / max(4.0 * nDotV * nDotL, 1e-4);
-    float attenuation = 1.0 / (1.0 + max(uLightFalloff[lightIndex], 0.0) * lightDistance * lightDistance);
-    float influenceRadius = uLightInfluenceRadius[lightIndex];
-    if (influenceRadius > 0.0) {
-      float influenceDistance = length(vWorldPosition - uLightTarget[lightIndex]);
-      attenuation *= 1.0 - smoothstep(influenceRadius * 0.68, influenceRadius, influenceDistance);
-    }
+    float attenuation = 1.0 / (1.0 + 0.0125 * lightDistance * lightDistance);
     vec3 lightRadiance = uLightColor[lightIndex] * max(uLightIntensity[lightIndex], 0.0) * attenuation;
     directSpecular += specularBrdf * lightRadiance * nDotL;
   }
-  float cutHighlightMask = max(facetMask, edge * 0.78);
-  directSpecular *= mix(0.18, 1.0, cutHighlightMask);
   vec3 transmissionContribution = transmitted * (vec3(1.0) - fresnel) * max(uRefractionStrength, 0.0);
   float edgeHighlight = mix(1.0, max(uEdgeHighlightStrength, 0.0), edge);
-  edgeHighlight *= 1.0 + facetMask * 0.42;
-  vec3 environmentReflection = reflected * fresnel * mix(0.38, 1.0, cutHighlightMask);
-  vec3 reflectionContribution = (environmentReflection + directSpecular)
+  vec3 reflectionContribution = (reflected * fresnel + directSpecular)
     * max(uReflectionStrength, 0.0) * edgeHighlight;
   outColor = vec4(transmissionContribution + reflectionContribution, 1.0);
 }
