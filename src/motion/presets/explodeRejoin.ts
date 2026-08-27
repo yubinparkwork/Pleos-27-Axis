@@ -3,7 +3,7 @@ import type { MotionPreset } from "../types";
 
 export const explodeRejoinPreset: MotionPreset = {
   id: "explode-rejoin",
-  label: "Explode & Rejoin",
+  label: "분해 후 결합",
   duration: 6.4,
   constraint: "anchored",
   modules: [ExplodeRejoinMotion],

@@ -87,7 +87,7 @@ Production geometry and expression layers should remain separable so new Looks d
 ## Artboard / Export
 
 - Virtual artboard: Yes; framing is independent from viewport and Inspector width.
-- Supported formats: Square 1:1 (1080 × 1080); Instagram 4:5 (1080 × 1350); Portrait 3:4 (1080 × 1440); Landscape 16:9 (1920 × 1080); Vertical 9:16 (1080 × 1920); Custom (1080 × 1080)
+- Supported formats: 정사각형 1:1 (1080 × 1080); 인스타그램 4:5 (1080 × 1350); 세로형 3:4 (1080 × 1440); 가로형 16:9 (1920 × 1080); 세로형 9:16 (1080 × 1920); 사용자 설정 (1080 × 1080)
 - Raster PNG: exact artboard or render-region pixels.
 - Path-traced still: Clear, Prism, and Smoked.
 - High-resolution raster: Spectral Flow.
@@ -129,37 +129,47 @@ Production geometry and expression layers should remain separable so new Looks d
 
 ## Latest Task
 
-- User request: Implement independent SOFT SPECTRAL Look
-- What changed: Added a soft center-led spectral field without changing Axis geometry or existing Looks
-- Why: Create a restrained optical expression with deterministic motion and print-safe raster output
-- Main implementation decisions: Independent SoftSpectralMaterial|Geometry motion disabled for this Look|Neutral lighting preset with shader-owned color|8-second seamless loop
+- User request: Refresh the AI handoff from the active production runtime.
+- What changed: Regenerated runtime inspection, latest previews, validation state, and the current-state handoff.
+- Why: Keep ChatGPT and Codex synchronized without manually copying project context.
+- Main implementation decisions: Use the production inspect/export API and deterministic hero time; do not capture editor UI.
 
 ## Files Changed
 
-- `src/crystal/materials/SoftSpectralMaterial.ts` — Independent shader material
-- `src/crystal/CrystalAssembly.ts` — Look lifecycle
-- `src/crystal/MotionStudioApp.ts` — runtime and UI bindings
-- `src/crystal/ui/StudioPanel.ts` — controls
-- `src/crystal/variations/StudioVariation.ts` — built-in variations
-- `scripts/capture-soft-spectral.mjs` — QA captures
-- `scripts/verify-soft-spectral.mjs` — contracts
-- `README.md` — usage
+- `.gitignore` — Git status M
+- `artifacts/latest/preview-4x5.png` — Git status M
+- `artifacts/latest/preview-9x16.png` — Git status M
+- `artifacts/latest/preview-main.png` — Git status M
+- `artifacts/latest/runtime-state.json` — Git status M
+- `docs/AI_HANDOFF.md` — Git status M
+- `scripts/verify-pathtracer.mjs` — Git status M
+- `scripts/verify-soft-spectral.mjs` — Git status M
+- `scripts/verify-spectral-flow.mjs` — Git status M
+- `src/artboard/FormatPresetRegistry.ts` — Git status M
+- `src/crystal/CrystalAssembly.ts` — Git status M
+- `src/crystal/LightingPanel.ts` — Git status M
+- `src/crystal/MotionStudioApp.ts` — Git status M
+- `src/crystal/presets/PrismStylePresets.ts` — Git status M
+- `src/crystal/ui/MotionPanel.ts` — Git status M
+- `src/crystal/ui/StudioPanel.ts` — Git status M
+- `src/crystal/ui/TransportBar.ts` — Git status M
+- `src/crystal/variations/StudioVariation.ts` — Git status M
+- `src/motion/presets/explodeRejoin.ts` — Git status M
+- `src/motion/presets/sharedVertexPulse.ts` — Git status M
+- `src/motion/presets/spectralAxisSweep.ts` — Git status M
+- `vite.config.ts` — Git status M
 
 ## Visual Changes
 
-- White-violet origin glow
-- Blue and cyan dominant broad spectral field
-- Restrained magenta secondary response
-- Dark optical rest state
-- No geometry motion
+No intentional visual changes
 
 ## Latest Previews
 
 | Preview | Pixels | Look | Hero time |
 | --- | ---: | --- | ---: |
-| `artifacts/latest/preview-main.png` | 1080 × 1080 | soft-spectral | 4s |
-| `artifacts/latest/preview-4x5.png` | 1080 × 1350 | soft-spectral | 4s |
-| `artifacts/latest/preview-9x16.png` | 1080 × 1920 | soft-spectral | 4s |
+| `artifacts/latest/preview-main.png` | 1080 × 1080 | prism | 3.6s |
+| `artifacts/latest/preview-4x5.png` | 1080 × 1350 | prism | 3.6s |
+| `artifacts/latest/preview-9x16.png` | 1080 × 1920 | prism | 3.6s |
 
 ## Validation
 

@@ -3,7 +3,7 @@ import type { MotionPreset } from "../types";
 
 export const sharedVertexPulsePreset: MotionPreset = {
   id: "shared-vertex-pulse",
-  label: "Shared Vertex Pulse",
+  label: "공유 꼭짓점 맥동",
   duration: 5.6,
   constraint: "strict",
   modules: [SharedVertexPulseMotion],

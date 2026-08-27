@@ -3,11 +3,11 @@ import type { MotionSettings } from "../../motion/types";
 
 export function renderMotionParameters(container: HTMLElement, settings: MotionSettings): void {
   const preset = MotionPresetRegistry.get(settings.preset);
-  if (!preset) { container.innerHTML = `<p class="empty-state">Motion is off.</p>`; return; }
+  if (!preset) { container.innerHTML = `<p class="empty-state">모션이 꺼져 있습니다.</p>`; return; }
   const labels: Record<string, string> = {
-    direction: "Direction", sweepWidth: "Sweep width", spectralLag: "Spectral lag", colorSaturation: "Color saturation", originPulse: "Origin pulse",
-    amount: "Amount", frequency: "Frequency", phase: "Phase", materialResponse: "Material response", reflectionResponse: "Reflection response",
-    distance: "Distance", stagger: "Stagger", hold: "Hold", rejoinImpact: "Rejoin impact", microRotation: "Micro rotation",
+    direction: "방향", sweepWidth: "이동 폭", spectralLag: "스펙트럴 지연", colorSaturation: "색상 채도", originPulse: "중심 맥동",
+    amount: "양", frequency: "빈도", phase: "위상", materialResponse: "재질 반응", reflectionResponse: "반사 반응",
+    distance: "거리", stagger: "시차", hold: "유지", rejoinImpact: "결합 충격", microRotation: "미세 회전",
   };
   container.innerHTML = Object.entries(preset.parameters).filter(([key]) => labels[key]).map(([key, fallback]) => {
     const value = settings.parameters[key] ?? fallback;

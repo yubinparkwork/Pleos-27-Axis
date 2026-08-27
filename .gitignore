@@ -5,3 +5,4 @@ artifacts/*.jpg
 !scripts/
 !scripts/render-motion-sequence.mjs
 !scripts/verify-motion-v1.mjs
+.vercel

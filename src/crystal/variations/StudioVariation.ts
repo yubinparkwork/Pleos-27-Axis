@@ -106,15 +106,15 @@ function softSpectralSnapshot(style: "subtle" | "balanced" | "active", artboard:
 
 function builtins(): StudioVariation[] {
   return [
-    { id: "builtin-prism-clean", label: "01  Prism Clean", builtin: true, snapshot: prismSnapshot("clean", format("square", 1080, 1080, .82, .5)) },
-    { id: "builtin-prism-rgb-edge", label: "02  Prism RGB Edge", builtin: true, snapshot: prismSnapshot("rgb-edge", format("instagram-portrait", 1080, 1350, .8, .46)) },
-    { id: "builtin-prism-immersive", label: "03  Prism Immersive", builtin: true, snapshot: prismSnapshot("immersive", format("vertical-9-16", 1080, 1920, 1.08, .49)) },
-    { id: "builtin-spectral-dark", label: "04  Spectral Dark", builtin: true, snapshot: spectralSnapshot("subtle", format("square", 1080, 1080, .82, .5)) },
-    { id: "builtin-spectral-balanced", label: "05  Spectral Balanced", builtin: true, snapshot: spectralSnapshot("balanced", format("instagram-portrait", 1080, 1350, .8, .46)) },
-    { id: "builtin-spectral-active", label: "06  Spectral Active", builtin: true, snapshot: spectralSnapshot("active", format("vertical-9-16", 1080, 1920, .7, .48)) },
-    { id: "builtin-soft-spectral-subtle", label: "07  Soft Spectral Subtle", builtin: true, snapshot: softSpectralSnapshot("subtle", format("square", 1080, 1080, .82, .5)) },
-    { id: "builtin-soft-spectral-balanced", label: "08  Soft Spectral Balanced", builtin: true, snapshot: softSpectralSnapshot("balanced", format("instagram-portrait", 1080, 1350, .8, .46)) },
-    { id: "builtin-soft-spectral-active", label: "09  Soft Spectral Active", builtin: true, snapshot: softSpectralSnapshot("active", format("vertical-9-16", 1080, 1920, .7, .48)) },
+    { id: "builtin-prism-clean", label: "01  프리즘 클린", builtin: true, snapshot: prismSnapshot("clean", format("square", 1080, 1080, .82, .5)) },
+    { id: "builtin-prism-rgb-edge", label: "02  프리즘 RGB 모서리", builtin: true, snapshot: prismSnapshot("rgb-edge", format("instagram-portrait", 1080, 1350, .8, .46)) },
+    { id: "builtin-prism-immersive", label: "03  프리즘 몰입형", builtin: true, snapshot: prismSnapshot("immersive", format("vertical-9-16", 1080, 1920, 1.08, .49)) },
+    { id: "builtin-spectral-dark", label: "04  스펙트럴 다크", builtin: true, snapshot: spectralSnapshot("subtle", format("square", 1080, 1080, .82, .5)) },
+    { id: "builtin-spectral-balanced", label: "05  스펙트럴 균형", builtin: true, snapshot: spectralSnapshot("balanced", format("instagram-portrait", 1080, 1350, .8, .46)) },
+    { id: "builtin-spectral-active", label: "06  스펙트럴 강조", builtin: true, snapshot: spectralSnapshot("active", format("vertical-9-16", 1080, 1920, .7, .48)) },
+    { id: "builtin-soft-spectral-subtle", label: "07  소프트 스펙트럴 절제", builtin: true, snapshot: softSpectralSnapshot("subtle", format("square", 1080, 1080, .82, .5)) },
+    { id: "builtin-soft-spectral-balanced", label: "08  소프트 스펙트럴 균형", builtin: true, snapshot: softSpectralSnapshot("balanced", format("instagram-portrait", 1080, 1350, .8, .46)) },
+    { id: "builtin-soft-spectral-active", label: "09  소프트 스펙트럴 강조", builtin: true, snapshot: softSpectralSnapshot("active", format("vertical-9-16", 1080, 1920, .7, .48)) },
   ];
 }
 

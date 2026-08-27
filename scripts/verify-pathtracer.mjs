@@ -65,10 +65,18 @@ try {
   const spaced = assembly.inspect();
   assert.equal(spaced.gap, 0.2);
   assert.equal(spaced.sharedCorner, null);
-  for (const position of spaced.cornerPositions) {
-    assert.ok(Math.abs(Math.hypot(...position) - 0.2) < 1e-6, "Every cube must receive the same gap offset");
-  }
+  const centroid = spaced.cornerPositions.reduce((sum, position) => position.map((value, index) => value + sum[index]), [0, 0, 0]);
+  assert.ok(centroid.every((value) => Math.abs(value) < 1e-6), "Bevel gap correction must keep the Axis centered");
   assert.equal(new Set(spaced.cornerPositions.map((position) => position.map((value) => value.toFixed(5)).join(","))).size, 3, "Gap directions must be distinct");
+  assembly.setBevelRadius(0);
+  assembly.setGap(0.2);
+  const squareSpacing = assembly.inspect();
+  const squarePairDistances = squareSpacing.cornerPositions.flatMap((position, index, positions) =>
+    positions.slice(index + 1).map((other) => Math.hypot(
+      position[0] - other[0], position[1] - other[1], position[2] - other[2],
+    )),
+  );
+  assert.ok(squarePairDistances.every((distance) => Math.abs(distance - squarePairDistances[0]) < 1e-6), "Unbeveled solids must retain equal radial spacing");
   assembly.setBevelRadius(0.15);
   assembly.setGap(0.2);
   const beveledSpacing = assembly.inspect();
@@ -78,7 +86,10 @@ try {
       position[0] - other[0], position[1] - other[1], position[2] - other[2],
     )),
   );
-  assert.ok(pairDistances.every((distance) => Math.abs(distance - pairDistances[0]) < 1e-6), "Beveled solids must retain equal projected spacing");
+  assert.ok(Math.abs(pairDistances[0] - pairDistances[1]) < 1e-6, "Upper diagonal gaps must remain mirror-symmetric");
+  assert.ok(pairDistances[2] > pairDistances[0], "Bevel compensation must widen the visually compressed lower gap");
+  assembly.setGap(0);
+  assert.deepEqual(assembly.inspect().cornerPositions, [[0, 0, 0], [0, 0, 0], [0, 0, 0]], "Gap 0 must preserve the exact shared corner at every bevel radius");
   assembly.dispose();
 
   console.log(JSON.stringify({

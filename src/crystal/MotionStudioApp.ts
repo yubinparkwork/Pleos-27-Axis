@@ -309,7 +309,7 @@ export class MotionStudioApp {
 
   private bindUi(): void {
     const softLookButton = this.root.querySelector<HTMLButtonElement>("[data-look='soft-spectral']");
-    if (softLookButton) softLookButton.textContent = "Soft Spectral";
+    if (softLookButton) softLookButton.textContent = "소프트 스펙트럴";
     const softControls = this.root.querySelector<HTMLElement>("[data-soft-spectral-controls]");
     const lookAdvanced = this.root.querySelector<HTMLElement>("[data-inspector-view='look'] .advanced-link");
     if (softControls && lookAdvanced) lookAdvanced.before(softControls);

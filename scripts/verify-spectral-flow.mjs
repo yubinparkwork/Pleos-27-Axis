@@ -31,7 +31,7 @@ assert.match(studio, /this\.settings\.look\.preset === "spectral-flow"[\s\S]*ren
 assert.match(studio, /duration: 7\.2/);
 
 const panel = files["src/crystal/ui/StudioPanel.ts"];
-for (const label of ["Spectral", "Style", "Primary", "Flow Position", "Flow Direction", "White Core", "Darkness", "Spectral Lag", "Edge Attraction"]) assert.ok(panel.includes(label), `missing UI label: ${label}`);
+for (const label of ["스펙트럴", "스타일", "기본 조정", "흐름 위치", "흐름 방향", "흰색 중심광", "어두움", "스펙트럴 지연", "모서리 집중"]) assert.ok(panel.includes(label), `missing UI label: ${label}`);
 
 const sequence = files["scripts/render-motion-sequence.mjs"];
 assert.match(sequence, /look: args\.look/);

@@ -5,18 +5,39 @@ import { bindScrubbableNumbers } from "./InspectorScrub";
 type GizmoMode = "translate" | "rotate";
 
 const PRESETS: Array<{ id: Exclude<LightingPresetName, "custom">; label: string }> = [
-  { id: "pleos-rgb", label: "Pleos RGB" }, { id: "pleos-blue", label: "Pleos Blue" },
-  { id: "pleos-prism", label: "Pleos Prism" }, { id: "dark-studio", label: "Dark Studio" },
-  { id: "soft-glass", label: "Soft Glass" },
+  { id: "pleos-rgb", label: "Pleos RGB" }, { id: "pleos-blue", label: "Pleos 블루" },
+  { id: "pleos-prism", label: "Pleos 프리즘" }, { id: "dark-studio", label: "어두운 스튜디오" },
+  { id: "soft-glass", label: "부드러운 유리" },
 ];
 
 const TYPES: Array<{ id: PleosLightType; label: string }> = [
-  { id: "rect", label: "Rect Area Light" }, { id: "spot", label: "Spot Light" },
-  { id: "point", label: "Point Light" }, { id: "directional", label: "Directional Light" },
+  { id: "rect", label: "사각 영역광" }, { id: "spot", label: "스폿 조명" },
+  { id: "point", label: "점광원" }, { id: "directional", label: "방향광" },
 ];
 
 function escapeHtml(value: string): string {
   return value.replace(/[&<>"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[char] ?? char);
+}
+
+function localizeLightName(value: string): string {
+  const words: Record<string, string> = {
+    White: "흰색", Blue: "파랑", Red: "빨강", Green: "초록", Neutral: "무채색",
+    Key: "주광", Fill: "보조광", Rim: "윤곽광", Back: "후면광", Side: "측면광",
+    Accent: "강조광", Top: "상단광", Bottom: "하단광", Optical: "광학", Hard: "강한",
+    Large: "대형", Soft: "부드러운", Light: "조명",
+  };
+  return value.split(" ").map((word) => words[word] ?? word).join(" ");
+}
+
+function localizeColorName(value: string): string {
+  return value
+    .replace("Light Gray", "밝은 회색")
+    .replace("Dark Gray", "어두운 회색")
+    .replace("White", "흰색")
+    .replace("Black", "검정")
+    .replace("Red", "빨강")
+    .replace("Green", "초록")
+    .replace("Blue", "파랑");
 }
 
 export class LightingPanel {
@@ -31,16 +52,16 @@ export class LightingPanel {
   render(): void {
     const state = this.lighting.state; const selected = this.lighting.selected;
     this.host.innerHTML = `
-      <div class="light-toolbar"><button data-light-action="add">+ ADD LIGHT</button><span>${state.lights.filter((light) => light.enabled).length} / ${state.lights.length} ACTIVE</span></div>
-      <details class="inspector-section lighting-global-section" open><summary><span><strong>GLOBAL LIGHTING</strong><small>Scene-wide optical response</small></span><i></i></summary><div class="section-content lighting-global">
-          ${this.slider("global-masterIntensity", "Master Intensity", 0, 4, .05, state.globals.masterIntensity)}
-          ${this.slider("global-environmentIntensity", "Environment", 0, 3, .05, state.globals.environmentIntensity)}
-          ${this.slider("global-exposure", "Exposure", .2, 3, .05, state.globals.exposure)}
-          ${this.slider("global-bloomIntensity", "Bloom", 0, 1.5, .01, state.globals.bloomIntensity)}
-          ${this.slider("global-colorSaturation", "Saturation", 0, 2, .05, state.globals.colorSaturation)}
+      <div class="light-toolbar"><button data-light-action="add">+ 조명 추가</button><span>${state.lights.filter((light) => light.enabled).length} / ${state.lights.length} 활성</span></div>
+      <details class="inspector-section lighting-global-section" open><summary><span><strong>전체 조명</strong><small>장면 전체의 광학 반응</small></span><i></i></summary><div class="section-content lighting-global">
+          ${this.slider("global-masterIntensity", "전체 강도", 0, 4, .05, state.globals.masterIntensity)}
+          ${this.slider("global-environmentIntensity", "환경광", 0, 3, .05, state.globals.environmentIntensity)}
+          ${this.slider("global-exposure", "노출", .2, 3, .05, state.globals.exposure)}
+          ${this.slider("global-bloomIntensity", "블룸", 0, 1.5, .01, state.globals.bloomIntensity)}
+          ${this.slider("global-colorSaturation", "채도", 0, 2, .05, state.globals.colorSaturation)}
       </div></details>
-      <details class="inspector-section"><summary><span><strong>LIGHTING PRESETS</strong><small>선택 후 개별 수정 가능</small></span><i></i></summary><div class="section-content"><div class="lighting-presets">${PRESETS.map((preset) => `<button data-lighting-preset="${preset.id}" class="${state.preset === preset.id ? "active" : ""}">${preset.label}</button>`).join("")}</div></div></details>
-      <div class="lighting-subhead list-heading"><strong>LIGHT LIST</strong><small>하나를 선택해 편집</small></div>
+      <details class="inspector-section"><summary><span><strong>조명 프리셋</strong><small>선택 후 개별 수정 가능</small></span><i></i></summary><div class="section-content"><div class="lighting-presets">${PRESETS.map((preset) => `<button data-lighting-preset="${preset.id}" class="${state.preset === preset.id ? "active" : ""}">${preset.label}</button>`).join("")}</div></div></details>
+      <div class="lighting-subhead list-heading"><strong>조명 목록</strong><small>하나를 선택해 편집</small></div>
       <div class="light-list">${state.lights.map((light, index) => this.lightListItem(light, index)).join("")}</div>
       ${selected ? this.editor(selected) : ""}`;
     this.bind();
@@ -50,29 +71,32 @@ export class LightingPanel {
   refreshValues(): void { this.render(); }
 
   private lightListItem(light: PleosLightData, index: number): string {
+    const displayName = localizeLightName(light.name);
     return `<div class="light-list-item ${light.id === this.lighting.state.selectedId ? "selected" : ""}" data-light-row="${light.id}">
-      <button class="light-select" data-light-select="${light.id}"><i style="--light-color:${light.color}"></i><span>${escapeHtml(light.name)}</span><small>${TYPES.find((type) => type.id === light.type)?.label ?? light.type}</small></button>
-      <button class="light-icon ${light.enabled ? "enabled" : ""}" data-light-toggle="${light.id}" title="켜기/끄기" aria-label="${escapeHtml(light.name)} 켜기/끄기">${light.enabled ? "●" : "○"}</button>
-      <button class="light-icon" data-light-duplicate="${light.id}" title="복제" aria-label="${escapeHtml(light.name)} 복제">＋</button>
-      <button class="light-icon" data-light-delete="${light.id}" title="삭제" aria-label="${escapeHtml(light.name)} 삭제" ${this.lighting.state.lights.length <= 1 ? "disabled" : ""}>×</button>
+      <button class="light-select" data-light-select="${light.id}"><i style="--light-color:${light.color}"></i><span>${escapeHtml(displayName)}</span><small>${TYPES.find((type) => type.id === light.type)?.label ?? light.type}</small></button>
+      <button class="light-icon ${light.enabled ? "enabled" : ""}" data-light-toggle="${light.id}" title="켜기/끄기" aria-label="${escapeHtml(displayName)} 켜기/끄기">${light.enabled ? "●" : "○"}</button>
+      <button class="light-icon" data-light-duplicate="${light.id}" title="복제" aria-label="${escapeHtml(displayName)} 복제">＋</button>
+      <button class="light-icon" data-light-delete="${light.id}" title="삭제" aria-label="${escapeHtml(displayName)} 삭제" ${this.lighting.state.lights.length <= 1 ? "disabled" : ""}>×</button>
       <b>${String(index + 1).padStart(2, "0")}</b>
     </div>`;
   }
 
   private editor(light: PleosLightData): string {
     const selectedColor = PLEOS_BRAND_COLORS.find((swatch) => swatch.value.toLowerCase() === light.color.toLowerCase());
-    const palette = (["Red", "Green", "Blue", "Neutral"] as const).map((family) => `<div class="palette-family"><small>${family.toUpperCase()}</small><div>${PLEOS_BRAND_COLORS.filter((swatch) => swatch.family === family).map((swatch) => `<button data-light-swatch="${swatch.value}" class="${swatch.value.toLowerCase() === light.color.toLowerCase() ? "active" : ""}" title="Pleos ${swatch.name}" aria-label="Pleos ${swatch.name}" style="--swatch:${swatch.value}"></button>`).join("")}</div></div>`).join("");
-    const conditional = light.type === "rect" ? this.section("SIZE", "Rect Area dimensions", `<div class="xyz-grid two">${this.number("width", "Width", light.width, .05, 20, .05)}${this.number("height", "Height", light.height, .05, 20, .05)}</div>`)
-      : light.type === "spot" ? this.section("SPOT", "Cone and falloff", `${this.slider("angle", "Angle", 1, 89, 1, light.angle)}${this.slider("penumbra", "Penumbra", 0, 1, .01, light.penumbra)}${this.slider("distance", "Distance", 0, 100, .5, light.distance)}${this.slider("decay", "Decay", 0, 4, .1, light.decay)}`)
-      : light.type === "point" ? this.section("POINT", "Distance attenuation", `${this.slider("distance", "Distance", 0, 100, .5, light.distance)}${this.slider("decay", "Decay", 0, 4, .1, light.decay)}`) : "";
+    const displayName = localizeLightName(light.name);
+    const familyLabels = { Red: "빨강", Green: "초록", Blue: "파랑", Neutral: "무채색" } as const;
+    const palette = (["Red", "Green", "Blue", "Neutral"] as const).map((family) => `<div class="palette-family"><small>${familyLabels[family]}</small><div>${PLEOS_BRAND_COLORS.filter((swatch) => swatch.family === family).map((swatch) => `<button data-light-swatch="${swatch.value}" class="${swatch.value.toLowerCase() === light.color.toLowerCase() ? "active" : ""}" title="Pleos ${swatch.name}" aria-label="Pleos ${swatch.name}" style="--swatch:${swatch.value}"></button>`).join("")}</div></div>`).join("");
+    const conditional = light.type === "rect" ? this.section("크기", "사각 영역광의 크기", `<div class="xyz-grid two">${this.number("width", "너비", light.width, .05, 20, .05)}${this.number("height", "높이", light.height, .05, 20, .05)}</div>`)
+      : light.type === "spot" ? this.section("스폿", "원뿔 범위와 감쇠", `${this.slider("angle", "각도", 1, 89, 1, light.angle)}${this.slider("penumbra", "반그림자", 0, 1, .01, light.penumbra)}${this.slider("distance", "거리", 0, 100, .5, light.distance)}${this.slider("decay", "감쇠", 0, 4, .1, light.decay)}`)
+      : light.type === "point" ? this.section("점광원", "거리에 따른 감쇠", `${this.slider("distance", "거리", 0, 100, .5, light.distance)}${this.slider("decay", "감쇠", 0, 4, .1, light.decay)}`) : "";
     return `<div class="light-editor" data-selected-light="${light.id}">
-      <div class="selected-light-head"><div><strong>${escapeHtml(light.name)}</strong><small>${TYPES.find((type) => type.id === light.type)?.label}</small></div><div class="gizmo-modes"><button data-gizmo-mode="translate" class="active">이동</button><button data-gizmo-mode="rotate">회전</button></div></div>
-      ${this.section("LIGHT", "Identity and type", `<label class="light-name"><span>Name</span><input data-light-name type="text" maxlength="40" value="${escapeHtml(light.name)}"></label><label class="light-type"><span>Type</span><select data-light-type>${TYPES.map((type) => `<option value="${type.id}" ${light.type === type.id ? "selected" : ""}>${type.label}</option>`).join("")}</select></label><label class="toggle-line"><span>Enabled</span><input data-light-boolean="enabled" type="checkbox" ${light.enabled ? "checked" : ""}></label>`)}
-      ${this.section("TRANSFORM", "Viewport or numeric control", `<label class="axis-label">POSITION</label><div class="xyz-grid">${this.vectorNumbers("position", light.position, -30, 30, .1)}</div><label class="axis-label">ROTATION</label><div class="xyz-grid">${this.vectorNumbers("rotation", light.rotation, -360, 360, 1)}</div>`)}
-      ${this.section("COLOR", "Pleos Brand Colors", `<div class="color-line"><input data-light-color type="color" value="${light.color}"><input data-light-color-hex type="text" value="${light.color.toUpperCase()}" maxlength="7"></div><div class="brand-palette" aria-label="Pleos Brand Colors">${palette}</div><div class="selected-color-info"><i style="--selected-color:${light.color}"></i><span><strong>${selectedColor ? `Pleos ${selectedColor.name}` : "Custom Color"}</strong><small>${light.color.toUpperCase()}</small></span></div>`)}
-      ${this.section("OUTPUT", "Light energy", `${this.slider("intensity", "Intensity", 0, 100, .5, light.intensity)}${this.slider("exposure", "Exposure", -8, 8, .1, light.exposure)}`)}
+      <div class="selected-light-head"><div><strong>${escapeHtml(displayName)}</strong><small>${TYPES.find((type) => type.id === light.type)?.label}</small></div><div class="gizmo-modes"><button data-gizmo-mode="translate" class="active">이동</button><button data-gizmo-mode="rotate">회전</button></div></div>
+      ${this.section("조명", "이름과 유형", `<label class="light-name"><span>이름</span><input data-light-name type="text" maxlength="40" value="${escapeHtml(displayName)}"></label><label class="light-type"><span>유형</span><select data-light-type>${TYPES.map((type) => `<option value="${type.id}" ${light.type === type.id ? "selected" : ""}>${type.label}</option>`).join("")}</select></label><label class="toggle-line"><span>사용</span><input data-light-boolean="enabled" type="checkbox" ${light.enabled ? "checked" : ""}></label>`)}
+      ${this.section("변형", "화면 또는 숫자로 조정", `<label class="axis-label">위치</label><div class="xyz-grid">${this.vectorNumbers("position", light.position, -30, 30, .1)}</div><label class="axis-label">회전</label><div class="xyz-grid">${this.vectorNumbers("rotation", light.rotation, -360, 360, 1)}</div>`)}
+      ${this.section("색상", "Pleos 브랜드 색상", `<div class="color-line"><input data-light-color type="color" value="${light.color}"><input data-light-color-hex type="text" value="${light.color.toUpperCase()}" maxlength="7"></div><div class="brand-palette" aria-label="Pleos 브랜드 색상">${palette}</div><div class="selected-color-info"><i style="--selected-color:${light.color}"></i><span><strong>${selectedColor ? `Pleos ${localizeColorName(selectedColor.name)}` : "사용자 색상"}</strong><small>${light.color.toUpperCase()}</small></span></div>`)}
+      ${this.section("출력", "조명 에너지", `${this.slider("intensity", "강도", 0, 100, .5, light.intensity)}${this.slider("exposure", "노출", -8, 8, .1, light.exposure)}`)}
       ${conditional}
-      ${this.section("SHADOW", "Physical light size controls softness", `<label class="toggle-line"><span>Cast Shadow</span><input data-light-boolean="castShadow" type="checkbox" ${light.castShadow ? "checked" : ""}></label>${this.slider("shadowIntensity", "Intensity", 0, 1, .05, light.shadowIntensity)}${this.slider("shadowSoftness", "Softness", 0, 20, .25, light.shadowSoftness)}${this.slider("bias", "Bias", -.02, .02, .0001, light.bias)}${this.slider("normalBias", "Normal Bias", 0, 1, .005, light.normalBias)}<p class="physical-note">최종 패스 트레이싱에서는 Area 크기와 Spot 반경이 실제 penumbra를 만듭니다.</p>`, false)}
+      ${this.section("그림자", "광원의 물리 크기로 부드러움 조정", `<label class="toggle-line"><span>그림자 생성</span><input data-light-boolean="castShadow" type="checkbox" ${light.castShadow ? "checked" : ""}></label>${this.slider("shadowIntensity", "강도", 0, 1, .05, light.shadowIntensity)}${this.slider("shadowSoftness", "부드러움", 0, 20, .25, light.shadowSoftness)}${this.slider("bias", "바이어스", -.02, .02, .0001, light.bias)}${this.slider("normalBias", "노멀 바이어스", 0, 1, .005, light.normalBias)}<p class="physical-note">최종 패스 트레이싱에서는 영역광 크기와 스폿 반경이 실제 반그림자를 만듭니다.</p>`, false)}
     </div>`;
   }
 

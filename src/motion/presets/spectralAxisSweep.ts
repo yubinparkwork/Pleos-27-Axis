@@ -3,7 +3,7 @@ import type { MotionPreset } from "../types";
 
 export const spectralAxisSweepPreset: MotionPreset = {
   id: "spectral-axis-sweep",
-  label: "Spectral Axis Sweep",
+  label: "스펙트럴 축 이동",
   duration: 7.2,
   constraint: "strict",
   modules: [SpectralAxisSweepMotion],

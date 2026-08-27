@@ -46,9 +46,41 @@ const TOUCH_CORNERS: Array<[number, number, number]> = [
 // lower solids look attached while the upper gaps look wider.
 const SCREEN_GAP_ANGLES = [90, 210, 330] as const;
 
+// A rounded corner loses more apparent width on the two upper diagonal seams
+// than it does on the near-vertical seam between the lower solids. Equal
+// radial translations therefore make the lower pair read as if it has a
+// smaller gap. Redistribute the radial travel while keeping the layout
+// centroid fixed. The correction fades to zero with the gap so gap 0 remains
+// an exact three-corner contact, independent of bevel radius.
+const BEVEL_GAP_RESPONSE = 0.55;
+const BEVEL_GAP_MAX_RATIO = 1.3;
+
+function smoothstep01(value: number): number {
+  const t = THREE.MathUtils.clamp(value, 0, 1);
+  return t * t * (3 - 2 * t);
+}
+
 function makeScreenGapDirection(index: number): THREE.Vector3 {
   const radians = THREE.MathUtils.degToRad(SCREEN_GAP_ANGLES[index]);
   return new THREE.Vector3(Math.cos(radians), Math.sin(radians), 0);
+}
+
+function makeScreenGapOffsets(gap: number, bevelRadius: number): THREE.Vector3[] {
+  const activation = smoothstep01(gap / 0.06);
+  const bevelToGap = bevelRadius / Math.max(gap, 1e-6);
+  // tanh gives continuous live correction while preventing a large bevel at
+  // a small gap from suddenly throwing the lower pair too far apart.
+  const differential = gap
+    * BEVEL_GAP_MAX_RATIO
+    * Math.tanh(bevelToGap * BEVEL_GAP_RESPONSE)
+    * activation;
+  const upperRadius = Math.max(0, gap - differential * (2 / 3));
+  const lowerRadius = gap + differential / 3;
+  const offsets = SCREEN_GAP_ANGLES.map((_, index) => (
+    makeScreenGapDirection(index).multiplyScalar(index === 0 ? upperRadius : lowerRadius)
+  ));
+  const centroid = offsets.reduce((sum, offset) => sum.add(offset), new THREE.Vector3()).multiplyScalar(1 / offsets.length);
+  return offsets.map((offset) => offset.sub(centroid));
 }
 
 const LOOKS: Record<PhysicalCrystalLook, {
@@ -226,9 +258,9 @@ export class CrystalAssembly extends THREE.Group {
 
   setGap(value: number): void {
     this.gap = THREE.MathUtils.clamp(value, 0, 0.45);
-    this.solids.forEach((solid) => {
-      const direction = solid.userData.gapDirection as THREE.Vector3;
-      solid.position.copy(direction).multiplyScalar(this.gap);
+    const offsets = makeScreenGapOffsets(this.gap, this.bevelRadius);
+    this.solids.forEach((solid, index) => {
+      solid.position.copy(offsets[index]);
     });
     this.updateMatrixWorld(true);
   }
@@ -278,9 +310,9 @@ export class CrystalAssembly extends THREE.Group {
 
   applyRuntimeGap(value: number): void {
     const runtimeGap = THREE.MathUtils.clamp(this.gap + value, 0, 0.65);
-    this.solids.forEach((solid) => {
-      const direction = solid.userData.gapDirection as THREE.Vector3;
-      solid.position.copy(direction).multiplyScalar(runtimeGap);
+    const offsets = makeScreenGapOffsets(runtimeGap, this.bevelRadius);
+    this.solids.forEach((solid, index) => {
+      solid.position.copy(offsets[index]);
     });
     this.updateMatrixWorld(true);
   }
@@ -403,6 +435,10 @@ export class CrystalAssembly extends THREE.Group {
       sharedCorner: this.gap === 0 ? [0, 0, 0] : null,
       cornerPositions: this.getSharedCornerPositions().map((position) => position.toArray()),
       screenGapAngles: [...SCREEN_GAP_ANGLES],
+      bevelGapCompensation: {
+        response: BEVEL_GAP_RESPONSE,
+        maxRatio: BEVEL_GAP_MAX_RATIO,
+      },
       projectedAxisAngles: [30, 90, 150, 210, 270, 330],
       linePrimitives: 0,
       material: this.materials.map((material) => ({
