@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
 import { createSpectralFlowState, SpectralFlowMaterial, type SpectralFlowState } from "./materials/SpectralFlowMaterial";
+import type { PhysicalLookParameters } from "./presets/PrismStylePresets";
 
 export const CRYSTAL_LOOKS = ["clear", "prism", "spectral-flow", "smoked"] as const;
 export type CrystalLook = (typeof CRYSTAL_LOOKS)[number];
@@ -36,6 +37,17 @@ const TOUCH_CORNERS: Array<[number, number, number]> = [
   [1, 1, 0],
   [0, 1, 1],
 ];
+
+// Gap is a screen-space presentation control. Keep its three separation rays
+// on the approved Axis angles instead of deriving them from a beveled bounding
+// box: rounding moves the lower projected centers inward, which makes the two
+// lower solids look attached while the upper gaps look wider.
+const SCREEN_GAP_ANGLES = [90, 210, 330] as const;
+
+function makeScreenGapDirection(index: number): THREE.Vector3 {
+  const radians = THREE.MathUtils.degToRad(SCREEN_GAP_ANGLES[index]);
+  return new THREE.Vector3(Math.cos(radians), Math.sin(radians), 0);
+}
 
 const LOOKS: Record<PhysicalCrystalLook, {
   color: number; attenuation: number; roughness: number; transmission: number;
@@ -165,6 +177,7 @@ export class CrystalAssembly extends THREE.Group {
   private bevelRadius = 0.018;
   private reflectionStrength = 1;
   private refractionStrength = 1;
+  private physicalParameters: PhysicalLookParameters = { ior: 1.52, thickness: 2.45, attenuationDistance: 3.8, iridescence: .14 };
 
   constructor() {
     super();
@@ -187,10 +200,7 @@ export class CrystalAssembly extends THREE.Group {
       // zero is a true world-space contact with no residual layout offset.
       const touchCorner = nearestGeometryVertex(geometry, idealTouchCorner);
       const basePosition = touchCorner.clone().negate();
-      const projectedCenter = geometry.boundingBox?.getCenter(new THREE.Vector3()).add(basePosition)
-        ?? basis.reduce((sum, vector) => sum.add(vector), new THREE.Vector3()).multiplyScalar(0.5).add(basePosition);
-      const gapDirection = new THREE.Vector3(projectedCenter.x, projectedCenter.y, 0).normalize();
-      pivot.userData.gapDirection = gapDirection;
+      pivot.userData.gapDirection = makeScreenGapDirection(index);
       pivot.userData.basePosition = new THREE.Vector3();
       pivot.userData.touchCorner = touchCorner;
       pivot.userData.offsetGroup = solid;
@@ -235,14 +245,11 @@ export class CrystalAssembly extends THREE.Group {
         .addScaledVector(basis[2], corner[2]);
       const touchCorner = nearestGeometryVertex(geometry, idealTouchCorner);
       const basePosition = touchCorner.clone().negate();
-      const projectedCenter = geometry.boundingBox?.getCenter(new THREE.Vector3()).add(basePosition)
-        ?? basis.reduce((sum, vector) => sum.add(vector), new THREE.Vector3()).multiplyScalar(0.5).add(basePosition);
-
       mesh.geometry.dispose();
       mesh.geometry = geometry;
       offsetGroup.position.copy(basePosition);
       pivot.userData.touchCorner = touchCorner;
-      pivot.userData.gapDirection = new THREE.Vector3(projectedCenter.x, projectedCenter.y, 0).normalize();
+      pivot.userData.gapDirection = makeScreenGapDirection(index);
     });
 
     // Re-apply the radial gap after each topology rebuild. At gap 0 every
@@ -323,6 +330,22 @@ export class CrystalAssembly extends THREE.Group {
     this.materials.forEach((material) => { material.dispersion = value; });
   }
 
+  setPhysicalParameters(value: PhysicalLookParameters): void {
+    this.physicalParameters = {
+      ior: THREE.MathUtils.clamp(value.ior, 1, 2.333),
+      thickness: THREE.MathUtils.clamp(value.thickness, .05, 8),
+      attenuationDistance: THREE.MathUtils.clamp(value.attenuationDistance, .1, 20),
+      iridescence: THREE.MathUtils.clamp(value.iridescence, 0, 1),
+    };
+    this.materials.forEach((material) => {
+      material.ior = this.physicalParameters.ior;
+      material.thickness = this.physicalParameters.thickness;
+      material.attenuationDistance = this.physicalParameters.attenuationDistance;
+      material.iridescence = this.physicalParameters.iridescence;
+      material.needsUpdate = true;
+    });
+  }
+
   setOpticalLighting(reflectionStrength: number, refractionStrength: number): void {
     this.reflectionStrength = THREE.MathUtils.clamp(reflectionStrength, 0, 3);
     this.refractionStrength = THREE.MathUtils.clamp(refractionStrength, 0, 1.25);
@@ -358,6 +381,7 @@ export class CrystalAssembly extends THREE.Group {
       bevelRadius: this.bevelRadius,
       sharedCorner: this.gap === 0 ? [0, 0, 0] : null,
       cornerPositions: this.getSharedCornerPositions().map((position) => position.toArray()),
+      screenGapAngles: [...SCREEN_GAP_ANGLES],
       projectedAxisAngles: [30, 90, 150, 210, 270, 330],
       linePrimitives: 0,
       material: this.materials.map((material) => ({
@@ -367,6 +391,7 @@ export class CrystalAssembly extends THREE.Group {
         thickness: material.thickness,
         dispersion: material.dispersion,
       })),
+      physicalParameters: { ...this.physicalParameters },
       spectralFlow: this.getSpectralFlowState(),
     };
   }

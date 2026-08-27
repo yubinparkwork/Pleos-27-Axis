@@ -1,5 +1,5 @@
 import { AXIS_DIRECTION_FAMILIES } from "../../axis/angles";
-import { bell } from "../easing";
+import { bell, interval } from "../easing";
 import type { MotionModule, MotionPatch } from "../types";
 
 export const SpectralAxisSweepMotion: MotionModule = {
@@ -12,19 +12,22 @@ export const SpectralAxisSweepMotion: MotionModule = {
     const directions = AXIS_DIRECTION_FAMILIES["30deg"];
     const direction = directions[((directionIndex % directions.length) + directions.length) % directions.length];
     const progress = context.progress;
-    const white = bell(progress, 0.34, width);
-    const spectral = bell(progress, 0.34 + lag, width * 1.15);
-    const origin = bell(progress, 0.08, 0.075) + bell(progress, 0.92, 0.075);
+    const amplitude = Math.pow(context.strength, 1.15);
+    const lightResponse = Math.min(1, .18 + context.strength * .82);
+    const activeWindow = interval(progress, .12, .89, .12);
+    const white = bell(progress, .43, width) * activeWindow;
+    const spectral = bell(progress, .43 + lag, width * 1.12) * activeWindow;
+    const origin = bell(progress, .49, .1) * activeWindow;
     return {
       solidPhase: [0, phaseOffset, phaseOffset * 2],
-      originPulse: origin * context.strength * (parameters.originPulse ?? 0.75),
-      spectralSweep: spectral * context.strength,
-      dispersionOffset: spectral * context.strength * 0.08,
-      reflectionOffset: white * context.strength * 0.45,
-      bloomOffset: white * context.strength * 0.18,
+      originPulse: origin * amplitude * (parameters.originPulse ?? 0.4),
+      spectralSweep: spectral * amplitude,
+      dispersionOffset: spectral * amplitude * 0.055,
+      reflectionOffset: white * lightResponse * 0.34,
+      bloomOffset: white * lightResponse * 0.105,
       lightRig: {
-        whitePulse: white * context.strength,
-        spectralIntensity: spectral * context.strength * (parameters.colorSaturation ?? 0.55),
+        whitePulse: white * lightResponse,
+        spectralIntensity: spectral * amplitude * (parameters.colorSaturation ?? 0.42),
         direction,
       },
     };

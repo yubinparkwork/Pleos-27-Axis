@@ -26,22 +26,22 @@ export interface SpectralFlowState {
 
 export const SPECTRAL_FLOW_PRESETS: Readonly<Record<SpectralFlowPresetId, SpectralFlowState>> = {
   subtle: {
-    preset: "subtle", flowPosition: 0, flowDirection: "axis-30", flowSpeed: .55,
-    flowWidth: .52, flowSoftness: .68, spectrumSpread: .62, spectrumSeparation: .27,
-    saturation: .72, spectralLag: .08, coreIntensity: 1.35, coreWidth: .15,
-    falloff: 2.1, edgeAttraction: .78, reflection: 1.15, darkness: .56, bloom: .22,
+    preset: "subtle", flowPosition: 0, flowDirection: "axis-30", flowSpeed: .42,
+    flowWidth: .48, flowSoftness: .76, spectrumSpread: .48, spectrumSeparation: .18,
+    saturation: .42, spectralLag: .1, coreIntensity: 1.72, coreWidth: .18,
+    falloff: 2.35, edgeAttraction: .92, reflection: 1.08, darkness: .72, bloom: .08,
   },
   balanced: {
-    preset: "balanced", flowPosition: 0, flowDirection: "axis-30", flowSpeed: .82,
-    flowWidth: .66, flowSoftness: .58, spectrumSpread: .92, spectrumSeparation: .42,
-    saturation: 1.04, spectralLag: .13, coreIntensity: 2.15, coreWidth: .19,
-    falloff: 1.65, edgeAttraction: 1.18, reflection: 1.38, darkness: .47, bloom: .42,
+    preset: "balanced", flowPosition: 0, flowDirection: "axis-30", flowSpeed: .68,
+    flowWidth: .6, flowSoftness: .7, spectrumSpread: .78, spectrumSeparation: .32,
+    saturation: .72, spectralLag: .16, coreIntensity: 2.5, coreWidth: .22,
+    falloff: 1.9, edgeAttraction: 1.32, reflection: 1.3, darkness: .63, bloom: .16,
   },
   active: {
-    preset: "active", flowPosition: 0, flowDirection: "auto", flowSpeed: 1.18,
-    flowWidth: .82, flowSoftness: .5, spectrumSpread: 1.28, spectrumSeparation: .58,
-    saturation: 1.28, spectralLag: .2, coreIntensity: 3.05, coreWidth: .23,
-    falloff: 1.3, edgeAttraction: 1.65, reflection: 1.62, darkness: .39, bloom: .7,
+    preset: "active", flowPosition: 0, flowDirection: "auto", flowSpeed: .92,
+    flowWidth: .72, flowSoftness: .62, spectrumSpread: 1.02, spectrumSeparation: .44,
+    saturation: .92, spectralLag: .22, coreIntensity: 3.05, coreWidth: .24,
+    falloff: 1.55, edgeAttraction: 1.72, reflection: 1.52, darkness: .55, bloom: .28,
   },
 };
 

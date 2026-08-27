@@ -295,6 +295,17 @@ export class LightingSystem {
     this.rebuildAll(); this.onChange("lights"); this.onChange("globals");
   }
 
+  applyState(value: LightingState): void {
+    const next = sanitizeLightingState(value);
+    this.runtime.forEach((_, id) => this.disposeRuntime(id));
+    this.state.globals = { ...next.globals };
+    this.state.lights = next.lights.map((light) => ({ ...light, position: [...light.position], rotation: [...light.rotation] }));
+    this.state.selectedId = next.selectedId;
+    this.state.preset = next.preset;
+    this.rebuildAll();
+    this.onChange("lights"); this.onChange("globals"); this.onChange("selection");
+  }
+
   updateGlobal<K extends keyof LightingGlobals>(key: K, value: LightingGlobals[K]): void {
     this.state.globals[key] = value; this.state.preset = "custom";
     if (key === "masterIntensity" || key === "colorSaturation") this.state.lights.forEach((light) => this.applyData(light));

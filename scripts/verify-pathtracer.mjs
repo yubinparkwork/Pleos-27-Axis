@@ -69,6 +69,16 @@ try {
     assert.ok(Math.abs(Math.hypot(...position) - 0.2) < 1e-6, "Every cube must receive the same gap offset");
   }
   assert.equal(new Set(spaced.cornerPositions.map((position) => position.map((value) => value.toFixed(5)).join(","))).size, 3, "Gap directions must be distinct");
+  assembly.setBevelRadius(0.15);
+  assembly.setGap(0.2);
+  const beveledSpacing = assembly.inspect();
+  assert.deepEqual(beveledSpacing.screenGapAngles, [90, 210, 330], "Bevel must not rotate the approved screen-space gap rays");
+  const pairDistances = beveledSpacing.cornerPositions.flatMap((position, index, positions) =>
+    positions.slice(index + 1).map((other) => Math.hypot(
+      position[0] - other[0], position[1] - other[1], position[2] - other[2],
+    )),
+  );
+  assert.ok(pairDistances.every((distance) => Math.abs(distance - pairDistances[0]) < 1e-6), "Beveled solids must retain equal projected spacing");
   assembly.dispose();
 
   console.log(JSON.stringify({

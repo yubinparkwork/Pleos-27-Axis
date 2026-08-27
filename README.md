@@ -23,7 +23,7 @@ npm run qa
 
 Inspector는 `SETUP / LOOK / MOTION / FORMAT / EXPORT`로 구성됩니다. 개별 light와 path-tracing 물리 파라미터는 우측 상단 톱니바퀴의 Advanced drawer에 있습니다.
 
-SETUP의 `모델링 → 베벨 반경`에서 `0–0.15` 범위로 세 광학 육면체의 모서리를 조절합니다. 값 변경 시 폐쇄형 geometry를 재생성하고 실제 bevel 꼭지점을 원점에 재정렬하므로, `큐브 간격 0`에서는 베벨 값과 관계없이 세 모델이 정확히 맞닿습니다.
+SETUP의 `모델링 → 베벨 반경`에서 `0–0.15` 범위로 세 광학 육면체의 모서리를 조절합니다. 값 변경 시 폐쇄형 geometry를 재생성하고 실제 bevel 꼭지점을 원점에 재정렬하므로, `큐브 간격 0`에서는 베벨 값과 관계없이 세 모델이 정확히 맞닿습니다. 양수 간격은 베벨된 바운딩 중심이 아닌 승인된 화면 축 `90° / 210° / 330°`를 사용해 세 방향의 시각적 간격을 동일하게 유지합니다.
 
 기본 카메라는 `Z = -12`에서 원점을 바라보며, 조명 프리셋과 studio rear plane도 같은 시점을 기준으로 배치됩니다. 이전 `+Z` 카메라 기준으로 저장된 lighting state는 로드 시 한 번만 `-Z` 메인 카메라 기준으로 자동 변환됩니다.
 
@@ -177,6 +177,21 @@ npm run handoff
 ```bash
 npm run handoff:full
 ```
+
+대표 Look·Motion·시점을 지정해 handoff preview를 만들 수도 있습니다.
+
+```bash
+npm run handoff:full -- --look spectral-flow --motion spectral-axis-sweep --hero-time 3
+```
+
+## Design Polish workflow
+
+- Inspector 상단 `Variation`에서 6개의 완성형 KV 조합을 즉시 불러옵니다.
+- `+ 저장`은 현재 Look, 조명, Motion hero frame, 판형, 카메라를 사용자 Variation으로 로컬 저장합니다.
+- Prism은 `Clean`, `RGB Edge`, `Immersive`를 먼저 고른 뒤 Primary controls만 조정합니다.
+- Spectral은 `Subtle`, `Balanced`, `Active`로 시작하며 세부 shader 값은 Advanced에 있습니다.
+- 판형 버튼은 해상도뿐 아니라 각 비율에 맞는 Axis 위치와 scale도 함께 적용합니다.
+- QA 이미지 재생성: `npm run capture:design-polish`
 
 생성 결과:
 

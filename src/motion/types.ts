@@ -71,7 +71,7 @@ export interface MotionRuntimeState {
 }
 
 export const STRENGTH_VALUES: Record<MotionStrengthMode, number> = {
-  restrained: 0.35,
-  balanced: 0.65,
-  active: 1,
+  restrained: 0.32,
+  balanced: 0.56,
+  active: 0.82,
 };

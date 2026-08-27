@@ -69,9 +69,9 @@ Production geometry and expression layers should remain separable so new Looks d
 
 - Runtime: `MotionEngine` + `MotionClock`
 - Current preset: `spectral-axis-sweep`
-- Available presets: spectral-axis-sweep — 6s, strict; shared-vertex-pulse — 4s, strict; explode-rejoin — 4.5s, anchored
+- Available presets: spectral-axis-sweep — 7.2s, strict; shared-vertex-pulse — 5.6s, strict; explode-rejoin — 6.4s, anchored
 - Determinism: absolute-time evaluation; fixed export time is `frameIndex / fps`.
-- Current duration / FPS: 6s / 30 fps
+- Current duration / FPS: 7.2s / 30 fps
 - Playback: realtime raster preview.
 - Sequence export: fixed-timestep raster PNG frames.
 - Path-traced stills: current absolute motion frame is synchronized before accumulation.
@@ -121,30 +121,70 @@ Production geometry and expression layers should remain separable so new Looks d
 
 ## Latest Task
 
-- User request: Publish current PLEOS 27 Axis work and AI handoff
-- What changed: Validated Motion Studio, Spectral Flow, retained render/export tools, and generated deterministic AI handoff artifacts for GitHub.
-- Why: Synchronize the active source, runtime metadata, and latest visual previews for reliable ChatGPT handoff.
-- Main implementation decisions: Preserve the approved Axis structure and current visual output; publish only the PLEOS repository scope; keep unrelated parent-workspace changes untouched.
+- User request: PLEOS Motion Studio V1 Design Polish
+- What changed: Simplified creative-tool UI, refined Prism/Spectral hero presets and motion timing, added Variation workflow
+- Why: Move from technical prototype toward production-ready KV authoring tool
+- Main implementation decisions: Preset-first UX|Advanced technical controls separated|No new renderer or motion type|Axis identity preserved
 
 ## Files Changed
 
-- `docs/AI_HANDOFF.md` — Current project handoff
-- `artifacts/latest/runtime-state.json` — Machine-readable runtime snapshot
-- `artifacts/latest/preview-main.png` — Main preview
-- `artifacts/latest/preview-4x5.png` — 4:5 preview
-- `artifacts/latest/preview-9x16.png` — 9:16 preview
+- `README.md` — Git status M
+- `artifacts/latest/preview-4x5.png` — Git status M
+- `artifacts/latest/preview-9x16.png` — Git status M
+- `artifacts/latest/preview-main.png` — Git status M
+- `artifacts/latest/runtime-state.json` — Git status M
+- `docs/AI_HANDOFF.md` — Git status M
+- `package.json` — Git status M
+- `scripts/update-ai-handoff.mjs` — Git status M
+- `scripts/verify-pathtracer.mjs` — Git status M
+- `scripts/verify-spectral-flow.mjs` — Git status M
+- `src/artboard/FormatPresetRegistry.ts` — Git status M
+- `src/crystal/CrystalApp.css` — Git status M
+- `src/crystal/CrystalAssembly.ts` — Git status M
+- `src/crystal/LightingSystem.ts` — Git status M
+- `src/crystal/MotionStudioApp.ts` — Git status M
+- `src/crystal/materials/SpectralFlowMaterial.ts` — Git status M
+- `src/crystal/ui/StudioPanel.ts` — Git status M
+- `src/main.ts` — Git status M
+- `src/motion/modules/ExplodeRejoinMotion.ts` — Git status M
+- `src/motion/modules/SharedVertexPulseMotion.ts` — Git status M
+- `src/motion/modules/SpectralAxisSweepMotion.ts` — Git status M
+- `src/motion/presets/explodeRejoin.ts` — Git status M
+- `src/motion/presets/sharedVertexPulse.ts` — Git status M
+- `src/motion/presets/spectralAxisSweep.ts` — Git status M
+- `src/motion/types.ts` — Git status M
+- `artifacts/design-polish/motion-explode.png` — Git status ??
+- `artifacts/design-polish/motion-pulse.png` — Git status ??
+- `artifacts/design-polish/motion-sweep.png` — Git status ??
+- `artifacts/design-polish/prism-clean.png` — Git status ??
+- `artifacts/design-polish/prism-immersive.png` — Git status ??
+- `artifacts/design-polish/prism-rgb-edge.png` — Git status ??
+- `artifacts/design-polish/spectral-active.png` — Git status ??
+- `artifacts/design-polish/spectral-balanced.png` — Git status ??
+- `artifacts/design-polish/spectral-subtle.png` — Git status ??
+- `artifacts/design-polish/ui-format.png` — Git status ??
+- `artifacts/design-polish/ui-look.png` — Git status ??
+- `artifacts/design-polish/ui-motion.png` — Git status ??
+- `artifacts/design-polish/ui-variations.png` — Git status ??
+- `scripts/capture-design-polish.mjs` — Git status ??
+- `scripts/verify-design-polish.mjs` — Git status ??
+- `src/crystal/presets/PrismStylePresets.ts` — Git status ??
+- `src/crystal/variations/StudioVariation.ts` — Git status ??
 
 ## Visual Changes
 
-- No intentional visual changes; deterministic representative previews refreshed.
+- Updated Prism hero looks
+- Updated Spectral Flow tuning
+- Motion timing refined
+- Inspector density reduced
 
 ## Latest Previews
 
 | Preview | Pixels | Look | Hero time |
 | --- | ---: | --- | ---: |
-| `artifacts/latest/preview-main.png` | 1080 × 1080 | prism | 3s |
-| `artifacts/latest/preview-4x5.png` | 1080 × 1350 | prism | 3s |
-| `artifacts/latest/preview-9x16.png` | 1080 × 1920 | prism | 3s |
+| `artifacts/latest/preview-main.png` | 1080 × 1080 | prism | 0s |
+| `artifacts/latest/preview-4x5.png` | 1080 × 1350 | prism | 0s |
+| `artifacts/latest/preview-9x16.png` | 1080 × 1920 | prism | 0s |
 
 ## Validation
 

@@ -24,6 +24,8 @@ import { PrismMotionAdapter } from "./PrismMotionAdapter";
 import { installStudioEnvironment, type PathTracingStudioEnvironment } from "./StudioEnvironment";
 import { bindScrubbableNumbers } from "./InspectorScrub";
 import { createSpectralFlowState, sanitizeSpectralFlowState, SPECTRAL_FLOW_PRESETS, type SpectralFlowDirection, type SpectralFlowPresetId, type SpectralFlowState } from "./materials/SpectralFlowMaterial";
+import { PRISM_STYLE_PRESETS, sanitizePrismStyle, type PhysicalLookParameters, type PrismStyleId } from "./presets/PrismStylePresets";
+import { StudioVariationStore, type StudioVariationSnapshot } from "./variations/StudioVariation";
 import { renderMotionParameters } from "./ui/MotionPanel";
 import { studioPanelTemplate } from "./ui/StudioPanel";
 import { transportTemplate } from "./ui/TransportBar";
@@ -31,13 +33,13 @@ import { transportTemplate } from "./ui/TransportBar";
 interface StudioSettingsV2 {
   version: 2;
   setup: { gap: number; bevelRadius: number; lightingRigVersion: number; viewLocked: boolean };
-  look: { preset: CrystalLook; roughness: number; dispersion: number; spectralFlow: SpectralFlowState };
+  look: { preset: CrystalLook; prismStyle: PrismStyleId; roughness: number; dispersion: number; physical: PhysicalLookParameters; spectralFlow: SpectralFlowState };
   lighting: LightingState;
   motion: MotionSettings;
   format: ArtboardState;
   export: { ppi: number };
   advanced: { renderScale: number; bounces: number; targetSamples: number; renderRegion: RenderRegion };
-  ui: { activeTab: InspectorTab; inspectorCollapsed: boolean; advancedOpen: boolean };
+  ui: { activeTab: InspectorTab; inspectorCollapsed: boolean; advancedOpen: boolean; selectedVariationId: string };
 }
 
 type RenderQuality = "fast" | "high";
@@ -71,17 +73,17 @@ const FAST_RENDER_SCALE = 0.5;
 const FAST_RENDER_BOUNCES = 4;
 const PRINT_RENDER_SAMPLES = 512;
 const PRINT_RENDER_BOUNCES = 12;
-const defaultMotion = (): MotionSettings => ({ enabled: false, preset: "spectral-axis-sweep", strengthMode: "balanced", strength: 0.65, duration: 6, fps: 30, speed: 1, seed: 27, loop: true, constraint: "strict", parameters: {} });
+const defaultMotion = (): MotionSettings => ({ enabled: false, preset: "spectral-axis-sweep", strengthMode: "balanced", strength: 0.5, duration: 7.2, fps: 30, speed: 1, seed: 27, loop: true, constraint: "strict", parameters: {} });
 const defaults = (): StudioSettingsV2 => ({
   version: 2,
   setup: { gap: 0, bevelRadius: 0.018, lightingRigVersion: 2, viewLocked: true },
-  look: { preset: "prism", roughness: 0.04, dispersion: 0.16, spectralFlow: createSpectralFlowState("balanced") },
+  look: { preset: "prism", prismStyle: "clean", roughness: PRISM_STYLE_PRESETS.clean.roughness, dispersion: PRISM_STYLE_PRESETS.clean.dispersion, physical: { ...PRISM_STYLE_PRESETS.clean.physical }, spectralFlow: createSpectralFlowState("balanced") },
   lighting: createLightingPreset("pleos-prism"),
   motion: defaultMotion(),
   format: { ...DEFAULT_ARTBOARD, axisAnchor: { ...DEFAULT_ARTBOARD.axisAnchor } },
   export: { ppi: 300 },
   advanced: { renderScale: 0.75, bounces: 8, targetSamples: 128, renderRegion: { enabled: false, x: -1, y: -1, width: 640, height: 480, unitPpi: 96 } },
-  ui: { activeTab: "motion", inspectorCollapsed: false, advancedOpen: false },
+  ui: { activeTab: "look", inspectorCollapsed: false, advancedOpen: false, selectedVariationId: "" },
 });
 
 function finite(value: unknown, fallback: number, min: number, max: number): number {
@@ -106,13 +108,20 @@ function loadSettingsV2(): StudioSettingsV2 {
         },
         look: {
           preset: v2.look?.preset === "clear" || v2.look?.preset === "smoked" || v2.look?.preset === "spectral-flow" ? v2.look.preset : "prism",
+          prismStyle: sanitizePrismStyle(v2.look?.prismStyle),
           roughness: finite(v2.look?.roughness, base.look.roughness, 0.02, 0.28),
           dispersion: finite(v2.look?.dispersion, base.look.dispersion, 0, 0.35),
+          physical: {
+            ior: finite(v2.look?.physical?.ior, base.look.physical.ior, 1, 2.5),
+            thickness: finite(v2.look?.physical?.thickness, base.look.physical.thickness, .01, 10),
+            attenuationDistance: finite(v2.look?.physical?.attenuationDistance, base.look.physical.attenuationDistance, .1, 20),
+            iridescence: finite(v2.look?.physical?.iridescence, base.look.physical.iridescence, 0, 1),
+          },
           spectralFlow: sanitizeSpectralFlowState(v2.look?.spectralFlow),
         },
         lighting,
         motion: { ...base.motion, ...v2.motion, parameters: { ...v2.motion?.parameters } },
-        format: { ...base.format, ...v2.format, axisAnchor: { ...base.format.axisAnchor, ...v2.format?.axisAnchor } },
+        format: sanitizeArtboard({ ...base.format, ...v2.format, axisAnchor: { ...base.format.axisAnchor, ...v2.format?.axisAnchor } }),
         export: { ppi: finite(v2.export?.ppi, 300, 36, 1200) },
         advanced: {
           renderScale: finite(v2.advanced?.renderScale, .75, .4, 1),
@@ -120,7 +129,7 @@ function loadSettingsV2(): StudioSettingsV2 {
           targetSamples: Math.round(finite(v2.advanced?.targetSamples, 128, 16, 512)),
           renderRegion: sanitizeRenderRegion(v2.advanced?.renderRegion, base.advanced.renderRegion),
         },
-        ui: { activeTab: v2.ui?.activeTab ?? "motion", inspectorCollapsed: v2.ui?.inspectorCollapsed === true, advancedOpen: v2.ui?.advancedOpen === true },
+        ui: { activeTab: v2.ui?.activeTab ?? "look", inspectorCollapsed: v2.ui?.inspectorCollapsed === true, advancedOpen: v2.ui?.advancedOpen === true, selectedVariationId: v2.ui?.selectedVariationId ?? "" },
       };
     }
     const v1 = JSON.parse(localStorage.getItem(STORAGE_V1) ?? "null") as Record<string, unknown> | null;
@@ -154,6 +163,16 @@ function sanitizeRenderRegion(value: Partial<RenderRegion> | undefined, fallback
   };
 }
 
+function sanitizeArtboard(value: ArtboardState): ArtboardState {
+  return {
+    ...value,
+    width: Math.round(finite(value.width, 1080, 16, 8192)), height: Math.round(finite(value.height, 1080, 16, 8192)),
+    scale: finite(value.scale, .82, .25, 2), previewZoom: finite(value.previewZoom, 1, .5, 1.8),
+    axisAnchor: { gridX: finite(value.axisAnchor?.gridX, .5, 0, 1), gridY: finite(value.axisAnchor?.gridY, .5, 0, 1) },
+    background: /^#[0-9a-f]{6}$/i.test(value.background) ? value.background : "#050607",
+  };
+}
+
 export class MotionStudioApp {
   private readonly settings = loadSettingsV2();
   private readonly scene = new THREE.Scene();
@@ -164,6 +183,7 @@ export class MotionStudioApp {
   private readonly motionEngine = new MotionEngine();
   private readonly motionClock = new MotionClock();
   private readonly constraints = new AxisConstraintService();
+  private readonly variations = new StudioVariationStore();
   private readonly composition = new CompositionAdapter();
   private readonly previewRenderer: THREE.WebGLRenderer;
   private readonly pathRenderer: THREE.WebGLRenderer;
@@ -216,6 +236,7 @@ export class MotionStudioApp {
     this.assembly.setLook(this.settings.look.preset);
     this.assembly.setRoughness(this.settings.look.roughness);
     this.assembly.setDispersion(this.settings.look.dispersion);
+    this.assembly.setPhysicalParameters(this.settings.look.physical);
     this.assembly.setGap(this.settings.setup.gap);
     this.assembly.setBevelRadius(this.settings.setup.bevelRadius);
     this.motionAdapter.captureRestPose();
@@ -266,7 +287,7 @@ export class MotionStudioApp {
     return `<section class="crystal-app motion-studio">
       <header class="topbar"><div class="wordmark"><strong>PLEOS AXIS STUDIO</strong><span>Prism 3D · Motion V1</span></div><div class="render-status"><span data-output="samples">Raster preview ready</span></div></header>
       <main class="pasteboard"><div class="artboard-meta"><span data-output="format-name">Square 1:1</span><b data-output="artboard-size">${this.settings.format.width} × ${this.settings.format.height}px</b></div><div class="artboard-shell"><div class="crystal-stage" aria-label="Pleos Axis virtual artboard"><div class="safe-guide" data-safe-guide></div><div class="render-region-guide" data-render-region-guide><span data-output="region-size"></span></div></div></div></main>
-      ${studioPanelTemplate({ look: this.settings.look.preset, spectralFlow: this.settings.look.spectralFlow, gap: this.settings.setup.gap, bevelRadius: this.settings.setup.bevelRadius, roughness: this.settings.look.roughness, dispersion: this.settings.look.dispersion, reflection: globals.reflectionStrength, refraction: globals.refractionStrength, exposure: globals.exposure, bloom: globals.bloomIntensity, saturation: globals.colorSaturation, environment: globals.environmentIntensity, motion: this.settings.motion, artboard: this.settings.format, activeTab: this.settings.ui.activeTab, outputSamples: this.settings.advanced.targetSamples, bounces: this.settings.advanced.bounces, renderScale: this.settings.advanced.renderScale, ppi: this.settings.export.ppi, renderRegion: region, printOutput: this.printOutputDescription() })}
+      ${studioPanelTemplate({ look: this.settings.look.preset, prismStyle: this.settings.look.prismStyle, physical: this.settings.look.physical, variations: this.variations.list().map(({ id, label, builtin }) => ({ id, label, builtin })), selectedVariationId: this.settings.ui.selectedVariationId, spectralFlow: this.settings.look.spectralFlow, gap: this.settings.setup.gap, bevelRadius: this.settings.setup.bevelRadius, roughness: this.settings.look.roughness, dispersion: this.settings.look.dispersion, reflection: globals.reflectionStrength, refraction: globals.refractionStrength, exposure: globals.exposure, bloom: globals.bloomIntensity, saturation: globals.colorSaturation, environment: globals.environmentIntensity, motion: this.settings.motion, artboard: this.settings.format, activeTab: this.settings.ui.activeTab, outputSamples: this.settings.advanced.targetSamples, bounces: this.settings.advanced.bounces, renderScale: this.settings.advanced.renderScale, ppi: this.settings.export.ppi, renderRegion: region, printOutput: this.printOutputDescription() })}
       ${transportTemplate()}
     </section>`;
   }
@@ -284,10 +305,16 @@ export class MotionStudioApp {
 
   private bindUi(): void {
     this.root.querySelectorAll<HTMLButtonElement>("[data-look]").forEach((button) => button.addEventListener("click", () => this.setLook(button.dataset.look as CrystalLook)));
+    this.root.querySelectorAll<HTMLButtonElement>("[data-prism-style]").forEach((button) => button.addEventListener("click", () => this.setPrismStyle(button.dataset.prismStyle as PrismStyleId)));
+    this.require<HTMLSelectElement>("[data-variation]").addEventListener("change", (event) => this.applyVariation((event.currentTarget as HTMLSelectElement).value));
     this.bindNumber("gap", (value) => { this.settings.setup.gap = value; this.assembly.setGap(value); this.motionAdapter.captureRestPose(); this.motionClock.pause(); this.applyMotionAt(this.motionClock.time); });
     this.bindNumber("bevel-radius", (value) => { this.settings.setup.bevelRadius = value; this.assembly.setBevelRadius(value); this.motionAdapter.captureRestPose(); this.motionClock.pause(); this.applyMotionAt(this.motionClock.time); });
     this.bindNumber("roughness", (value) => { this.settings.look.roughness = value; this.assembly.setRoughness(value); });
     this.bindNumber("dispersion", (value) => { this.settings.look.dispersion = value; this.assembly.setDispersion(value); });
+    this.bindNumber("ior", (value) => this.updatePhysical({ ior: value }));
+    this.bindNumber("thickness", (value) => this.updatePhysical({ thickness: value }));
+    this.bindNumber("attenuation-distance", (value) => this.updatePhysical({ attenuationDistance: value }));
+    this.bindNumber("iridescence", (value) => this.updatePhysical({ iridescence: value }));
     this.bindNumber("spectral-flow-position", (value) => this.updateSpectralFlow({ flowPosition: value }));
     this.bindNumber("spectral-flow-speed", (value) => this.updateSpectralFlow({ flowSpeed: value }));
     this.bindNumber("spectral-flow-width", (value) => this.updateSpectralFlow({ flowWidth: value }));
@@ -316,6 +343,8 @@ export class MotionStudioApp {
     this.bindNumber("motion-duration", (value) => { this.settings.motion.duration = value; this.updateTransport(); });
     this.bindNumber("motion-fps", (value) => { this.settings.motion.fps = Math.round(value); this.updateTransport(); });
     this.bindNumber("artboard-scale", (value) => { this.settings.format.scale = value; this.resize(); });
+    this.bindNumber("axis-anchor-x", (value) => { this.settings.format.axisAnchor.gridX = value; this.resize(); });
+    this.bindNumber("axis-anchor-y", (value) => { this.settings.format.axisAnchor.gridY = value; this.resize(); });
     this.bindNumber("preview-zoom", (value) => { this.settings.format.previewZoom = value; this.resize(); });
     this.bindNumber("scale", (value) => { this.settings.advanced.renderScale = value; this.pathTracer.renderScale = value; this.updateRenderUi(); });
     this.bindNumber("bounces", (value) => { this.settings.advanced.bounces = Math.round(value); this.pathTracer.bounces = Math.round(value); });
@@ -333,11 +362,13 @@ export class MotionStudioApp {
     timeline.addEventListener("input", () => { this.pause(); this.seek(Number(timeline.value)); });
     this.require<HTMLInputElement>("[data-motion='transport-loop']").addEventListener("change", (event) => { const value = (event.currentTarget as HTMLInputElement).checked; this.settings.motion.loop = value; loop.checked = value; this.persist(); });
     this.require<HTMLSelectElement>("[data-format='preset']").addEventListener("change", (event) => this.setArtboard({ id: (event.currentTarget as HTMLSelectElement).value as ArtboardPresetId }));
+    this.root.querySelectorAll<HTMLButtonElement>("[data-format-preset]").forEach((button) => button.addEventListener("click", () => this.setArtboard({ id: button.dataset.formatPreset as ArtboardPresetId })));
     for (const key of ["width", "height"] as const) this.require<HTMLInputElement>(`[data-format='${key}']`).addEventListener("change", (event) => this.setArtboard({ id: "custom", [key]: Number((event.currentTarget as HTMLInputElement).value) }));
     this.require<HTMLSelectElement>("[data-format='fit']").value = this.settings.format.fitMode;
     this.require<HTMLSelectElement>("[data-format='fit']").addEventListener("change", (event) => { this.settings.format.fitMode = (event.currentTarget as HTMLSelectElement).value as ArtboardState["fitMode"]; this.persist(); });
     this.require<HTMLInputElement>("[data-format='safe-guide']").addEventListener("change", (event) => { this.settings.format.safeGuide = (event.currentTarget as HTMLInputElement).checked; this.resize(); this.persist(); });
     this.require<HTMLInputElement>("[data-format='transparent']").addEventListener("change", (event) => { this.settings.format.transparent = (event.currentTarget as HTMLInputElement).checked; this.updateBackground(); this.persist(); });
+    this.require<HTMLInputElement>("[data-format='background']").addEventListener("input", (event) => { this.settings.format.background = (event.currentTarget as HTMLInputElement).value; this.updateBackground(); this.showPreview(); this.persist(); });
     this.require<HTMLInputElement>("[data-control='view-lock']").addEventListener("change", (event) => { this.settings.setup.viewLocked = (event.currentTarget as HTMLInputElement).checked; this.controls.enabled = !this.settings.setup.viewLocked && !this.motionClock.playing; this.persist(); });
     this.require<HTMLSelectElement>("[data-control='export-ppi']").addEventListener("change", (event) => { this.settings.export.ppi = Number((event.currentTarget as HTMLSelectElement).value); this.updateRenderUi(); this.persist(); });
     this.bindRenderRegionUi();
@@ -496,6 +527,10 @@ export class MotionStudioApp {
     else if (action === "frame-next") this.stepFrame(1);
     else if (action === "reset") this.resetCamera();
     else if (action === "scene-reset") { this.resetCamera(); this.resetMotion(); this.settings.setup.gap = 0; this.settings.setup.bevelRadius = .018; this.assembly.setGap(0); this.assembly.setBevelRadius(.018); this.motionAdapter.captureRestPose(); }
+    else if (action === "variation-save") this.saveCurrentVariation();
+    else if (action === "variation-duplicate") this.duplicateVariation();
+    else if (action === "variation-rename") this.renameVariation();
+    else if (action === "variation-delete") this.deleteVariation();
     else if (action === "advanced-toggle" || action === "advanced-close") { this.settings.ui.advancedOpen = action === "advanced-toggle" ? !this.settings.ui.advancedOpen : false; this.updateAdvanced(); this.updateRenderRegion(); this.persist(); }
     else if (action === "region-center") { this.centerRenderRegion(); this.updateRenderRegion(); this.persist(); }
     else if (action === "region-full") { this.settings.advanced.renderRegion = { ...this.settings.advanced.renderRegion, enabled: true, x: 0, y: 0, width: this.settings.format.width, height: this.settings.format.height }; this.syncRenderRegionInputs(); this.updateRenderRegion(); this.persist(); }
@@ -505,6 +540,115 @@ export class MotionStudioApp {
     else if (action === "render-current-high") void this.renderCurrentFrame(true).catch((error) => this.showPreview(`고품질 렌더링 실패 · ${error.message}`));
     else if (action === "export-print") void this.renderPrintFrame(true).catch((error) => this.showPreview(`인쇄용 렌더링 실패 · ${error.message}`));
     else if (action === "copy-sequence") void navigator.clipboard.writeText(this.sequenceCommand());
+  }
+
+  private updatePhysical(patch: Partial<PhysicalLookParameters>): void {
+    this.settings.look.physical = { ...this.settings.look.physical, ...patch };
+    this.assembly.setPhysicalParameters(this.settings.look.physical);
+  }
+
+  setPrismStyle(id: PrismStyleId): void {
+    const preset = PRISM_STYLE_PRESETS[sanitizePrismStyle(id)];
+    this.settings.look.prismStyle = preset.id;
+    this.settings.look.roughness = preset.roughness;
+    this.settings.look.dispersion = preset.dispersion;
+    this.settings.look.physical = { ...preset.physical };
+    this.assembly.setRoughness(preset.roughness);
+    this.assembly.setDispersion(preset.dispersion);
+    this.assembly.setPhysicalParameters(preset.physical);
+    const lighting = createLightingPreset(preset.lightingPreset);
+    Object.assign(lighting.globals, preset.lightingGlobals);
+    this.lighting.applyState(lighting);
+    if (preset.id === "immersive") this.settings.format.scale = Math.max(this.settings.format.scale, 1.04);
+    this.settings.ui.selectedVariationId = "";
+    this.syncStudioUi(); this.resize(); this.persist();
+  }
+
+  private captureVariationSnapshot(): StudioVariationSnapshot {
+    return {
+      setup: { gap: this.settings.setup.gap, bevelRadius: this.settings.setup.bevelRadius },
+      look: JSON.parse(JSON.stringify(this.settings.look)) as StudioVariationSnapshot["look"],
+      lighting: JSON.parse(JSON.stringify(this.lighting.state)) as LightingState,
+      motion: JSON.parse(JSON.stringify(this.settings.motion)) as MotionSettings,
+      format: JSON.parse(JSON.stringify(this.settings.format)) as ArtboardState,
+      camera: { position: this.camera.position.toArray() as [number, number, number], target: this.controls.target.toArray() as [number, number, number], zoom: this.camera.zoom },
+      heroTime: this.motionClock.time,
+    };
+  }
+
+  applyVariation(id: string): void {
+    const variation = this.variations.get(id); if (!variation) return;
+    const snapshot = this.variations.sanitizeSnapshot(variation.snapshot);
+    this.pause();
+    this.settings.setup.gap = snapshot.setup.gap; this.settings.setup.bevelRadius = snapshot.setup.bevelRadius;
+    this.settings.look = JSON.parse(JSON.stringify(snapshot.look)) as StudioSettingsV2["look"];
+    this.settings.motion = JSON.parse(JSON.stringify(snapshot.motion)) as MotionSettings;
+    this.settings.format = JSON.parse(JSON.stringify(snapshot.format)) as ArtboardState;
+    this.settings.ui.selectedVariationId = id;
+    this.assembly.setGap(snapshot.setup.gap); this.assembly.setBevelRadius(snapshot.setup.bevelRadius);
+    this.assembly.setSpectralFlowState(snapshot.look.spectralFlow); this.assembly.setLook(snapshot.look.preset);
+    this.assembly.setRoughness(snapshot.look.roughness); this.assembly.setDispersion(snapshot.look.dispersion); this.assembly.setPhysicalParameters(snapshot.look.physical);
+    this.motionAdapter.captureRestPose();
+    this.lighting.applyState(snapshot.lighting); this.lightingPanel.refreshValues();
+    this.camera.position.fromArray(snapshot.camera.position); this.controls.target.fromArray(snapshot.camera.target); this.camera.zoom = snapshot.camera.zoom; this.camera.updateProjectionMatrix(); this.controls.update();
+    this.motionClock.reset(); this.seek(snapshot.heroTime);
+    this.syncStudioUi(); this.resize(); this.persist();
+  }
+
+  listVariations(): Array<{ id: string; label: string; builtin: boolean }> {
+    return this.variations.list().map(({ id, label, builtin }) => ({ id, label, builtin }));
+  }
+
+  private saveCurrentVariation(): void {
+    const count = this.variations.list().filter((item) => !item.builtin).length + 1;
+    const item = this.variations.save(`Variation ${String(count).padStart(2, "0")}`, this.captureVariationSnapshot());
+    this.settings.ui.selectedVariationId = item.id; this.syncVariationUi(); this.persist();
+  }
+
+  private duplicateVariation(): void {
+    const item = this.variations.duplicate(this.settings.ui.selectedVariationId); if (!item) return;
+    this.settings.ui.selectedVariationId = item.id; this.syncVariationUi(); this.persist();
+  }
+
+  private renameVariation(): void {
+    const current = this.variations.get(this.settings.ui.selectedVariationId); if (!current || current.builtin) return;
+    const label = window.prompt("Variation 이름", current.label); if (!label?.trim()) return;
+    this.variations.rename(current.id, label.trim()); this.syncVariationUi();
+  }
+
+  private deleteVariation(): void {
+    const current = this.variations.get(this.settings.ui.selectedVariationId); if (!current || current.builtin) return;
+    this.variations.remove(current.id); this.settings.ui.selectedVariationId = "builtin-prism-clean"; this.syncVariationUi(); this.persist();
+  }
+
+  private syncVariationUi(): void {
+    const select = this.root.querySelector<HTMLSelectElement>("[data-variation]"); if (!select) return;
+    select.innerHTML = `<option value="">현재 설정</option>` + this.variations.list().map((item) => `<option value="${item.id}">${item.label}${item.builtin ? "" : " · User"}</option>`).join("");
+    select.value = this.settings.ui.selectedVariationId;
+    const selected = this.variations.get(this.settings.ui.selectedVariationId);
+    for (const action of ["variation-rename", "variation-delete"]) { const button = this.root.querySelector<HTMLButtonElement>(`[data-action='${action}']`); if (button) button.disabled = !selected || selected.builtin; }
+  }
+
+  private syncNumeric(name: string, value: number): void {
+    const range = this.root.querySelector<HTMLInputElement>(`[data-control='${name}']`); const number = this.root.querySelector<HTMLInputElement>(`[data-number='${name}']`);
+    if (range) range.value = String(value); if (number) number.value = String(value);
+  }
+
+  private syncStudioUi(): void {
+    this.root.querySelectorAll<HTMLButtonElement>("[data-look]").forEach((button) => button.classList.toggle("active", button.dataset.look === this.settings.look.preset));
+    this.root.querySelectorAll<HTMLButtonElement>("[data-prism-style]").forEach((button) => button.classList.toggle("active", button.dataset.prismStyle === this.settings.look.prismStyle));
+    this.root.querySelector<HTMLElement>("[data-spectral-flow-controls]")?.toggleAttribute("hidden", this.settings.look.preset !== "spectral-flow");
+    this.root.querySelector<HTMLElement>("[data-physical-optics]")?.toggleAttribute("hidden", this.settings.look.preset === "spectral-flow");
+    this.root.querySelector<HTMLElement>("[data-prism-style-panel]")?.toggleAttribute("hidden", this.settings.look.preset !== "prism");
+    [["gap", this.settings.setup.gap], ["bevel-radius", this.settings.setup.bevelRadius], ["roughness", this.settings.look.roughness], ["dispersion", this.settings.look.dispersion], ["ior", this.settings.look.physical.ior], ["thickness", this.settings.look.physical.thickness], ["attenuation-distance", this.settings.look.physical.attenuationDistance], ["iridescence", this.settings.look.physical.iridescence], ["motion-strength", this.settings.motion.strength], ["motion-duration", this.settings.motion.duration], ["motion-fps", this.settings.motion.fps], ["artboard-scale", this.settings.format.scale], ["axis-anchor-x", this.settings.format.axisAnchor.gridX], ["axis-anchor-y", this.settings.format.axisAnchor.gridY]].forEach(([name, value]) => this.syncNumeric(name as string, value as number));
+    const motionPreset = this.root.querySelector<HTMLSelectElement>("[data-motion='preset']"); if (motionPreset) motionPreset.value = this.settings.motion.preset;
+    const motionEnabled = this.root.querySelector<HTMLInputElement>("[data-motion='enabled']"); if (motionEnabled) motionEnabled.checked = this.settings.motion.enabled;
+    const strength = this.root.querySelector<HTMLSelectElement>("[data-motion='strength-mode']"); if (strength) strength.value = this.settings.motion.strengthMode;
+    const loop = this.root.querySelector<HTMLInputElement>("[data-motion='loop']"); if (loop) loop.checked = this.settings.motion.loop;
+    const background = this.root.querySelector<HTMLInputElement>("[data-format='background']"); if (background) background.value = this.settings.format.background;
+    const transparent = this.root.querySelector<HTMLInputElement>("[data-format='transparent']"); if (transparent) transparent.checked = this.settings.format.transparent;
+    this.root.querySelectorAll<HTMLButtonElement>("[data-format-preset]").forEach((button) => button.classList.toggle("active", button.dataset.formatPreset === this.settings.format.id));
+    this.syncSpectralFlowUi(); this.renderPresetParameters(); this.syncVariationUi(); this.updateTransport(); this.updateRenderUi();
   }
 
   private renderPresetParameters(): void {
@@ -560,7 +704,7 @@ export class MotionStudioApp {
   }
 
   private resize(): void {
-    const panelWidth = this.inspector?.isCollapsed ? 0 : 380;
+    const panelWidth = this.inspector?.isCollapsed ? 0 : 360;
     const transportHeight = this.settings.motion.enabled ? 48 : 0;
     const width = Math.max(320, this.root.clientWidth - panelWidth);
     const height = Math.max(240, this.root.clientHeight - transportHeight);
@@ -654,6 +798,8 @@ export class MotionStudioApp {
     this.settings.format.height = Math.round(finite(this.settings.format.height, 1080, 16, 8192));
     const width = this.root.querySelector<HTMLInputElement>("[data-format='width']"); const height = this.root.querySelector<HTMLInputElement>("[data-format='height']");
     if (width) width.value = String(this.settings.format.width); if (height) height.value = String(this.settings.format.height);
+    this.syncNumeric("artboard-scale", this.settings.format.scale); this.syncNumeric("axis-anchor-x", this.settings.format.axisAnchor.gridX); this.syncNumeric("axis-anchor-y", this.settings.format.axisAnchor.gridY);
+    this.root.querySelectorAll<HTMLButtonElement>("[data-format-preset]").forEach((button) => button.classList.toggle("active", button.dataset.formatPreset === this.settings.format.id));
     this.resize(); this.persist();
   }
 
@@ -668,12 +814,16 @@ export class MotionStudioApp {
     this.assembly.setLook(look);
     this.assembly.setRoughness(this.settings.look.roughness);
     this.assembly.setDispersion(this.settings.look.dispersion);
+    this.assembly.setPhysicalParameters(this.settings.look.physical);
     this.assembly.setSpectralFlowRuntime(this.motionClock.time, this.settings.motion.duration, this.settings.motion.enabled, this.lastPatch.spectralSweep ?? 0);
     this.root.querySelectorAll<HTMLButtonElement>("[data-look]").forEach((button) => button.classList.toggle("active", button.dataset.look === look));
     const spectralControls = this.root.querySelector<HTMLElement>("[data-spectral-flow-controls]");
     const physicalControls = this.root.querySelector<HTMLElement>("[data-physical-optics]");
+    const prismStylePanel = this.root.querySelector<HTMLElement>("[data-prism-style-panel]");
     if (spectralControls) spectralControls.hidden = look !== "spectral-flow";
     if (physicalControls) physicalControls.hidden = look === "spectral-flow";
+    if (prismStylePanel) prismStylePanel.hidden = look !== "prism";
+    this.settings.ui.selectedVariationId = ""; this.syncVariationUi();
     this.applyMotionAt(this.motionClock.time);
     this.updateRenderUi();
     this.persist();
@@ -690,6 +840,7 @@ export class MotionStudioApp {
     this.assembly.setSpectralFlowState(this.settings.look.spectralFlow);
     this.assembly.setSpectralFlowRuntime(this.motionClock.time, this.settings.motion.duration, this.settings.motion.enabled, this.lastPatch.spectralSweep ?? 0);
     this.syncSpectralFlowUi();
+    this.settings.ui.selectedVariationId = ""; this.syncVariationUi();
     this.applyMotionAt(this.motionClock.time);
     this.persist();
   }
@@ -912,6 +1063,8 @@ export class MotionStudioApp {
       export: { ppi: this.settings.export.ppi, rasterPng: true, pathTracedStill: true, fixedTimestepSequence: true, transparency: true },
       pathTracing: { active: this.renderingHigh, samples: this.pathTracer.samples, quality: this.renderJob?.quality ?? null, output: this.renderJob ? [this.renderJob.width, this.renderJob.height] : null },
       assembly: this.assembly.inspect(),
+      look: { ...this.settings.look, physical: { ...this.settings.look.physical }, spectralFlow: { ...this.settings.look.spectralFlow } },
+      variations: { selectedId: this.settings.ui.selectedVariationId, items: this.listVariations() },
       sharedVertexValid: this.motionAdapter.getSharedCornerValidity(),
       inspector: { tabs: ["setup", "look", "motion", "format", "export"], advancedDrawer: true },
       storageVersion: 2,

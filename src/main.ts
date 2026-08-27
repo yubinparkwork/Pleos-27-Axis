@@ -3,6 +3,7 @@ import type { ArtboardState } from "./artboard/ArtboardState";
 import type { MotionPresetId, MotionStrengthMode } from "./motion/types";
 import type { CrystalLook } from "./crystal/CrystalAssembly";
 import type { SpectralFlowPresetId, SpectralFlowState } from "./crystal/materials/SpectralFlowMaterial";
+import type { PrismStyleId } from "./crystal/presets/PrismStylePresets";
 
 const root = document.querySelector<HTMLElement>("#app");
 if (!root) throw new Error("Missing #app root");
@@ -30,6 +31,9 @@ async function mount(): Promise<void> {
   window.__pleos27Axis = {
     inspect: () => app.inspect(),
     setLook: (look) => app.setLook(look),
+    setPrismStyle: (style) => app.setPrismStyle(style),
+    applyVariation: (id) => app.applyVariation(id),
+    listVariations: () => app.listVariations(),
     setSpectralFlow: (settings) => app.setSpectralFlow(settings),
     setSpectralFlowPreset: (preset) => app.setSpectralFlowPreset(preset),
     setMotionPreset: (preset) => app.setMotionPreset(preset),
@@ -54,6 +58,9 @@ declare global {
     __pleos27Axis?: {
       inspect(): object;
       setLook(look: CrystalLook): void;
+      setPrismStyle(style: PrismStyleId): void;
+      applyVariation(id: string): void;
+      listVariations(): Array<{ id: string; label: string; builtin: boolean }>;
       setSpectralFlow(settings: Partial<SpectralFlowState>): void;
       setSpectralFlowPreset(preset: SpectralFlowPresetId): void;
       setMotionPreset(preset: MotionPresetId): void;

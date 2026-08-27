@@ -28,19 +28,19 @@ assert.match(assembly, /mesh\.material = this\.spectralMaterials/);
 const studio = files["src/crystal/MotionStudioApp.ts"];
 assert.match(studio, /setSpectralFlowRuntime\(time, this\.settings\.motion\.duration/);
 assert.match(studio, /this\.settings\.look\.preset === "spectral-flow"[\s\S]*renderRasterFrame/);
-assert.match(studio, /duration: 6/);
+assert.match(studio, /duration: 7\.2/);
 
 const panel = files["src/crystal/ui/StudioPanel.ts"];
-for (const label of ["SPECTRAL FLOW", "FLOW", "SPECTRUM", "LIGHT", "SURFACE", "Position", "Direction", "Spectral Lag", "Edge Attraction"]) assert.ok(panel.includes(label), `missing UI label: ${label}`);
+for (const label of ["Spectral", "Style", "Primary", "Flow Position", "Flow Direction", "White Core", "Darkness", "Spectral Lag", "Edge Attraction"]) assert.ok(panel.includes(label), `missing UI label: ${label}`);
 
 const sequence = files["scripts/render-motion-sequence.mjs"];
 assert.match(sequence, /look: args\.look/);
 assert.match(sequence, /api\.setLook\(value\.look\)/);
 
 const envelope = (time, duration) => Math.sin(Math.PI * (((time / duration) % 1 + 1) % 1)) ** 2;
-assert.equal(envelope(0, 6), 0);
-assert.ok(envelope(6, 6) < Number.EPSILON);
-assert.equal(envelope(3, 6), 1);
+assert.equal(envelope(0, 7.2), 0);
+assert.ok(envelope(7.2, 7.2) < Number.EPSILON);
+assert.equal(envelope(3.6, 7.2), 1);
 
 console.log(JSON.stringify({
   status: "pass",
@@ -48,7 +48,7 @@ console.log(JSON.stringify({
   renderer: "realtime-raster-meshphysical-custom-glsl",
   axisSource: "src/axis/angles.ts",
   presets: ["subtle", "balanced", "active"],
-  loopSeconds: 6,
-  loopBoundaryDelta: Math.abs(envelope(0, 6) - envelope(6, 6)),
+  loopSeconds: 7.2,
+  loopBoundaryDelta: Math.abs(envelope(0, 7.2) - envelope(7.2, 7.2)),
   pathTracingUsedForSpectralFlow: false,
 }, null, 2));

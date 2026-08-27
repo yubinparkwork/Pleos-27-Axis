@@ -108,7 +108,7 @@ function decodePng(dataUrl) {
   return Buffer.from(dataUrl.slice(dataUrl.indexOf(",") + 1), "base64");
 }
 
-async function captureRuntime() {
+async function captureRuntime(options = {}) {
   const server = await ensureServer();
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 });
@@ -123,10 +123,11 @@ async function captureRuntime() {
     await page.goto(appUrl, { waitUntil: "load" });
     await page.waitForFunction(() => Boolean(window.__pleos27Axis?.inspect().ready), undefined, { timeout: 20_000 });
     const initialRuntime = await page.evaluate(() => window.__pleos27Axis.inspect());
-    const activeLook = initialRuntime.assembly?.look ?? "prism";
-    const activeMotionPreset = initialRuntime.motion?.preset ?? "off";
+    const activeLook = options.look ?? initialRuntime.assembly?.look ?? "prism";
+    const activeMotionPreset = options.motion ?? initialRuntime.motion?.preset ?? "off";
     const duration = Number(initialRuntime.motion?.duration ?? 6);
-    const heroTime = activeMotionPreset === "off" ? 0 : duration * 0.5;
+    const requestedHeroTime = Number(options.heroTime);
+    const heroTime = Number.isFinite(requestedHeroTime) ? Math.max(0, Math.min(duration, requestedHeroTime)) : activeMotionPreset === "off" ? 0 : duration * 0.5;
 
     await page.evaluate(({ look, preset, durationSeconds, time }) => {
       const api = window.__pleos27Axis;
@@ -372,12 +373,12 @@ await mkdir(latestDirectory, { recursive: true });
 const statusBefore = runGitRaw(["status", "--porcelain=v1", "--untracked-files=all", "--", "."], "")
   .split("\n").filter(Boolean).map(normalizeStatusLine);
 const branch = runGit(["rev-parse", "--abbrev-ref", "HEAD"]);
-const commit = runGit(["rev-parse", "HEAD"]);
+const sourceBaseCommit = runGit(["rev-parse", "HEAD"]);
 const remote = runGit(["remote", "get-url", "origin"], "no-origin");
 let capture;
 let captureFailure = null;
 try {
-  capture = await captureRuntime();
+  capture = await captureRuntime({ look: args.look, motion: args.motion, heroTime: args["hero-time"] });
   validation.browserConsole = capture.browserErrors.length ? "fail" : "pass";
 } catch (error) {
   captureFailure = error instanceof Error ? error.message : String(error);
@@ -393,7 +394,7 @@ const runtimeState = {
     root: ".",
     projectPath,
     branch,
-    commit,
+    sourceBaseCommit,
     remote,
     dirtyBeforeHandoff: statusBefore.length > 0,
     changedBeforeHandoff: statusBefore,
@@ -460,7 +461,7 @@ const summary = {
   previews: capture.previews.map((preview) => preview.file),
   validation,
   branch,
-  commit,
+  sourceBaseCommit,
   remote,
 };
 process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);

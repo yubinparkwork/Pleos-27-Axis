@@ -4,8 +4,8 @@ import type { MotionPreset } from "../types";
 export const spectralAxisSweepPreset: MotionPreset = {
   id: "spectral-axis-sweep",
   label: "Spectral Axis Sweep",
-  duration: 6,
+  duration: 7.2,
   constraint: "strict",
   modules: [SpectralAxisSweepMotion],
-  parameters: { direction: 0, sweepWidth: 0.2, sweepSoftness: 0.65, phaseOffset: 0.12, spectralLag: 0.08, colorSaturation: 0.55, originPulse: 0.75, loopHold: 0.08 },
+  parameters: { direction: 0, sweepWidth: 0.18, sweepSoftness: 0.72, phaseOffset: 0.09, spectralLag: 0.17, colorSaturation: 0.42, originPulse: 0.4, loopHold: 0.12 },
 };
