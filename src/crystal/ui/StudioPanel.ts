@@ -5,6 +5,7 @@ import type { MotionSettings } from "../../motion/types";
 import { CRYSTAL_LOOKS, type CrystalLook } from "../CrystalAssembly";
 import type { InspectorTab } from "../InspectorPanel";
 import type { SpectralFlowState } from "../materials/SpectralFlowMaterial";
+import type { SoftSpectralState } from "../materials/SoftSpectralMaterial";
 import { PRISM_STYLE_PRESETS, type PhysicalLookParameters, type PrismStyleId } from "../presets/PrismStylePresets";
 
 export interface StudioPanelModel {
@@ -16,7 +17,7 @@ export interface StudioPanelModel {
   artboard: ArtboardState; activeTab: InspectorTab; outputSamples: number;
   bounces: number; renderScale: number; ppi: number;
   renderRegion: { enabled: boolean; x: number; y: number; width: number; height: number; unitPpi: number };
-  printOutput: string; spectralFlow: SpectralFlowState;
+  printOutput: string; spectralFlow: SpectralFlowState; softSpectral: SoftSpectralState;
 }
 
 const property = (name: string, label: string, min: number, max: number, step: number, value: number): string =>
@@ -34,6 +35,15 @@ function spectralPrimary(state: SpectralFlowState, visible: boolean): string {
   return `<div class="spectral-flow-controls" data-spectral-flow-controls ${visible ? "" : "hidden"}>
     ${section("Style", `<div class="preset-cards spectral-preset-grid">${(["subtle", "balanced", "active"] as const).map((preset) => `<button data-spectral-preset="${preset}" class="${state.preset === preset ? "active" : ""}"><strong>${preset[0].toUpperCase() + preset.slice(1)}</strong><span>${preset === "subtle" ? "Dark & restrained" : preset === "balanced" ? "White core hero" : "Screen presence"}</span></button>`).join("")}</div>`)}
     ${section("Primary", `${property("spectral-flow-position", "Flow Position", -3, 3, .01, state.flowPosition)}<label class="select-row"><span>Flow Direction</span><select data-spectral-direction>${spectralDirection(state)}</select></label>${property("spectral-spread", "Spectrum", .1, 2.5, .01, state.spectrumSpread)}${property("spectral-core-intensity", "White Core", 0, 5, .01, state.coreIntensity)}${property("spectral-darkness", "Darkness", .1, 1, .01, state.darkness)}`)}
+  </div>`;
+}
+
+function softSpectralPrimary(state: SoftSpectralState, visible: boolean): string {
+  const descriptions = { subtle: "Quiet optical haze", balanced: "Soft spectral hero", active: "Expanded color field" } as const;
+  return `<div class="spectral-flow-controls soft-spectral-controls" data-soft-spectral-controls ${visible ? "" : "hidden"}>
+    ${section("Style", `<div class="preset-cards spectral-preset-grid">${(["subtle", "balanced", "active"] as const).map((preset) => `<button data-soft-spectral-preset="${preset}" class="${state.preset === preset ? "active" : ""}"><strong>${preset[0].toUpperCase() + preset.slice(1)}</strong><span>${descriptions[preset]}</span></button>`).join("")}</div>`)}
+    ${section("Primary", `${property("soft-glow", "Glow", 0, 2.5, .01, state.glow)}${property("soft-spectrum", "Spectrum", 0, 2, .01, state.spectrum)}${property("soft-edge", "Edge", 0, 2, .01, state.edge)}${property("soft-darkness", "Darkness", .1, 1, .01, state.darkness)}${property("soft-motion-depth", "Motion Depth", 0, 1.5, .01, state.motionDepth)}`)}
+    ${advancedSection("Optical Field", `${property("soft-center-radius", "Center Radius", .1, 2.5, .01, state.centerRadius)}${property("soft-center-softness", "Center Softness", .05, 1, .01, state.centerSoftness)}${property("soft-spread", "Spectrum Spread", .1, 2.5, .01, state.spectrumSpread)}${property("soft-separation", "Separation", 0, 1, .01, state.spectrumSeparation)}${property("soft-saturation", "Saturation", 0, 1.5, .01, state.saturation)}${property("soft-phase-offset", "Phase Offset", -1, 1, .01, state.phaseOffset)}${property("soft-edge-attraction", "Edge Attraction", 0, 2, .01, state.edgeAttraction)}${property("soft-edge-softness", "Edge Softness", .05, 1, .01, state.edgeSoftness)}${property("soft-reflection", "Reflection", 0, 3, .01, state.reflection)}${property("soft-roughness", "Roughness", .02, .5, .01, state.roughness)}${property("soft-falloff", "Falloff", .3, 4, .01, state.falloff)}${property("soft-bloom", "Bloom", 0, 1, .01, state.bloom)}`, "Soft Spectral only")}
   </div>`;
 }
 
@@ -70,5 +80,6 @@ export function studioPanelTemplate(model: StudioPanelModel): string {
         ${advancedSection("Print Output", `<label class="select-row"><span>Output PPI</span><select data-control="export-ppi">${[72,150,300].map((ppi) => `<option value="${ppi}" ${model.ppi === ppi ? "selected" : ""}>${ppi}</option>`).join("")}</select></label><div class="export-summary"><span>Physical-size output</span><b data-output="print-size">${model.printOutput}</b></div><button class="wide-button primary" data-action="export-print">PPI 기준 렌더·저장</button>`)}
         ${advancedSection("Individual Lights", `<section class="lighting-panel" data-lighting-panel></section>`)}
       </div>
+      ${softSpectralPrimary(model.softSpectral, model.look === "soft-spectral")}
     </aside>`;
 }

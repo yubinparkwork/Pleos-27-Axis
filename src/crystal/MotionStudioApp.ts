@@ -24,6 +24,7 @@ import { PrismMotionAdapter } from "./PrismMotionAdapter";
 import { installStudioEnvironment, type PathTracingStudioEnvironment } from "./StudioEnvironment";
 import { bindScrubbableNumbers } from "./InspectorScrub";
 import { createSpectralFlowState, sanitizeSpectralFlowState, SPECTRAL_FLOW_PRESETS, type SpectralFlowDirection, type SpectralFlowPresetId, type SpectralFlowState } from "./materials/SpectralFlowMaterial";
+import { createSoftSpectralState, sanitizeSoftSpectralState, SOFT_SPECTRAL_PRESETS, type SoftSpectralPresetId, type SoftSpectralState } from "./materials/SoftSpectralMaterial";
 import { PRISM_STYLE_PRESETS, sanitizePrismStyle, type PhysicalLookParameters, type PrismStyleId } from "./presets/PrismStylePresets";
 import { StudioVariationStore, type StudioVariationSnapshot } from "./variations/StudioVariation";
 import { renderMotionParameters } from "./ui/MotionPanel";
@@ -33,7 +34,7 @@ import { transportTemplate } from "./ui/TransportBar";
 interface StudioSettingsV2 {
   version: 2;
   setup: { gap: number; bevelRadius: number; lightingRigVersion: number; viewLocked: boolean };
-  look: { preset: CrystalLook; prismStyle: PrismStyleId; roughness: number; dispersion: number; physical: PhysicalLookParameters; spectralFlow: SpectralFlowState };
+  look: { preset: CrystalLook; prismStyle: PrismStyleId; roughness: number; dispersion: number; physical: PhysicalLookParameters; spectralFlow: SpectralFlowState; softSpectral: SoftSpectralState };
   lighting: LightingState;
   motion: MotionSettings;
   format: ArtboardState;
@@ -77,7 +78,7 @@ const defaultMotion = (): MotionSettings => ({ enabled: false, preset: "spectral
 const defaults = (): StudioSettingsV2 => ({
   version: 2,
   setup: { gap: 0, bevelRadius: 0.018, lightingRigVersion: 2, viewLocked: true },
-  look: { preset: "prism", prismStyle: "clean", roughness: PRISM_STYLE_PRESETS.clean.roughness, dispersion: PRISM_STYLE_PRESETS.clean.dispersion, physical: { ...PRISM_STYLE_PRESETS.clean.physical }, spectralFlow: createSpectralFlowState("balanced") },
+  look: { preset: "prism", prismStyle: "clean", roughness: PRISM_STYLE_PRESETS.clean.roughness, dispersion: PRISM_STYLE_PRESETS.clean.dispersion, physical: { ...PRISM_STYLE_PRESETS.clean.physical }, spectralFlow: createSpectralFlowState("balanced"), softSpectral: createSoftSpectralState("balanced") },
   lighting: createLightingPreset("pleos-prism"),
   motion: defaultMotion(),
   format: { ...DEFAULT_ARTBOARD, axisAnchor: { ...DEFAULT_ARTBOARD.axisAnchor } },
@@ -107,7 +108,7 @@ function loadSettingsV2(): StudioSettingsV2 {
           viewLocked: v2.setup?.viewLocked !== false,
         },
         look: {
-          preset: v2.look?.preset === "clear" || v2.look?.preset === "smoked" || v2.look?.preset === "spectral-flow" ? v2.look.preset : "prism",
+          preset: v2.look?.preset === "clear" || v2.look?.preset === "smoked" || v2.look?.preset === "spectral-flow" || v2.look?.preset === "soft-spectral" ? v2.look.preset : "prism",
           prismStyle: sanitizePrismStyle(v2.look?.prismStyle),
           roughness: finite(v2.look?.roughness, base.look.roughness, 0.02, 0.28),
           dispersion: finite(v2.look?.dispersion, base.look.dispersion, 0, 0.35),
@@ -118,6 +119,7 @@ function loadSettingsV2(): StudioSettingsV2 {
             iridescence: finite(v2.look?.physical?.iridescence, base.look.physical.iridescence, 0, 1),
           },
           spectralFlow: sanitizeSpectralFlowState(v2.look?.spectralFlow),
+          softSpectral: sanitizeSoftSpectralState(v2.look?.softSpectral),
         },
         lighting,
         motion: { ...base.motion, ...v2.motion, parameters: { ...v2.motion?.parameters } },
@@ -139,6 +141,7 @@ function loadSettingsV2(): StudioSettingsV2 {
       base.look.roughness = finite(v1.roughness, .04, .02, .28);
       base.look.dispersion = finite(v1.dispersion, .16, 0, .35);
       base.look.spectralFlow = createSpectralFlowState("balanced");
+      base.look.softSpectral = createSoftSpectralState("balanced");
       if (v1.lighting) base.lighting = migrateLightingRigToMainCamera(sanitizeLightingState(v1.lighting));
       base.advanced.renderScale = finite(v1.scale, .75, .4, 1);
       base.advanced.bounces = Math.round(finite(v1.bounces, 8, 3, 14));
@@ -233,6 +236,7 @@ export class MotionStudioApp {
     this.controls.enablePan = false;
     this.controls.enabled = !this.settings.setup.viewLocked;
     this.assembly.setSpectralFlowState(this.settings.look.spectralFlow);
+    this.assembly.setSoftSpectralState(this.settings.look.softSpectral);
     this.assembly.setLook(this.settings.look.preset);
     this.assembly.setRoughness(this.settings.look.roughness);
     this.assembly.setDispersion(this.settings.look.dispersion);
@@ -287,7 +291,7 @@ export class MotionStudioApp {
     return `<section class="crystal-app motion-studio">
       <header class="topbar"><div class="wordmark"><strong>PLEOS AXIS STUDIO</strong><span>Prism 3D · Motion V1</span></div><div class="render-status"><span data-output="samples">Raster preview ready</span></div></header>
       <main class="pasteboard"><div class="artboard-meta"><span data-output="format-name">Square 1:1</span><b data-output="artboard-size">${this.settings.format.width} × ${this.settings.format.height}px</b></div><div class="artboard-shell"><div class="crystal-stage" aria-label="Pleos Axis virtual artboard"><div class="safe-guide" data-safe-guide></div><div class="render-region-guide" data-render-region-guide><span data-output="region-size"></span></div></div></div></main>
-      ${studioPanelTemplate({ look: this.settings.look.preset, prismStyle: this.settings.look.prismStyle, physical: this.settings.look.physical, variations: this.variations.list().map(({ id, label, builtin }) => ({ id, label, builtin })), selectedVariationId: this.settings.ui.selectedVariationId, spectralFlow: this.settings.look.spectralFlow, gap: this.settings.setup.gap, bevelRadius: this.settings.setup.bevelRadius, roughness: this.settings.look.roughness, dispersion: this.settings.look.dispersion, reflection: globals.reflectionStrength, refraction: globals.refractionStrength, exposure: globals.exposure, bloom: globals.bloomIntensity, saturation: globals.colorSaturation, environment: globals.environmentIntensity, motion: this.settings.motion, artboard: this.settings.format, activeTab: this.settings.ui.activeTab, outputSamples: this.settings.advanced.targetSamples, bounces: this.settings.advanced.bounces, renderScale: this.settings.advanced.renderScale, ppi: this.settings.export.ppi, renderRegion: region, printOutput: this.printOutputDescription() })}
+      ${studioPanelTemplate({ look: this.settings.look.preset, prismStyle: this.settings.look.prismStyle, physical: this.settings.look.physical, variations: this.variations.list().map(({ id, label, builtin }) => ({ id, label, builtin })), selectedVariationId: this.settings.ui.selectedVariationId, spectralFlow: this.settings.look.spectralFlow, softSpectral: this.settings.look.softSpectral, gap: this.settings.setup.gap, bevelRadius: this.settings.setup.bevelRadius, roughness: this.settings.look.roughness, dispersion: this.settings.look.dispersion, reflection: globals.reflectionStrength, refraction: globals.refractionStrength, exposure: globals.exposure, bloom: globals.bloomIntensity, saturation: globals.colorSaturation, environment: globals.environmentIntensity, motion: this.settings.motion, artboard: this.settings.format, activeTab: this.settings.ui.activeTab, outputSamples: this.settings.advanced.targetSamples, bounces: this.settings.advanced.bounces, renderScale: this.settings.advanced.renderScale, ppi: this.settings.export.ppi, renderRegion: region, printOutput: this.printOutputDescription() })}
       ${transportTemplate()}
     </section>`;
   }
@@ -304,6 +308,11 @@ export class MotionStudioApp {
   }
 
   private bindUi(): void {
+    const softLookButton = this.root.querySelector<HTMLButtonElement>("[data-look='soft-spectral']");
+    if (softLookButton) softLookButton.textContent = "Soft Spectral";
+    const softControls = this.root.querySelector<HTMLElement>("[data-soft-spectral-controls]");
+    const lookAdvanced = this.root.querySelector<HTMLElement>("[data-inspector-view='look'] .advanced-link");
+    if (softControls && lookAdvanced) lookAdvanced.before(softControls);
     this.root.querySelectorAll<HTMLButtonElement>("[data-look]").forEach((button) => button.addEventListener("click", () => this.setLook(button.dataset.look as CrystalLook)));
     this.root.querySelectorAll<HTMLButtonElement>("[data-prism-style]").forEach((button) => button.addEventListener("click", () => this.setPrismStyle(button.dataset.prismStyle as PrismStyleId)));
     this.require<HTMLSelectElement>("[data-variation]").addEventListener("change", (event) => this.applyVariation((event.currentTarget as HTMLSelectElement).value));
@@ -332,6 +341,14 @@ export class MotionStudioApp {
     this.bindNumber("spectral-darkness", (value) => this.updateSpectralFlow({ darkness: value }));
     this.root.querySelectorAll<HTMLButtonElement>("[data-spectral-preset]").forEach((button) => button.addEventListener("click", () => this.setSpectralFlowPreset(button.dataset.spectralPreset as SpectralFlowPresetId)));
     this.require<HTMLSelectElement>("[data-spectral-direction]").addEventListener("change", (event) => this.updateSpectralFlow({ flowDirection: (event.currentTarget as HTMLSelectElement).value as SpectralFlowDirection }));
+    const softBindings: Array<[string, keyof SoftSpectralState]> = [
+      ["soft-glow", "glow"], ["soft-spectrum", "spectrum"], ["soft-edge", "edge"], ["soft-darkness", "darkness"], ["soft-motion-depth", "motionDepth"],
+      ["soft-center-radius", "centerRadius"], ["soft-center-softness", "centerSoftness"], ["soft-spread", "spectrumSpread"], ["soft-separation", "spectrumSeparation"],
+      ["soft-saturation", "saturation"], ["soft-phase-offset", "phaseOffset"], ["soft-edge-attraction", "edgeAttraction"], ["soft-edge-softness", "edgeSoftness"],
+      ["soft-reflection", "reflection"], ["soft-roughness", "roughness"], ["soft-falloff", "falloff"], ["soft-bloom", "bloom"],
+    ];
+    softBindings.forEach(([control, key]) => this.bindNumber(control, (value) => this.updateSoftSpectral({ [key]: value })));
+    this.root.querySelectorAll<HTMLButtonElement>("[data-soft-spectral-preset]").forEach((button) => button.addEventListener("click", () => this.setSoftSpectralPreset(button.dataset.softSpectralPreset as SoftSpectralPresetId)));
     this.bindNumber("reflection-strength", (value) => this.lighting.updateGlobal("reflectionStrength", value));
     this.bindNumber("refraction-strength", (value) => this.lighting.updateGlobal("refractionStrength", value));
     this.bindNumber("master-intensity", (value) => this.lighting.updateGlobal("masterIntensity", value));
@@ -502,7 +519,7 @@ export class MotionStudioApp {
     if (printSize) printSize.textContent = this.printOutputDescription();
     const fast = this.root.querySelector<HTMLButtonElement>("[data-action='render-fast']");
     const high = this.root.querySelector<HTMLButtonElement>("[data-action='render-high']");
-    if (this.settings.look.preset === "spectral-flow") {
+    if (this.settings.look.preset === "spectral-flow" || this.settings.look.preset === "soft-spectral") {
       if (fast) fast.innerHTML = `<strong>빠른 래스터</strong><span>실시간 셰이더</span>`;
       if (high) high.innerHTML = `<strong>고품질 래스터</strong><span>노이즈 없음 · 100%</span>`;
       fast?.classList.remove("active"); high?.classList.remove("active");
@@ -586,7 +603,7 @@ export class MotionStudioApp {
     this.settings.format = JSON.parse(JSON.stringify(snapshot.format)) as ArtboardState;
     this.settings.ui.selectedVariationId = id;
     this.assembly.setGap(snapshot.setup.gap); this.assembly.setBevelRadius(snapshot.setup.bevelRadius);
-    this.assembly.setSpectralFlowState(snapshot.look.spectralFlow); this.assembly.setLook(snapshot.look.preset);
+    this.assembly.setSpectralFlowState(snapshot.look.spectralFlow); this.assembly.setSoftSpectralState(snapshot.look.softSpectral); this.assembly.setLook(snapshot.look.preset);
     this.assembly.setRoughness(snapshot.look.roughness); this.assembly.setDispersion(snapshot.look.dispersion); this.assembly.setPhysicalParameters(snapshot.look.physical);
     this.motionAdapter.captureRestPose();
     this.lighting.applyState(snapshot.lighting); this.lightingPanel.refreshValues();
@@ -638,7 +655,8 @@ export class MotionStudioApp {
     this.root.querySelectorAll<HTMLButtonElement>("[data-look]").forEach((button) => button.classList.toggle("active", button.dataset.look === this.settings.look.preset));
     this.root.querySelectorAll<HTMLButtonElement>("[data-prism-style]").forEach((button) => button.classList.toggle("active", button.dataset.prismStyle === this.settings.look.prismStyle));
     this.root.querySelector<HTMLElement>("[data-spectral-flow-controls]")?.toggleAttribute("hidden", this.settings.look.preset !== "spectral-flow");
-    this.root.querySelector<HTMLElement>("[data-physical-optics]")?.toggleAttribute("hidden", this.settings.look.preset === "spectral-flow");
+    this.root.querySelector<HTMLElement>("[data-soft-spectral-controls]")?.toggleAttribute("hidden", this.settings.look.preset !== "soft-spectral");
+    this.root.querySelector<HTMLElement>("[data-physical-optics]")?.toggleAttribute("hidden", this.settings.look.preset === "spectral-flow" || this.settings.look.preset === "soft-spectral");
     this.root.querySelector<HTMLElement>("[data-prism-style-panel]")?.toggleAttribute("hidden", this.settings.look.preset !== "prism");
     [["gap", this.settings.setup.gap], ["bevel-radius", this.settings.setup.bevelRadius], ["roughness", this.settings.look.roughness], ["dispersion", this.settings.look.dispersion], ["ior", this.settings.look.physical.ior], ["thickness", this.settings.look.physical.thickness], ["attenuation-distance", this.settings.look.physical.attenuationDistance], ["iridescence", this.settings.look.physical.iridescence], ["motion-strength", this.settings.motion.strength], ["motion-duration", this.settings.motion.duration], ["motion-fps", this.settings.motion.fps], ["artboard-scale", this.settings.format.scale], ["axis-anchor-x", this.settings.format.axisAnchor.gridX], ["axis-anchor-y", this.settings.format.axisAnchor.gridY]].forEach(([name, value]) => this.syncNumeric(name as string, value as number));
     const motionPreset = this.root.querySelector<HTMLSelectElement>("[data-motion='preset']"); if (motionPreset) motionPreset.value = this.settings.motion.preset;
@@ -648,7 +666,7 @@ export class MotionStudioApp {
     const background = this.root.querySelector<HTMLInputElement>("[data-format='background']"); if (background) background.value = this.settings.format.background;
     const transparent = this.root.querySelector<HTMLInputElement>("[data-format='transparent']"); if (transparent) transparent.checked = this.settings.format.transparent;
     this.root.querySelectorAll<HTMLButtonElement>("[data-format-preset]").forEach((button) => button.classList.toggle("active", button.dataset.formatPreset === this.settings.format.id));
-    this.syncSpectralFlowUi(); this.renderPresetParameters(); this.syncVariationUi(); this.updateTransport(); this.updateRenderUi();
+    this.syncSpectralFlowUi(); this.syncSoftSpectralUi(); this.renderPresetParameters(); this.syncVariationUi(); this.updateTransport(); this.updateRenderUi();
   }
 
   private renderPresetParameters(): void {
@@ -667,11 +685,13 @@ export class MotionStudioApp {
     const raw = this.motionEngine.evaluate(this.settings.motion, time);
     const patch = this.constraints.constrain(raw, this.settings.motion.constraint);
     this.lastPatch = patch;
-    this.motionAdapter.applyFrame(patch);
+    if (this.settings.look.preset === "soft-spectral") this.motionAdapter.restoreRestPose();
+    else this.motionAdapter.applyFrame(patch);
     this.assembly.setDispersion(this.settings.look.dispersion + (patch.dispersionOffset ?? 0));
     this.assembly.setSpectralFlowRuntime(time, this.settings.motion.duration, this.settings.motion.enabled, patch.spectralSweep ?? 0);
+    this.assembly.setSoftSpectralRuntime(time, this.settings.motion.duration, this.settings.motion.enabled, patch.spectralSweep ?? 0);
     this.applyMotionLights(patch);
-    const spectralBloom = this.settings.look.preset === "spectral-flow" ? this.settings.look.spectralFlow.bloom : 0;
+    const spectralBloom = this.settings.look.preset === "spectral-flow" ? this.settings.look.spectralFlow.bloom : this.settings.look.preset === "soft-spectral" ? this.settings.look.softSpectral.bloom : 0;
     this.previewBloom.strength = this.settings.lighting.globals.bloomIntensity + spectralBloom + (patch.bloomOffset ?? 0);
     this.showPreview();
     this.updateTransport();
@@ -757,7 +777,7 @@ export class MotionStudioApp {
   pause(): void { this.motionClock.pause(); this.controls.enabled = !this.settings.setup.viewLocked; this.updateTransport(); }
   seek(time: number): void { this.motionClock.seek(Math.min(this.settings.motion.duration, Math.max(0, time)), this.settings.motion.fps); this.applyMotionAt(this.motionClock.time); }
   stepFrame(frames: number): void { this.pause(); this.motionClock.step(frames, this.settings.motion.fps, this.settings.motion.duration); this.applyMotionAt(this.motionClock.time); }
-  resetMotion(): void { this.motionClock.reset(); this.motionAdapter.restoreRestPose(); this.assembly.setDispersion(this.settings.look.dispersion); this.assembly.setSpectralFlowRuntime(0, this.settings.motion.duration, this.settings.motion.enabled, 0); this.applyMotionLights({}); this.lastPatch = {}; this.showPreview(); this.updateTransport(); }
+  resetMotion(): void { this.motionClock.reset(); this.motionAdapter.restoreRestPose(); this.assembly.setDispersion(this.settings.look.dispersion); this.assembly.setSpectralFlowRuntime(0, this.settings.motion.duration, this.settings.motion.enabled, 0); this.assembly.setSoftSpectralRuntime(0, this.settings.motion.duration, this.settings.motion.enabled, 0); this.applyMotionLights({}); this.lastPatch = {}; this.showPreview(); this.updateTransport(); }
 
   setMotionPreset(id: MotionPresetId): void {
     this.settings.motion.preset = id;
@@ -811,17 +831,28 @@ export class MotionStudioApp {
   setLook(look: CrystalLook): void {
     this.settings.look.preset = look;
     this.assembly.setSpectralFlowState(this.settings.look.spectralFlow);
+    this.assembly.setSoftSpectralState(this.settings.look.softSpectral);
     this.assembly.setLook(look);
     this.assembly.setRoughness(this.settings.look.roughness);
     this.assembly.setDispersion(this.settings.look.dispersion);
     this.assembly.setPhysicalParameters(this.settings.look.physical);
+    if (look === "soft-spectral") {
+      this.settings.motion.preset = "spectral-axis-sweep"; this.settings.motion.duration = 8; this.settings.motion.enabled = true;
+      const neutral = createLightingPreset("soft-glass");
+      neutral.lights.forEach((light, index) => { light.color = index % 3 === 0 ? "#CDDCFF" : index % 2 === 0 ? "#F2F2F2" : "#FFFFFF"; });
+      Object.assign(neutral.globals, { masterIntensity: .68, environmentIntensity: .22, exposure: .96, bloomIntensity: .035, colorSaturation: .24 });
+      this.lighting.applyState(neutral); this.lightingPanel.refreshValues();
+    }
     this.assembly.setSpectralFlowRuntime(this.motionClock.time, this.settings.motion.duration, this.settings.motion.enabled, this.lastPatch.spectralSweep ?? 0);
+    this.assembly.setSoftSpectralRuntime(this.motionClock.time, this.settings.motion.duration, this.settings.motion.enabled, this.lastPatch.spectralSweep ?? 0);
     this.root.querySelectorAll<HTMLButtonElement>("[data-look]").forEach((button) => button.classList.toggle("active", button.dataset.look === look));
     const spectralControls = this.root.querySelector<HTMLElement>("[data-spectral-flow-controls]");
+    const softSpectralControls = this.root.querySelector<HTMLElement>("[data-soft-spectral-controls]");
     const physicalControls = this.root.querySelector<HTMLElement>("[data-physical-optics]");
     const prismStylePanel = this.root.querySelector<HTMLElement>("[data-prism-style-panel]");
     if (spectralControls) spectralControls.hidden = look !== "spectral-flow";
-    if (physicalControls) physicalControls.hidden = look === "spectral-flow";
+    if (softSpectralControls) softSpectralControls.hidden = look !== "soft-spectral";
+    if (physicalControls) physicalControls.hidden = look === "spectral-flow" || look === "soft-spectral";
     if (prismStylePanel) prismStylePanel.hidden = look !== "prism";
     this.settings.ui.selectedVariationId = ""; this.syncVariationUi();
     this.applyMotionAt(this.motionClock.time);
@@ -872,6 +903,36 @@ export class MotionStudioApp {
     this.root.querySelectorAll<HTMLButtonElement>("[data-spectral-preset]").forEach((button) => button.classList.toggle("active", button.dataset.spectralPreset === state.preset));
   }
 
+  setSoftSpectral(patch: Partial<SoftSpectralState>): void {
+    this.updateSoftSpectral(patch); this.syncSoftSpectralUi(); this.persist();
+  }
+
+  setSoftSpectralPreset(preset: SoftSpectralPresetId): void {
+    this.settings.look.softSpectral = { ...SOFT_SPECTRAL_PRESETS[preset] };
+    this.assembly.setSoftSpectralState(this.settings.look.softSpectral);
+    this.assembly.setSoftSpectralRuntime(this.motionClock.time, this.settings.motion.duration, this.settings.motion.enabled, this.lastPatch.spectralSweep ?? 0);
+    this.syncSoftSpectralUi(); this.settings.ui.selectedVariationId = ""; this.syncVariationUi(); this.applyMotionAt(this.motionClock.time); this.persist();
+  }
+
+  private updateSoftSpectral(patch: Partial<SoftSpectralState>): void {
+    this.settings.look.softSpectral = sanitizeSoftSpectralState({ ...this.settings.look.softSpectral, ...patch, preset: this.settings.look.softSpectral.preset });
+    this.assembly.setSoftSpectralState(this.settings.look.softSpectral);
+    this.assembly.setSoftSpectralRuntime(this.motionClock.time, this.settings.motion.duration, this.settings.motion.enabled, this.lastPatch.spectralSweep ?? 0);
+    this.applyMotionAt(this.motionClock.time);
+  }
+
+  private syncSoftSpectralUi(): void {
+    const state = this.settings.look.softSpectral;
+    const values: Array<[string, number]> = [
+      ["soft-glow", state.glow], ["soft-spectrum", state.spectrum], ["soft-edge", state.edge], ["soft-darkness", state.darkness], ["soft-motion-depth", state.motionDepth],
+      ["soft-center-radius", state.centerRadius], ["soft-center-softness", state.centerSoftness], ["soft-spread", state.spectrumSpread], ["soft-separation", state.spectrumSeparation],
+      ["soft-saturation", state.saturation], ["soft-phase-offset", state.phaseOffset], ["soft-edge-attraction", state.edgeAttraction], ["soft-edge-softness", state.edgeSoftness],
+      ["soft-reflection", state.reflection], ["soft-roughness", state.roughness], ["soft-falloff", state.falloff], ["soft-bloom", state.bloom],
+    ];
+    values.forEach(([name, value]) => this.syncNumeric(name, value));
+    this.root.querySelectorAll<HTMLButtonElement>("[data-soft-spectral-preset]").forEach((button) => button.classList.toggle("active", button.dataset.softSpectralPreset === state.preset));
+  }
+
   private resetCamera(): void { this.camera.position.set(0, 0, -12); this.camera.lookAt(0, .02, 0); this.camera.zoom = 1; this.camera.updateProjectionMatrix(); this.controls.target.set(0, .02, 0); this.controls.update(); this.showPreview(); }
 
   async exportPng(download = true): Promise<string> {
@@ -895,28 +956,28 @@ export class MotionStudioApp {
       const suffix = printOutput ? `-${this.settings.export.ppi}ppi` : "";
       this.download(await this.injectPpi(dataUrl, this.settings.export.ppi), `pleos-axis-${this.settings.look.preset}-${label}-${this.settings.motion.preset}-frame-${String(this.motionClock.frame).padStart(6, "0")}-${output.width}x${output.height}${suffix}.png`);
     }
-    this.resize(); this.showPreview(`${this.settings.look.preset === "spectral-flow" ? "Spectral Flow" : "Raster"} PNG 준비 완료 · ${output.width} × ${output.height}px`);
+    this.resize(); this.showPreview(`${this.settings.look.preset === "spectral-flow" ? "Spectral Flow" : this.settings.look.preset === "soft-spectral" ? "Soft Spectral" : "Raster"} PNG 준비 완료 · ${output.width} × ${output.height}px`);
     return dataUrl;
   }
 
   renderCurrentFrame(download = true): Promise<string> {
-    if (this.settings.look.preset === "spectral-flow") return this.renderRasterFrame(download, 1, false, "hq");
+    if (this.settings.look.preset === "spectral-flow" || this.settings.look.preset === "soft-spectral") return this.renderRasterFrame(download, 1, false, "hq");
     return this.startPathRender("high", download, 1, false);
   }
 
   renderPreview(quality: RenderQuality): Promise<string> {
-    if (this.settings.look.preset === "spectral-flow") return this.renderRasterFrame(false, 1, false, quality === "high" ? "hq" : "raster");
+    if (this.settings.look.preset === "spectral-flow" || this.settings.look.preset === "soft-spectral") return this.renderRasterFrame(false, 1, false, quality === "high" ? "hq" : "raster");
     return this.startPathRender(quality, false, 1, false);
   }
 
   renderPrintFrame(download = true): Promise<string> {
     const printScale = this.settings.export.ppi / this.settings.advanced.renderRegion.unitPpi;
-    if (this.settings.look.preset === "spectral-flow") return this.renderRasterFrame(download, printScale, true, "hq");
+    if (this.settings.look.preset === "spectral-flow" || this.settings.look.preset === "soft-spectral") return this.renderRasterFrame(download, printScale, true, "hq");
     return this.startPathRender("high", download, printScale, true);
   }
 
   private togglePreviewRender(quality: RenderQuality): void {
-    if (this.settings.look.preset === "spectral-flow") {
+    if (this.settings.look.preset === "spectral-flow" || this.settings.look.preset === "soft-spectral") {
       void this.renderRasterFrame(false, 1, false, quality === "high" ? "hq" : "raster").catch((error) => this.showPreview(`래스터 렌더링 실패 · ${error.message}`));
       return;
     }
@@ -1011,7 +1072,7 @@ export class MotionStudioApp {
     const globals = this.lighting.state.globals;
     this.environment.setIntensity(globals.environmentIntensity); this.assembly.setOpticalLighting(globals.reflectionStrength, globals.refractionStrength);
     this.previewRenderer.toneMappingExposure = globals.exposure; this.pathRenderer.toneMappingExposure = globals.exposure;
-    this.previewBloom.strength = globals.bloomIntensity + (this.settings.look.preset === "spectral-flow" ? this.settings.look.spectralFlow.bloom : 0); this.pathBloom.strength = globals.bloomIntensity;
+    this.previewBloom.strength = globals.bloomIntensity + (this.settings.look.preset === "spectral-flow" ? this.settings.look.spectralFlow.bloom : this.settings.look.preset === "soft-spectral" ? this.settings.look.softSpectral.bloom : 0); this.pathBloom.strength = globals.bloomIntensity;
     this.showPreview(); this.persist();
   };
 

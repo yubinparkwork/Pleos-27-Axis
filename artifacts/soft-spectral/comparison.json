@@ -1,0 +1,175 @@
+{
+  "status": "pass",
+  "renderer": "high-resolution-raster",
+  "captures": [
+    {
+      "file": "soft-subtle.png",
+      "preset": "subtle",
+      "time": 4,
+      "width": 1080,
+      "height": 1080,
+      "actual": [
+        1080,
+        1080
+      ],
+      "bytes": 360874,
+      "sha256": "37cc9aa893eea660da8f11f76d40fb6ec1727b4a8267589e83c1d2d3e06152f7"
+    },
+    {
+      "file": "soft-balanced.png",
+      "preset": "balanced",
+      "time": 4,
+      "width": 1080,
+      "height": 1080,
+      "actual": [
+        1080,
+        1080
+      ],
+      "bytes": 413561,
+      "sha256": "69e7a5e652ac98bbf22f4c799efc3d9a61b57663ea470e1215227225f08e328b"
+    },
+    {
+      "file": "soft-active.png",
+      "preset": "active",
+      "time": 4,
+      "width": 1080,
+      "height": 1080,
+      "actual": [
+        1080,
+        1080
+      ],
+      "bytes": 552518,
+      "sha256": "6bea2bd3b1066111856194c8c31a43b650582e7e967d10b030dfcef908de1072"
+    },
+    {
+      "file": "soft-center-glow.png",
+      "preset": "balanced",
+      "time": 4,
+      "width": 1080,
+      "height": 1080,
+      "patch": {
+        "glow": 1.8,
+        "centerRadius": 0.72,
+        "centerSoftness": 0.9,
+        "spectrum": 0.52
+      },
+      "actual": [
+        1080,
+        1080
+      ],
+      "bytes": 424070,
+      "sha256": "1673714c49366c0989c89421672bf2f96be854db962914499b9e690bbcbfc9c9"
+    },
+    {
+      "file": "soft-edge-response.png",
+      "preset": "active",
+      "time": 6,
+      "width": 1080,
+      "height": 1080,
+      "patch": {
+        "edge": 1.25,
+        "edgeAttraction": 1.45,
+        "edgeSoftness": 0.9,
+        "glow": 0.82
+      },
+      "actual": [
+        1080,
+        1080
+      ],
+      "bytes": 350655,
+      "sha256": "b2b87cd1ec90fb875f6357506268307e4f533e49fbc58c2bf497cbc2f0de4ef6"
+    },
+    {
+      "file": "soft-dark-rest.png",
+      "preset": "subtle",
+      "time": 0,
+      "width": 1080,
+      "height": 1080,
+      "patch": {
+        "darkness": 0.92,
+        "glow": 0.42,
+        "spectrum": 0.3
+      },
+      "actual": [
+        1080,
+        1080
+      ],
+      "bytes": 213275,
+      "sha256": "e20eb2e72c9f0fd43ef3bc407133401d1c423798c27684f13482f65587133e65"
+    },
+    {
+      "file": "soft-4x5.png",
+      "preset": "balanced",
+      "time": 4,
+      "width": 1080,
+      "height": 1350,
+      "actual": [
+        1080,
+        1350
+      ],
+      "bytes": 529871,
+      "sha256": "369ff6c49a81f5eca09f9036243661496d17e310f7f463f78ebf449bf39d9e89"
+    },
+    {
+      "file": "soft-9x16.png",
+      "preset": "balanced",
+      "time": 4,
+      "width": 1080,
+      "height": 1920,
+      "actual": [
+        1080,
+        1920
+      ],
+      "bytes": 854276,
+      "sha256": "899a9d9f40a24efbe4a5afee56f675644a8cbd25fed2c9a73d3ae5f0d8b6631d"
+    },
+    {
+      "file": "soft-motion-25.png",
+      "preset": "balanced",
+      "time": 2,
+      "width": 1080,
+      "height": 1080,
+      "actual": [
+        1080,
+        1080
+      ],
+      "bytes": 280080,
+      "sha256": "515ac4731c2fa35c1701fcb526465a50582d03be49469ddb8eef852e931bd8c5"
+    },
+    {
+      "file": "soft-motion-50.png",
+      "preset": "balanced",
+      "time": 4,
+      "width": 1080,
+      "height": 1080,
+      "actual": [
+        1080,
+        1080
+      ],
+      "bytes": 413561,
+      "sha256": "69e7a5e652ac98bbf22f4c799efc3d9a61b57663ea470e1215227225f08e328b"
+    },
+    {
+      "file": "soft-motion-75.png",
+      "preset": "balanced",
+      "time": 6,
+      "width": 1080,
+      "height": 1080,
+      "actual": [
+        1080,
+        1080
+      ],
+      "bytes": 301228,
+      "sha256": "fe7cd7df022cbf4cc2549c3dbc13df472782a8a2e6cccbffc7fbe694c2eedd62"
+    }
+  ],
+  "loop": {
+    "duration": 8,
+    "exact": true,
+    "hashes": [
+      "cc60b119f5a83fe7aae488542d998735bb079e740c79c1b027207df87fd202ea",
+      "cc60b119f5a83fe7aae488542d998735bb079e740c79c1b027207df87fd202ea"
+    ]
+  },
+  "consoleErrors": []
+}

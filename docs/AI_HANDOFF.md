@@ -57,6 +57,14 @@ Production geometry and expression layers should remain separable so new Looks d
 - Render strategy: high-resolution-raster
 - Motion support: Yes, via the shared Motion system
 
+### Soft Spectral
+
+- Role: Soft center-led optical field with blue/cyan spectral response
+- Implementation: Independent MeshPhysicalMaterial.onBeforeCompile custom GLSL
+- Main file: `src/crystal/materials/SoftSpectralMaterial.ts`
+- Render strategy: high-resolution-raster
+- Motion support: Yes, via the shared Motion system
+
 ### Smoked
 
 - Role: Dark smoked optical glass
@@ -121,70 +129,37 @@ Production geometry and expression layers should remain separable so new Looks d
 
 ## Latest Task
 
-- User request: PLEOS Motion Studio V1 Design Polish
-- What changed: Simplified creative-tool UI, refined Prism/Spectral hero presets and motion timing, added Variation workflow
-- Why: Move from technical prototype toward production-ready KV authoring tool
-- Main implementation decisions: Preset-first UX|Advanced technical controls separated|No new renderer or motion type|Axis identity preserved
+- User request: Implement independent SOFT SPECTRAL Look
+- What changed: Added a soft center-led spectral field without changing Axis geometry or existing Looks
+- Why: Create a restrained optical expression with deterministic motion and print-safe raster output
+- Main implementation decisions: Independent SoftSpectralMaterial|Geometry motion disabled for this Look|Neutral lighting preset with shader-owned color|8-second seamless loop
 
 ## Files Changed
 
-- `README.md` — Git status M
-- `artifacts/latest/preview-4x5.png` — Git status M
-- `artifacts/latest/preview-9x16.png` — Git status M
-- `artifacts/latest/preview-main.png` — Git status M
-- `artifacts/latest/runtime-state.json` — Git status M
-- `docs/AI_HANDOFF.md` — Git status M
-- `package.json` — Git status M
-- `scripts/update-ai-handoff.mjs` — Git status M
-- `scripts/verify-pathtracer.mjs` — Git status M
-- `scripts/verify-spectral-flow.mjs` — Git status M
-- `src/artboard/FormatPresetRegistry.ts` — Git status M
-- `src/crystal/CrystalApp.css` — Git status M
-- `src/crystal/CrystalAssembly.ts` — Git status M
-- `src/crystal/LightingSystem.ts` — Git status M
-- `src/crystal/MotionStudioApp.ts` — Git status M
-- `src/crystal/materials/SpectralFlowMaterial.ts` — Git status M
-- `src/crystal/ui/StudioPanel.ts` — Git status M
-- `src/main.ts` — Git status M
-- `src/motion/modules/ExplodeRejoinMotion.ts` — Git status M
-- `src/motion/modules/SharedVertexPulseMotion.ts` — Git status M
-- `src/motion/modules/SpectralAxisSweepMotion.ts` — Git status M
-- `src/motion/presets/explodeRejoin.ts` — Git status M
-- `src/motion/presets/sharedVertexPulse.ts` — Git status M
-- `src/motion/presets/spectralAxisSweep.ts` — Git status M
-- `src/motion/types.ts` — Git status M
-- `artifacts/design-polish/motion-explode.png` — Git status ??
-- `artifacts/design-polish/motion-pulse.png` — Git status ??
-- `artifacts/design-polish/motion-sweep.png` — Git status ??
-- `artifacts/design-polish/prism-clean.png` — Git status ??
-- `artifacts/design-polish/prism-immersive.png` — Git status ??
-- `artifacts/design-polish/prism-rgb-edge.png` — Git status ??
-- `artifacts/design-polish/spectral-active.png` — Git status ??
-- `artifacts/design-polish/spectral-balanced.png` — Git status ??
-- `artifacts/design-polish/spectral-subtle.png` — Git status ??
-- `artifacts/design-polish/ui-format.png` — Git status ??
-- `artifacts/design-polish/ui-look.png` — Git status ??
-- `artifacts/design-polish/ui-motion.png` — Git status ??
-- `artifacts/design-polish/ui-variations.png` — Git status ??
-- `scripts/capture-design-polish.mjs` — Git status ??
-- `scripts/verify-design-polish.mjs` — Git status ??
-- `src/crystal/presets/PrismStylePresets.ts` — Git status ??
-- `src/crystal/variations/StudioVariation.ts` — Git status ??
+- `src/crystal/materials/SoftSpectralMaterial.ts` — Independent shader material
+- `src/crystal/CrystalAssembly.ts` — Look lifecycle
+- `src/crystal/MotionStudioApp.ts` — runtime and UI bindings
+- `src/crystal/ui/StudioPanel.ts` — controls
+- `src/crystal/variations/StudioVariation.ts` — built-in variations
+- `scripts/capture-soft-spectral.mjs` — QA captures
+- `scripts/verify-soft-spectral.mjs` — contracts
+- `README.md` — usage
 
 ## Visual Changes
 
-- Updated Prism hero looks
-- Updated Spectral Flow tuning
-- Motion timing refined
-- Inspector density reduced
+- White-violet origin glow
+- Blue and cyan dominant broad spectral field
+- Restrained magenta secondary response
+- Dark optical rest state
+- No geometry motion
 
 ## Latest Previews
 
 | Preview | Pixels | Look | Hero time |
 | --- | ---: | --- | ---: |
-| `artifacts/latest/preview-main.png` | 1080 × 1080 | prism | 0s |
-| `artifacts/latest/preview-4x5.png` | 1080 × 1350 | prism | 0s |
-| `artifacts/latest/preview-9x16.png` | 1080 × 1920 | prism | 0s |
+| `artifacts/latest/preview-main.png` | 1080 × 1080 | soft-spectral | 4s |
+| `artifacts/latest/preview-4x5.png` | 1080 × 1350 | soft-spectral | 4s |
+| `artifacts/latest/preview-9x16.png` | 1080 × 1920 | soft-spectral | 4s |
 
 ## Validation
 

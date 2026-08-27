@@ -3,6 +3,7 @@ import type { ArtboardState } from "./artboard/ArtboardState";
 import type { MotionPresetId, MotionStrengthMode } from "./motion/types";
 import type { CrystalLook } from "./crystal/CrystalAssembly";
 import type { SpectralFlowPresetId, SpectralFlowState } from "./crystal/materials/SpectralFlowMaterial";
+import type { SoftSpectralPresetId, SoftSpectralState } from "./crystal/materials/SoftSpectralMaterial";
 import type { PrismStyleId } from "./crystal/presets/PrismStylePresets";
 
 const root = document.querySelector<HTMLElement>("#app");
@@ -36,6 +37,8 @@ async function mount(): Promise<void> {
     listVariations: () => app.listVariations(),
     setSpectralFlow: (settings) => app.setSpectralFlow(settings),
     setSpectralFlowPreset: (preset) => app.setSpectralFlowPreset(preset),
+    setSoftSpectral: (settings) => app.setSoftSpectral(settings),
+    setSoftSpectralPreset: (preset) => app.setSoftSpectralPreset(preset),
     setMotionPreset: (preset) => app.setMotionPreset(preset),
     setMotionStrength: (strength) => app.setMotionStrength(strength),
     configureMotion: (settings) => app.configureMotion(settings),
@@ -63,6 +66,8 @@ declare global {
       listVariations(): Array<{ id: string; label: string; builtin: boolean }>;
       setSpectralFlow(settings: Partial<SpectralFlowState>): void;
       setSpectralFlowPreset(preset: SpectralFlowPresetId): void;
+      setSoftSpectral(settings: Partial<SoftSpectralState>): void;
+      setSoftSpectralPreset(preset: SoftSpectralPresetId): void;
       setMotionPreset(preset: MotionPresetId): void;
       setMotionStrength(strength: MotionStrengthMode | number): void;
       configureMotion(settings: { duration?: number; fps?: number; seed?: number; speed?: number; loop?: boolean; constraint?: "strict" | "anchored" | "experimental" }): void;

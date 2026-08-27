@@ -2,17 +2,19 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
 import { createSpectralFlowState, SpectralFlowMaterial, type SpectralFlowState } from "./materials/SpectralFlowMaterial";
+import { createSoftSpectralState, SoftSpectralMaterial, type SoftSpectralState } from "./materials/SoftSpectralMaterial";
 import type { PhysicalLookParameters } from "./presets/PrismStylePresets";
 
-export const CRYSTAL_LOOKS = ["clear", "prism", "spectral-flow", "smoked"] as const;
+export const CRYSTAL_LOOKS = ["clear", "prism", "spectral-flow", "soft-spectral", "smoked"] as const;
 export type CrystalLook = (typeof CRYSTAL_LOOKS)[number];
 export const CRYSTAL_LOOK_RENDER_STRATEGY: Readonly<Record<CrystalLook, "path-traced-still+raster-preview" | "high-resolution-raster">> = {
   clear: "path-traced-still+raster-preview",
   prism: "path-traced-still+raster-preview",
   "spectral-flow": "high-resolution-raster",
+  "soft-spectral": "high-resolution-raster",
   smoked: "path-traced-still+raster-preview",
 };
-type PhysicalCrystalLook = Exclude<CrystalLook, "spectral-flow">;
+type PhysicalCrystalLook = Exclude<CrystalLook, "spectral-flow" | "soft-spectral">;
 type CrystalMaterial = THREE.MeshPhysicalMaterial & { dispersion: number };
 
 export interface PrismRestPose {
@@ -169,6 +171,7 @@ function nearestGeometryVertex(geometry: THREE.BufferGeometry, target: THREE.Vec
 export class CrystalAssembly extends THREE.Group {
   private readonly materials: CrystalMaterial[] = [];
   private readonly spectralMaterials: SpectralFlowMaterial[] = [];
+  private readonly softSpectralMaterials: SoftSpectralMaterial[] = [];
   private readonly solids: THREE.Group[] = [];
   private readonly meshes: THREE.Mesh[] = [];
   private readonly span = 1.35;
@@ -186,6 +189,7 @@ export class CrystalAssembly extends THREE.Group {
     TOUCH_CORNERS.forEach((corner, index) => {
       const material = makeOpticalMaterial("prism");
       const spectralMaterial = new SpectralFlowMaterial(createSpectralFlowState());
+      const softSpectralMaterial = new SoftSpectralMaterial(createSoftSpectralState());
       const geometry = transformOpticalCube(CUBE_BASIS, this.span, this.bevelRadius);
       const pivot = new THREE.Group();
       pivot.name = `SharedVertexPivot${index + 1}`;
@@ -212,6 +216,7 @@ export class CrystalAssembly extends THREE.Group {
       solid.add(mesh);
       this.materials.push(material);
       this.spectralMaterials.push(spectralMaterial);
+      this.softSpectralMaterials.push(softSpectralMaterial);
       this.meshes.push(mesh);
       this.solids.push(pivot);
       pivot.add(solid);
@@ -305,6 +310,10 @@ export class CrystalAssembly extends THREE.Group {
       this.meshes.forEach((mesh, index) => { mesh.material = this.spectralMaterials[index]; });
       return;
     }
+    if (look === "soft-spectral") {
+      this.meshes.forEach((mesh, index) => { mesh.material = this.softSpectralMaterials[index]; });
+      return;
+    }
     const preset = LOOKS[look];
     this.meshes.forEach((mesh, index) => { mesh.material = this.materials[index]; });
     this.materials.forEach((material) => {
@@ -349,7 +358,7 @@ export class CrystalAssembly extends THREE.Group {
   setOpticalLighting(reflectionStrength: number, refractionStrength: number): void {
     this.reflectionStrength = THREE.MathUtils.clamp(reflectionStrength, 0, 3);
     this.refractionStrength = THREE.MathUtils.clamp(refractionStrength, 0, 1.25);
-    const physicalLook: PhysicalCrystalLook = this.look === "spectral-flow" ? "prism" : this.look;
+    const physicalLook: PhysicalCrystalLook = this.look === "spectral-flow" || this.look === "soft-spectral" ? "prism" : this.look;
     const preset = LOOKS[physicalLook];
     this.materials.forEach((material) => {
       material.envMapIntensity = preset.envMapIntensity * this.reflectionStrength;
@@ -369,6 +378,18 @@ export class CrystalAssembly extends THREE.Group {
 
   getSpectralFlowState(): SpectralFlowState {
     return this.spectralMaterials[0]?.spectralState ?? createSpectralFlowState();
+  }
+
+  setSoftSpectralState(state: SoftSpectralState): void {
+    this.softSpectralMaterials.forEach((material) => material.setState(state));
+  }
+
+  setSoftSpectralRuntime(time: number, duration: number, motionEnabled: boolean, sweep = 0): void {
+    this.softSpectralMaterials.forEach((material) => material.setRuntime(time, duration, motionEnabled, sweep));
+  }
+
+  getSoftSpectralState(): SoftSpectralState {
+    return this.softSpectralMaterials[0]?.softSpectralState ?? createSoftSpectralState();
   }
 
   inspect(): object {
@@ -393,6 +414,7 @@ export class CrystalAssembly extends THREE.Group {
       })),
       physicalParameters: { ...this.physicalParameters },
       spectralFlow: this.getSpectralFlowState(),
+      softSpectral: this.getSoftSpectralState(),
     };
   }
 
@@ -404,5 +426,6 @@ export class CrystalAssembly extends THREE.Group {
     geometries.forEach((geometry) => geometry.dispose());
     this.materials.forEach((material) => material.dispose());
     this.spectralMaterials.forEach((material) => material.dispose());
+    this.softSpectralMaterials.forEach((material) => material.dispose());
   }
 }

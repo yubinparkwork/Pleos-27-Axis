@@ -593,8 +593,11 @@ input[type="range"]:focus::-webkit-slider-thumb, input[type="range"]:active::-we
 }
 
 /* SPECTRAL FLOW Look ---------------------------------------------------- */
-.motion-studio .look-segmented { grid-template-columns: repeat(4, 1fr); }
+.motion-studio .look-segmented { grid-template-columns: repeat(5, 1fr); }
 .motion-studio .look-segmented button { min-width: 0; padding-inline: 4px; font-size: 10px; }
+.motion-studio .look-segmented button[data-look="soft-spectral"] { font-size: 9px; line-height: 1.05; }
+.motion-studio .control-dock:has([data-look="soft-spectral"].active) [data-physical-optics] { display: none; }
+.motion-studio .soft-spectral-controls { border-top: 1px solid rgba(205,220,255,.12); }
 .motion-studio [hidden] { display: none !important; }
 .motion-studio .spectral-flow-controls { position: relative; }
 .motion-studio .spectral-flow-controls::before {

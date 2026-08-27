@@ -162,6 +162,29 @@ window.__pleos27Axis.setSpectralFlowPreset("balanced");
 window.__pleos27Axis.setSpectralFlow({ flowDirection: "axis-150", edgeAttraction: 1.6 });
 ```
 
+## SOFT SPECTRAL Look
+
+`LOOK → Soft Spectral`은 기존 세 육면체와 shared origin을 그대로 유지하면서, geometry가 아니라 중심·Axis·normal·view direction에 반응하는 넓은 광학 필드를 입힙니다. 흰색/옅은 보라 중심광, Blue/Cyan 우세 스펙트럼, 제한된 Magenta를 사용하며 warm accent는 5% 미만입니다. 기본 motion은 `spectral-axis-sweep`, 8초 seamless loop이고 육면체 위치·회전·크기는 움직이지 않습니다.
+
+- Primary: Glow, Spectrum, Edge, Darkness, Motion Depth
+- Style: Subtle, Balanced, Active
+- Variation: 07–09 Soft Spectral
+- 출력: 고해상도/인쇄용 raster PNG, 부분 렌더, fixed-timestep PNG sequence, transparency
+
+```bash
+npm run verify:soft-spectral
+npm run capture:soft-spectral
+npm run handoff:full -- --look soft-spectral --motion spectral-axis-sweep --hero-time 4
+```
+
+Browser API:
+
+```ts
+window.__pleos27Axis.setLook("soft-spectral");
+window.__pleos27Axis.setSoftSpectralPreset("balanced");
+window.__pleos27Axis.setSoftSpectral({ glow: 1.2, edge: .6, motionDepth: .5 });
+```
+
 ## AI Collaboration / Handoff
 
 이 기능은 production 렌더 결과가 아니라 개발자·ChatGPT·Codex 사이에서 현재 프로젝트 상태를 공유하기 위한 infrastructure입니다.
@@ -186,7 +209,7 @@ npm run handoff:full -- --look spectral-flow --motion spectral-axis-sweep --hero
 
 ## Design Polish workflow
 
-- Inspector 상단 `Variation`에서 6개의 완성형 KV 조합을 즉시 불러옵니다.
+- Inspector 상단 `Variation`에서 9개의 완성형 KV 조합을 즉시 불러옵니다.
 - `+ 저장`은 현재 Look, 조명, Motion hero frame, 판형, 카메라를 사용자 Variation으로 로컬 저장합니다.
 - Prism은 `Clean`, `RGB Edge`, `Immersive`를 먼저 고른 뒤 Primary controls만 조정합니다.
 - Spectral은 `Subtle`, `Balanced`, `Active`로 시작하며 세부 shader 값은 Advanced에 있습니다.

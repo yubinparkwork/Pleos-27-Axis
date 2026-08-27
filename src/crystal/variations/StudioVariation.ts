@@ -3,6 +3,7 @@ import type { MotionSettings } from "../../motion/types";
 import type { CrystalLook } from "../CrystalAssembly";
 import { createLightingPreset, sanitizeLightingState, type LightingState } from "../LightingSystem";
 import { createSpectralFlowState, type SpectralFlowState } from "../materials/SpectralFlowMaterial";
+import { createSoftSpectralState, sanitizeSoftSpectralState, type SoftSpectralState } from "../materials/SoftSpectralMaterial";
 import { PRISM_STYLE_PRESETS, type PhysicalLookParameters, type PrismStyleId } from "../presets/PrismStylePresets";
 
 export interface VariationCameraState {
@@ -20,6 +21,7 @@ export interface StudioVariationSnapshot {
     dispersion: number;
     physical: PhysicalLookParameters;
     spectralFlow: SpectralFlowState;
+    softSpectral: SoftSpectralState;
   };
   lighting: LightingState;
   motion: MotionSettings;
@@ -52,7 +54,7 @@ function prismSnapshot(style: PrismStyleId, artboard: ArtboardState): StudioVari
   Object.assign(lighting.globals, preset.lightingGlobals);
   return {
     setup: { gap: style === "immersive" ? .018 : 0, bevelRadius: style === "clean" ? .026 : .042 },
-    look: { preset: "prism", prismStyle: style, roughness: preset.roughness, dispersion: preset.dispersion, physical: { ...preset.physical }, spectralFlow: createSpectralFlowState("balanced") },
+    look: { preset: "prism", prismStyle: style, roughness: preset.roughness, dispersion: preset.dispersion, physical: { ...preset.physical }, spectralFlow: createSpectralFlowState("balanced"), softSpectral: createSoftSpectralState("balanced") },
     lighting,
     motion: motion("spectral-axis-sweep", false, "restrained", .42, 6.8),
     format: artboard,
@@ -72,12 +74,33 @@ function spectralSnapshot(style: "subtle" | "balanced" | "active", artboard: Art
       : { masterIntensity: .86, environmentIntensity: .2, exposure: .98, bloomIntensity: .08, colorSaturation: .78 });
   return {
     setup: { gap: 0, bevelRadius: .034 },
-    look: { preset: "spectral-flow", prismStyle: "clean", roughness: prism.roughness, dispersion: prism.dispersion, physical: { ...prism.physical }, spectralFlow: spectral },
+    look: { preset: "spectral-flow", prismStyle: "clean", roughness: prism.roughness, dispersion: prism.dispersion, physical: { ...prism.physical }, spectralFlow: spectral, softSpectral: createSoftSpectralState("balanced") },
     lighting,
     motion: motion("spectral-axis-sweep", true, style === "active" ? "balanced" : "restrained", style === "subtle" ? .32 : style === "balanced" ? .5 : .68, 7.2),
     format: artboard,
     camera: camera(),
     heroTime: style === "subtle" ? 2.6 : style === "balanced" ? 3.5 : 4.1,
+  };
+}
+
+function softSpectralSnapshot(style: "subtle" | "balanced" | "active", artboard: ArtboardState): StudioVariationSnapshot {
+  const prism = PRISM_STYLE_PRESETS.clean;
+  const softSpectral = createSoftSpectralState(style);
+  const lighting = createLightingPreset("soft-glass");
+  lighting.lights.forEach((light, index) => { light.color = index % 3 === 0 ? "#CDDCFF" : index % 2 === 0 ? "#F2F2F2" : "#FFFFFF"; });
+  Object.assign(lighting.globals, style === "subtle"
+    ? { masterIntensity: .58, environmentIntensity: .18, exposure: .92, bloomIntensity: .02, colorSaturation: .18 }
+    : style === "balanced"
+      ? { masterIntensity: .68, environmentIntensity: .22, exposure: .96, bloomIntensity: .035, colorSaturation: .24 }
+      : { masterIntensity: .76, environmentIntensity: .2, exposure: .98, bloomIntensity: .05, colorSaturation: .3 });
+  return {
+    setup: { gap: 0, bevelRadius: style === "subtle" ? .072 : style === "balanced" ? .092 : .112 },
+    look: { preset: "soft-spectral", prismStyle: "clean", roughness: prism.roughness, dispersion: prism.dispersion, physical: { ...prism.physical }, spectralFlow: createSpectralFlowState("balanced"), softSpectral },
+    lighting,
+    motion: motion("spectral-axis-sweep", true, style === "active" ? "balanced" : "restrained", style === "subtle" ? .28 : style === "balanced" ? .46 : .64, 8),
+    format: artboard,
+    camera: camera(),
+    heroTime: 4,
   };
 }
 
@@ -89,6 +112,9 @@ function builtins(): StudioVariation[] {
     { id: "builtin-spectral-dark", label: "04  Spectral Dark", builtin: true, snapshot: spectralSnapshot("subtle", format("square", 1080, 1080, .82, .5)) },
     { id: "builtin-spectral-balanced", label: "05  Spectral Balanced", builtin: true, snapshot: spectralSnapshot("balanced", format("instagram-portrait", 1080, 1350, .8, .46)) },
     { id: "builtin-spectral-active", label: "06  Spectral Active", builtin: true, snapshot: spectralSnapshot("active", format("vertical-9-16", 1080, 1920, .7, .48)) },
+    { id: "builtin-soft-spectral-subtle", label: "07  Soft Spectral Subtle", builtin: true, snapshot: softSpectralSnapshot("subtle", format("square", 1080, 1080, .82, .5)) },
+    { id: "builtin-soft-spectral-balanced", label: "08  Soft Spectral Balanced", builtin: true, snapshot: softSpectralSnapshot("balanced", format("instagram-portrait", 1080, 1350, .8, .46)) },
+    { id: "builtin-soft-spectral-active", label: "09  Soft Spectral Active", builtin: true, snapshot: softSpectralSnapshot("active", format("vertical-9-16", 1080, 1920, .7, .48)) },
   ];
 }
 
@@ -125,7 +151,9 @@ export class StudioVariationStore {
   }
 
   sanitizeSnapshot(snapshot: StudioVariationSnapshot): StudioVariationSnapshot {
-    return { ...cloneSnapshot(snapshot), lighting: sanitizeLightingState(snapshot.lighting) };
+    const cloned = cloneSnapshot(snapshot);
+    cloned.look.softSpectral = sanitizeSoftSpectralState(cloned.look.softSpectral);
+    return { ...cloned, lighting: sanitizeLightingState(snapshot.lighting) };
   }
 
   private load(): void {

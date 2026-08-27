@@ -189,6 +189,7 @@ function lookDescription(look, strategies) {
     clear: ["Neutral clear optical glass", "MeshPhysicalMaterial preset", "src/crystal/CrystalAssembly.ts"],
     prism: ["Primary optical prism expression", "MeshPhysicalMaterial with dispersion", "src/crystal/CrystalAssembly.ts"],
     "spectral-flow": ["Axis-driven moving spectral light field", "MeshPhysicalMaterial.onBeforeCompile custom GLSL", "src/crystal/materials/SpectralFlowMaterial.ts"],
+    "soft-spectral": ["Soft center-led optical field with blue/cyan spectral response", "Independent MeshPhysicalMaterial.onBeforeCompile custom GLSL", "src/crystal/materials/SoftSpectralMaterial.ts"],
     smoked: ["Dark smoked optical glass", "MeshPhysicalMaterial preset", "src/crystal/CrystalAssembly.ts"],
   };
   const [role, implementation, file] = details[look] ?? ["Runtime Look", "Inspect active source", "src/crystal/CrystalAssembly.ts"];
@@ -209,7 +210,7 @@ function makeHandoff({ runtimeState, task, filesChanged, visualChanges, knownIss
     `Browser console — ${validation.browserConsole.toUpperCase()}`,
   ];
   const previewTable = runtimeState.previews.map((preview) => `| \`${preview.file}\` | ${preview.width} × ${preview.height} | ${preview.look} | ${preview.heroTime}s |`).join("\n");
-  const lookSections = looks.map((look) => `### ${look.look === "spectral-flow" ? "Spectral Flow" : look.look[0].toUpperCase() + look.look.slice(1)}
+  const lookSections = looks.map((look) => `### ${look.look === "spectral-flow" ? "Spectral Flow" : look.look === "soft-spectral" ? "Soft Spectral" : look.look[0].toUpperCase() + look.look.slice(1)}
 
 - Role: ${look.role}
 - Implementation: ${look.implementation}
@@ -372,9 +373,12 @@ await mkdir(latestDirectory, { recursive: true });
 
 const statusBefore = runGitRaw(["status", "--porcelain=v1", "--untracked-files=all", "--", "."], "")
   .split("\n").filter(Boolean).map(normalizeStatusLine);
-const branch = runGit(["rev-parse", "--abbrev-ref", "HEAD"]);
-const sourceBaseCommit = runGit(["rev-parse", "HEAD"]);
-const remote = runGit(["remote", "get-url", "origin"], "no-origin");
+// This project can be embedded in a larger workshop repository. Explicit
+// metadata keeps the handoff tied to the production Pleos repository rather
+// than accidentally reporting the parent workspace remote.
+const branch = process.env.PLEOS_GIT_BRANCH ?? runGit(["rev-parse", "--abbrev-ref", "HEAD"]);
+const sourceBaseCommit = process.env.PLEOS_GIT_BASE ?? runGit(["rev-parse", "HEAD"]);
+const remote = process.env.PLEOS_GIT_REMOTE ?? runGit(["remote", "get-url", "origin"], "no-origin");
 let capture;
 let captureFailure = null;
 try {
