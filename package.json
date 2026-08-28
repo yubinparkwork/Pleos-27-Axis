@@ -19,6 +19,7 @@
     "capture:spectral-flow": "node scripts/capture-spectral-flow.mjs",
     "capture:soft-spectral": "node scripts/capture-soft-spectral.mjs",
     "capture:design-polish": "node scripts/capture-design-polish.mjs",
+    "capture:ui-redesign": "node scripts/capture-ui-redesign.mjs",
     "handoff": "node scripts/update-ai-handoff.mjs",
     "handoff:full": "node scripts/update-ai-handoff.mjs --full",
     "render:motion": "node scripts/render-motion-sequence.mjs",

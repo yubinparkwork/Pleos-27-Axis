@@ -213,6 +213,7 @@ export class MotionStudioApp {
   private renderingHigh = false;
   private renderJob: PathRenderJob | null = null;
   private lastPatch: MotionPatch = {};
+  private gestureZoomStart = 1;
 
   constructor(private readonly root: HTMLElement) {
     this.root.innerHTML = this.template();
@@ -235,6 +236,7 @@ export class MotionStudioApp {
     this.controls.enableDamping = true;
     this.controls.enablePan = false;
     this.controls.enabled = !this.settings.setup.viewLocked;
+    this.controls.enableZoom = false;
     this.assembly.setSpectralFlowState(this.settings.look.spectralFlow);
     this.assembly.setSoftSpectralState(this.settings.look.softSpectral);
     this.assembly.setLook(this.settings.look.preset);
@@ -277,6 +279,7 @@ export class MotionStudioApp {
     this.lightingPanel = new LightingPanel(this.require("[data-lighting-panel]"), this.lighting, () => undefined);
     this.inspector = new InspectorPanel(this.root, this.settings.ui.activeTab, this.settings.ui.inspectorCollapsed, (tab, collapsed) => { this.settings.ui.activeTab = tab; this.settings.ui.inspectorCollapsed = collapsed; this.persist(); this.resize(); });
     this.bindUi();
+    this.bindCanvasZoom();
     bindScrubbableNumbers(this.root);
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(this.root);
@@ -289,7 +292,7 @@ export class MotionStudioApp {
     const globals = this.settings.lighting.globals;
     const region = this.settings.advanced.renderRegion;
     return `<section class="crystal-app motion-studio">
-      <header class="topbar"><div class="wordmark"><strong>PLEOS AXIS STUDIO</strong><span>Prism 3D · Motion V1</span></div><div class="render-status"><span data-output="samples">Raster preview ready</span></div></header>
+      <header class="topbar"><div class="wordmark"><strong>PLEOS 27 AXIS</strong></div><div class="topbar-actions"><div class="render-status"><span data-output="samples">Ready</span></div><span class="topbar-save" data-output="topbar-save">Saved</span><button data-action="inspector-toggle" aria-label="Inspector 표시 또는 숨기기">Inspector</button></div></header>
       <main class="pasteboard"><div class="artboard-meta"><span data-output="format-name">Square 1:1</span><b data-output="artboard-size">${this.settings.format.width} × ${this.settings.format.height}px</b></div><div class="artboard-shell"><div class="crystal-stage" aria-label="Pleos Axis virtual artboard"><div class="safe-guide" data-safe-guide></div><div class="render-region-guide" data-render-region-guide><span data-output="region-size"></span></div></div></div></main>
       ${studioPanelTemplate({ look: this.settings.look.preset, prismStyle: this.settings.look.prismStyle, physical: this.settings.look.physical, variations: this.variations.list().map(({ id, label, builtin }) => ({ id, label, builtin })), selectedVariationId: this.settings.ui.selectedVariationId, spectralFlow: this.settings.look.spectralFlow, softSpectral: this.settings.look.softSpectral, gap: this.settings.setup.gap, bevelRadius: this.settings.setup.bevelRadius, roughness: this.settings.look.roughness, dispersion: this.settings.look.dispersion, reflection: globals.reflectionStrength, refraction: globals.refractionStrength, exposure: globals.exposure, bloom: globals.bloomIntensity, saturation: globals.colorSaturation, environment: globals.environmentIntensity, motion: this.settings.motion, artboard: this.settings.format, activeTab: this.settings.ui.activeTab, outputSamples: this.settings.advanced.targetSamples, bounces: this.settings.advanced.bounces, renderScale: this.settings.advanced.renderScale, ppi: this.settings.export.ppi, renderRegion: region, printOutput: this.printOutputDescription() })}
       ${transportTemplate()}
@@ -313,6 +316,8 @@ export class MotionStudioApp {
     const softControls = this.root.querySelector<HTMLElement>("[data-soft-spectral-controls]");
     const lookAdvanced = this.root.querySelector<HTMLElement>("[data-inspector-view='look'] .advanced-link");
     if (softControls && lookAdvanced) lookAdvanced.before(softControls);
+    this.root.querySelector<HTMLSelectElement>("[data-look-select]")?.addEventListener("change", (event) => this.setLook((event.currentTarget as HTMLSelectElement).value as CrystalLook));
+    this.root.querySelector<HTMLSelectElement>("[data-prism-style-select]")?.addEventListener("change", (event) => this.setPrismStyle((event.currentTarget as HTMLSelectElement).value as PrismStyleId));
     this.root.querySelectorAll<HTMLButtonElement>("[data-look]").forEach((button) => button.addEventListener("click", () => this.setLook(button.dataset.look as CrystalLook)));
     this.root.querySelectorAll<HTMLButtonElement>("[data-prism-style]").forEach((button) => button.addEventListener("click", () => this.setPrismStyle(button.dataset.prismStyle as PrismStyleId)));
     this.require<HTMLSelectElement>("[data-variation]").addEventListener("change", (event) => this.applyVariation((event.currentTarget as HTMLSelectElement).value));
@@ -386,10 +391,23 @@ export class MotionStudioApp {
     this.require<HTMLInputElement>("[data-format='safe-guide']").addEventListener("change", (event) => { this.settings.format.safeGuide = (event.currentTarget as HTMLInputElement).checked; this.resize(); this.persist(); });
     this.require<HTMLInputElement>("[data-format='transparent']").addEventListener("change", (event) => { this.settings.format.transparent = (event.currentTarget as HTMLInputElement).checked; this.updateBackground(); this.persist(); });
     this.require<HTMLInputElement>("[data-format='background']").addEventListener("input", (event) => { this.settings.format.background = (event.currentTarget as HTMLInputElement).value; this.updateBackground(); this.showPreview(); this.persist(); });
+    const transparentMirror = this.root.querySelector<HTMLInputElement>("[data-format='transparent-mirror']");
+    transparentMirror?.addEventListener("change", () => {
+      this.settings.format.transparent = transparentMirror.checked;
+      this.require<HTMLInputElement>("[data-format='transparent']").checked = transparentMirror.checked;
+      this.updateBackground(); this.persist();
+    });
     this.require<HTMLInputElement>("[data-control='view-lock']").addEventListener("change", (event) => { this.settings.setup.viewLocked = (event.currentTarget as HTMLInputElement).checked; this.controls.enabled = !this.settings.setup.viewLocked && !this.motionClock.playing; this.persist(); });
     this.require<HTMLSelectElement>("[data-control='export-ppi']").addEventListener("change", (event) => { this.settings.export.ppi = Number((event.currentTarget as HTMLSelectElement).value); this.updateRenderUi(); this.persist(); });
     this.bindRenderRegionUi();
     this.root.querySelectorAll<HTMLButtonElement>("[data-action]").forEach((button) => button.addEventListener("click", () => this.handleAction(button.dataset.action ?? "")));
+    this.root.querySelectorAll<HTMLDetailsElement>("[data-context-advanced]").forEach((details) => details.addEventListener("toggle", () => {
+      this.settings.ui.advancedOpen = Array.from(this.root.querySelectorAll<HTMLDetailsElement>("[data-context-advanced]")).some((item) => item.open);
+      this.updateAdvanced(); this.updateRenderRegion(); this.persist();
+    }));
+    for (const selector of ["[data-export-type]", "[data-export-render]", "[data-export-quality]"]) {
+      this.root.querySelector<HTMLSelectElement>(selector)?.addEventListener("change", () => this.updateExportWorkflow());
+    }
     window.addEventListener("keydown", this.onKeydown);
     document.addEventListener("visibilitychange", this.onVisibility);
     this.renderPresetParameters();
@@ -397,7 +415,44 @@ export class MotionStudioApp {
     this.updateTransport();
     this.updateRenderRegion();
     this.updateRenderUi();
+    this.updateExportWorkflow();
   }
+
+  private bindCanvasZoom(): void {
+    this.stage.addEventListener("wheel", this.onCanvasWheel, { passive: false });
+    this.stage.addEventListener("gesturestart", this.onGestureStart as EventListener, { passive: false });
+    this.stage.addEventListener("gesturechange", this.onGestureChange as EventListener, { passive: false });
+    this.stage.addEventListener("gestureend", this.onGestureEnd as EventListener, { passive: false });
+  }
+
+  private zoomCanvas(nextZoom: number): void {
+    this.camera.zoom = THREE.MathUtils.clamp(nextZoom, .35, 8);
+    this.camera.updateProjectionMatrix();
+    this.controls.update();
+    this.pathCamera.copy(this.camera);
+    this.pathTracer.updateCamera();
+    this.showPreview();
+  }
+
+  private readonly onCanvasWheel = (event: WheelEvent): void => {
+    event.preventDefault();
+    event.stopPropagation();
+    const sensitivity = event.ctrlKey ? .01 : .0015;
+    this.zoomCanvas(this.camera.zoom * Math.exp(-event.deltaY * sensitivity));
+  };
+
+  private readonly onGestureStart = (event: Event): void => {
+    event.preventDefault();
+    this.gestureZoomStart = this.camera.zoom;
+  };
+
+  private readonly onGestureChange = (event: Event): void => {
+    event.preventDefault();
+    const gesture = event as Event & { scale?: number; clientX?: number; clientY?: number };
+    this.zoomCanvas(this.gestureZoomStart * (gesture.scale ?? 1));
+  };
+
+  private readonly onGestureEnd = (event: Event): void => { event.preventDefault(); };
 
   private bindNumber(name: string, apply: (value: number) => void): void {
     const range = this.root.querySelector<HTMLInputElement>(`[data-control='${name}']`);
@@ -475,7 +530,8 @@ export class MotionStudioApp {
     guide.style.top = `${region.y / this.settings.format.height * 100}%`;
     guide.style.width = `${region.width / this.settings.format.width * 100}%`;
     guide.style.height = `${region.height / this.settings.format.height * 100}%`;
-    guide.classList.toggle("active", region.enabled && this.settings.ui.advancedOpen);
+    const regionControlsOpen = this.root.querySelector<HTMLDetailsElement>("[data-context-advanced='export-region']")?.open === true;
+    guide.classList.toggle("active", region.enabled && regionControlsOpen);
     this.require<HTMLElement>("[data-output='region-size']").textContent = `X ${region.x} · Y ${region.y} · ${region.width} × ${region.height}px`;
     this.syncRenderRegionInputs();
     this.updateRenderUi();
@@ -519,6 +575,17 @@ export class MotionStudioApp {
     if (printSize) printSize.textContent = this.printOutputDescription();
     const fast = this.root.querySelector<HTMLButtonElement>("[data-action='render-fast']");
     const high = this.root.querySelector<HTMLButtonElement>("[data-action='render-high']");
+    const progressText = this.root.querySelector<HTMLElement>("[data-output='render-progress-text']");
+    const progressPercent = this.root.querySelector<HTMLElement>("[data-output='render-progress-percent']");
+    const progressBar = this.root.querySelector<HTMLElement>("[data-output='render-progress-bar']");
+    const cancel = this.root.querySelector<HTMLButtonElement>("[data-action='cancel-render']");
+    const renderPrimary = this.root.querySelector<HTMLButtonElement>("[data-action='render-export']");
+    const progress = this.renderJob ? Math.min(1, this.pathTracer.samples / this.renderJob.targetSamples) : 0;
+    if (progressText) progressText.textContent = this.renderJob ? `${this.renderJob.quality === "fast" ? "Preview" : "High"} · ${Math.floor(this.pathTracer.samples)} / ${this.renderJob.targetSamples} spp` : "준비됨";
+    if (progressPercent) progressPercent.textContent = `${Math.round(progress * 100)}%`;
+    if (progressBar) progressBar.style.width = `${progress * 100}%`;
+    if (cancel) cancel.hidden = !this.renderJob;
+    if (renderPrimary) renderPrimary.disabled = this.renderingHigh;
     if (this.settings.look.preset === "spectral-flow" || this.settings.look.preset === "soft-spectral") {
       if (fast) fast.innerHTML = `<strong>빠른 래스터</strong><span>실시간 셰이더</span>`;
       if (high) high.innerHTML = `<strong>고품질 래스터</strong><span>노이즈 없음 · 100%</span>`;
@@ -532,7 +599,7 @@ export class MotionStudioApp {
     high?.classList.toggle("active", this.renderJob?.quality === "high");
     if (fast) fast.disabled = this.renderingHigh && this.renderJob?.quality !== "fast";
     if (high) high.disabled = this.renderingHigh && this.renderJob?.quality !== "high";
-    for (const selector of ["[data-action='export-raster']", "[data-action='render-current-high']", "[data-action='export-print']"]) {
+    for (const selector of ["[data-action='export-raster']", "[data-action='render-current-high']", "[data-action='export-print']", "[data-action='render-export']"]) {
       const button = this.root.querySelector<HTMLButtonElement>(selector); if (button) button.disabled = this.renderingHigh;
     }
   }
@@ -556,7 +623,37 @@ export class MotionStudioApp {
     else if (action === "export-raster") void this.exportPng(true).catch((error) => this.showPreview(`PNG 저장 실패 · ${error.message}`));
     else if (action === "render-current-high") void this.renderCurrentFrame(true).catch((error) => this.showPreview(`고품질 렌더링 실패 · ${error.message}`));
     else if (action === "export-print") void this.renderPrintFrame(true).catch((error) => this.showPreview(`인쇄용 렌더링 실패 · ${error.message}`));
+    else if (action === "render-export") void this.runExportWorkflow().catch((error) => this.showPreview(`렌더링 실패 · ${error.message}`));
+    else if (action === "cancel-render") this.cancelPathRender("렌더링 취소됨");
     else if (action === "copy-sequence") void navigator.clipboard.writeText(this.sequenceCommand());
+  }
+
+  private updateExportWorkflow(): void {
+    const type = this.root.querySelector<HTMLSelectElement>("[data-export-type]")?.value ?? "still";
+    const quality = this.root.querySelector<HTMLSelectElement>("[data-export-quality]")?.value ?? "high";
+    const render = this.root.querySelector<HTMLSelectElement>("[data-export-render]");
+    const button = this.root.querySelector<HTMLButtonElement>("[data-action='render-export']");
+    const custom = this.root.querySelector<HTMLDetailsElement>("[data-context-advanced='export-custom']");
+    const motion = this.root.querySelector<HTMLDetailsElement>("[data-context-advanced='export-motion']");
+    if (render) render.disabled = type === "motion";
+    if (button) button.textContent = type === "motion" ? "시퀀스 명령 복사" : quality === "print" ? "인쇄 렌더 및 내보내기" : "렌더 및 내보내기";
+    if (custom && quality === "custom") custom.open = true;
+    if (motion) motion.classList.toggle("workflow-relevant", type === "motion");
+  }
+
+  private async runExportWorkflow(): Promise<void> {
+    const type = this.root.querySelector<HTMLSelectElement>("[data-export-type]")?.value ?? "still";
+    const render = this.root.querySelector<HTMLSelectElement>("[data-export-render]")?.value ?? "path";
+    const quality = this.root.querySelector<HTMLSelectElement>("[data-export-quality]")?.value ?? "high";
+    if (type === "motion") {
+      await navigator.clipboard.writeText(this.sequenceCommand());
+      this.showPreview("PNG 시퀀스 명령을 복사했습니다.");
+      return;
+    }
+    if (quality === "print") { await this.renderPrintFrame(true); return; }
+    if (render === "raster" || quality === "draft") { await this.exportPng(true); return; }
+    if (quality === "preview") { await this.startPathRender("fast", true, 1, false); return; }
+    await this.renderCurrentFrame(true);
   }
 
   private updatePhysical(patch: Partial<PhysicalLookParameters>): void {
@@ -652,6 +749,8 @@ export class MotionStudioApp {
   }
 
   private syncStudioUi(): void {
+    const lookSelect = this.root.querySelector<HTMLSelectElement>("[data-look-select]"); if (lookSelect) lookSelect.value = this.settings.look.preset;
+    const prismStyleSelect = this.root.querySelector<HTMLSelectElement>("[data-prism-style-select]"); if (prismStyleSelect) prismStyleSelect.value = this.settings.look.prismStyle;
     this.root.querySelectorAll<HTMLButtonElement>("[data-look]").forEach((button) => button.classList.toggle("active", button.dataset.look === this.settings.look.preset));
     this.root.querySelectorAll<HTMLButtonElement>("[data-prism-style]").forEach((button) => button.classList.toggle("active", button.dataset.prismStyle === this.settings.look.prismStyle));
     this.root.querySelector<HTMLElement>("[data-spectral-flow-controls]")?.toggleAttribute("hidden", this.settings.look.preset !== "spectral-flow");
@@ -665,6 +764,7 @@ export class MotionStudioApp {
     const loop = this.root.querySelector<HTMLInputElement>("[data-motion='loop']"); if (loop) loop.checked = this.settings.motion.loop;
     const background = this.root.querySelector<HTMLInputElement>("[data-format='background']"); if (background) background.value = this.settings.format.background;
     const transparent = this.root.querySelector<HTMLInputElement>("[data-format='transparent']"); if (transparent) transparent.checked = this.settings.format.transparent;
+    const transparentMirror = this.root.querySelector<HTMLInputElement>("[data-format='transparent-mirror']"); if (transparentMirror) transparentMirror.checked = this.settings.format.transparent;
     this.root.querySelectorAll<HTMLButtonElement>("[data-format-preset]").forEach((button) => button.classList.toggle("active", button.dataset.formatPreset === this.settings.format.id));
     this.syncSpectralFlowUi(); this.syncSoftSpectralUi(); this.renderPresetParameters(); this.syncVariationUi(); this.updateTransport(); this.updateRenderUi();
   }
@@ -756,7 +856,12 @@ export class MotionStudioApp {
     this.artboardShell.classList.toggle("transparent", this.settings.format.transparent);
   }
 
-  private updateAdvanced(): void { const drawer = this.require<HTMLElement>("[data-advanced]"); drawer.hidden = !this.settings.ui.advancedOpen; drawer.classList.toggle("open", this.settings.ui.advancedOpen); this.root.querySelector<HTMLElement>("[data-render-region-guide]")?.classList.toggle("active", this.settings.ui.advancedOpen && this.settings.advanced.renderRegion.enabled); }
+  private updateAdvanced(): void {
+    const advancedOpen = Array.from(this.root.querySelectorAll<HTMLDetailsElement>("[data-context-advanced]")).some((details) => details.open);
+    this.settings.ui.advancedOpen = advancedOpen;
+    const regionOpen = this.root.querySelector<HTMLDetailsElement>("[data-context-advanced='export-region']")?.open === true;
+    this.root.querySelector<HTMLElement>("[data-render-region-guide]")?.classList.toggle("active", regionOpen && this.settings.advanced.renderRegion.enabled);
+  }
 
   private updateTransport(): void {
     const transport = this.require<HTMLElement>("[data-transport]");
@@ -846,6 +951,7 @@ export class MotionStudioApp {
     this.assembly.setSpectralFlowRuntime(this.motionClock.time, this.settings.motion.duration, this.settings.motion.enabled, this.lastPatch.spectralSweep ?? 0);
     this.assembly.setSoftSpectralRuntime(this.motionClock.time, this.settings.motion.duration, this.settings.motion.enabled, this.lastPatch.spectralSweep ?? 0);
     this.root.querySelectorAll<HTMLButtonElement>("[data-look]").forEach((button) => button.classList.toggle("active", button.dataset.look === look));
+    const lookSelect = this.root.querySelector<HTMLSelectElement>("[data-look-select]"); if (lookSelect) lookSelect.value = look;
     const spectralControls = this.root.querySelector<HTMLElement>("[data-spectral-flow-controls]");
     const softSpectralControls = this.root.querySelector<HTMLElement>("[data-soft-spectral-controls]");
     const physicalControls = this.root.querySelector<HTMLElement>("[data-physical-optics]");
@@ -1127,12 +1233,23 @@ export class MotionStudioApp {
       look: { ...this.settings.look, physical: { ...this.settings.look.physical }, spectralFlow: { ...this.settings.look.spectralFlow } },
       variations: { selectedId: this.settings.ui.selectedVariationId, items: this.listVariations() },
       sharedVertexValid: this.motionAdapter.getSharedCornerValidity(),
-      inspector: { tabs: ["setup", "look", "motion", "format", "export"], advancedDrawer: true },
+      inspector: { tabs: ["setup", "look", "motion", "format", "export"], advancedDrawer: false, contextualAdvanced: true, consolidatedExport: true },
       storageVersion: 2,
     };
   }
   getMotionState(): object { return { preset: this.settings.motion.preset, enabled: this.settings.motion.enabled, playing: this.motionClock.playing, time: this.motionClock.time, frame: this.motionClock.frame, duration: this.settings.motion.duration, fps: this.settings.motion.fps, seed: this.settings.motion.seed, patch: this.lastPatch }; }
-  private persist(): void { window.clearTimeout(this.saveTimer); this.saveTimer = window.setTimeout(() => { localStorage.setItem(STORAGE_V2, JSON.stringify(this.settings)); const status = this.root.querySelector<HTMLElement>("[data-output='save']"); if (status) status.textContent = "저장됨"; }, 180); }
-  dispose(): void { cancelAnimationFrame(this.raf); clearTimeout(this.saveTimer); this.resizeObserver.disconnect(); window.removeEventListener("keydown", this.onKeydown); document.removeEventListener("visibilitychange", this.onVisibility); this.controls.dispose(); this.pathTracer.dispose(); this.previewComposer.dispose(); this.pathComposer.dispose(); this.lighting.dispose(); this.environment.dispose(); this.assembly.dispose(); this.previewRenderer.dispose(); this.pathRenderer.dispose(); }
+  private persist(): void {
+    const panelStatus = this.root.querySelector<HTMLElement>("[data-output='save']");
+    const topbarStatus = this.root.querySelector<HTMLElement>("[data-output='topbar-save']");
+    if (panelStatus) panelStatus.textContent = "저장 중";
+    if (topbarStatus) topbarStatus.textContent = "Saving";
+    window.clearTimeout(this.saveTimer);
+    this.saveTimer = window.setTimeout(() => {
+      localStorage.setItem(STORAGE_V2, JSON.stringify(this.settings));
+      if (panelStatus) panelStatus.textContent = "저장됨";
+      if (topbarStatus) topbarStatus.textContent = "Saved";
+    }, 180);
+  }
+  dispose(): void { cancelAnimationFrame(this.raf); clearTimeout(this.saveTimer); this.resizeObserver.disconnect(); window.removeEventListener("keydown", this.onKeydown); document.removeEventListener("visibilitychange", this.onVisibility); this.stage.removeEventListener("wheel", this.onCanvasWheel); this.stage.removeEventListener("gesturestart", this.onGestureStart as EventListener); this.stage.removeEventListener("gesturechange", this.onGestureChange as EventListener); this.stage.removeEventListener("gestureend", this.onGestureEnd as EventListener); this.controls.dispose(); this.pathTracer.dispose(); this.previewComposer.dispose(); this.pathComposer.dispose(); this.lighting.dispose(); this.environment.dispose(); this.assembly.dispose(); this.previewRenderer.dispose(); this.pathRenderer.dispose(); }
   private require<T extends Element>(selector: string): T { const element = this.root.querySelector<T>(selector); if (!element) throw new Error(`Missing Motion Studio element: ${selector}`); return element; }
 }

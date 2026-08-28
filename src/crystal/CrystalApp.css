@@ -116,6 +116,7 @@
 .motion-studio .transport-buttons .play-button { color: white; background: var(--ui-accent); }
 .motion-studio .motion-transport time, .motion-studio .motion-transport label, .motion-studio .motion-transport span { color: var(--ui-text-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
 .motion-studio .pathtrace-canvas, .motion-studio .preview-canvas { inset: 0; width: 100%; height: 100%; opacity: 0; }
+.motion-studio .crystal-stage, .motion-studio .preview-canvas { touch-action: none; overscroll-behavior: contain; }
 .motion-studio canvas.visible, .motion-studio .preview-canvas { opacity: 1; }
 .motion-studio .pathtrace-canvas.visible { opacity: 1; z-index: 3; }
 .motion-studio.controls-hidden .pasteboard { right: 0; }
@@ -658,3 +659,200 @@ input[type="range"]:focus::-webkit-slider-thumb, input[type="range"]:active::-we
 .motion-studio .advanced-drawer .inspector-section > summary { min-height: 52px; }
 .motion-studio .advanced-drawer .inspector-section > summary strong { font-size: 11px; letter-spacing: 0; text-transform: none; }
 .motion-studio .advanced-drawer .section-content { padding-bottom: 20px; }
+
+/* Axis Studio inspector redesign ---------------------------------------- */
+.motion-studio {
+  --control-panel-width: 360px;
+  --workspace-bg: #111315;
+  --panel-bg: #151719;
+  --panel-surface: #1b1d20;
+  --panel-hover: #202328;
+  --panel-border: rgba(255,255,255,.075);
+  --panel-text: rgba(255,255,255,.9);
+  --panel-secondary: rgba(255,255,255,.55);
+  --panel-muted: rgba(255,255,255,.34);
+  background: var(--workspace-bg);
+}
+.motion-studio .pasteboard {
+  inset: 44px var(--control-panel-width) 42px 0;
+  background: var(--workspace-bg);
+  transition: right .16s ease;
+}
+.motion-studio .artboard-shell {
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 1px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.22);
+}
+.motion-studio .artboard-meta { left: 16px; top: 12px; gap: 6px; font-size: 11px; }
+.motion-studio .topbar {
+  inset: 0 var(--control-panel-width) auto 0;
+  height: 44px;
+  padding: 0 14px 0 16px;
+  background: #131517;
+  border-bottom: 1px solid var(--panel-border);
+  pointer-events: auto;
+}
+.motion-studio .wordmark { gap: 8px; }
+.motion-studio .wordmark strong { font-size: 12px; letter-spacing: .02em; }
+.motion-studio .wordmark span { font-size: 10px; color: var(--panel-muted); }
+.motion-studio .topbar-actions { display: flex; align-items: center; gap: 12px; }
+.motion-studio .topbar-save { color: var(--panel-muted); font-size: 10px; }
+.motion-studio .topbar-actions > button {
+  height: 26px; padding: 0 8px; border: 1px solid var(--panel-border); border-radius: 3px;
+  color: var(--panel-secondary); background: transparent; cursor: pointer; font-size: 10px;
+}
+.motion-studio .topbar-actions > button:hover { color: var(--panel-text); background: var(--panel-hover); }
+.motion-studio .render-status { gap: 6px; font-size: 10px; letter-spacing: 0; text-transform: none; }
+.motion-studio .render-status::before { width: 5px; height: 5px; background: #67d591; }
+.motion-studio .control-dock {
+  width: var(--control-panel-width); padding: 0; overflow: hidden;
+  background: var(--panel-bg); border-left: 1px solid var(--panel-border); box-shadow: none;
+}
+.motion-studio .inspector-header {
+  position: relative; top: auto; height: 44px; padding: 0 12px 0 14px;
+  background: var(--panel-bg); border-bottom: 1px solid var(--panel-border);
+}
+.motion-studio .inspector-header > div { justify-content: flex-start; gap: 9px; }
+.motion-studio .inspector-header strong { font-size: 11px; letter-spacing: .055em; }
+.motion-studio .inspector-header span { color: #67d591; font-size: 10px; }
+.motion-studio .inspector-header button { width: 26px; height: 26px; border-radius: 3px; font-size: 14px; }
+.motion-studio .variation-bar {
+  position: relative; height: 48px; padding: 8px 12px; display: grid; grid-template-columns: 1fr 28px; gap: 6px;
+  background: var(--panel-bg); border-bottom: 1px solid var(--panel-border);
+}
+.motion-studio .variation-bar label { grid-template-columns: 66px 1fr; gap: 6px; }
+.motion-studio .variation-bar label span { color: var(--panel-muted); font-size: 10px; }
+.motion-studio .variation-bar select,
+.motion-studio .select-row select,
+.motion-studio input[type="number"],
+.motion-studio .dimension-grid input,
+.motion-studio .motion-region-grid input,
+.motion-studio .unit-value input {
+  height: 26px; min-width: 0; border: 1px solid var(--panel-border); border-radius: 3px;
+  color: var(--panel-text); background: var(--panel-surface); font-size: 11px;
+}
+.motion-studio .variation-actions { position: relative; }
+.motion-studio .variation-actions > summary {
+  width: 28px; height: 28px; display: grid; place-items: center; list-style: none;
+  border: 1px solid var(--panel-border); border-radius: 3px; color: var(--panel-secondary);
+  background: var(--panel-surface); cursor: pointer; font-size: 11px;
+}
+.motion-studio .variation-actions > summary::-webkit-details-marker { display: none; }
+.motion-studio .variation-actions > div {
+  position: absolute; z-index: 20; top: 32px; right: 0; width: 132px; padding: 4px;
+  display: grid; gap: 2px; border: 1px solid rgba(255,255,255,.12); border-radius: 4px;
+  background: #202225; box-shadow: 0 10px 28px rgba(0,0,0,.38);
+}
+.motion-studio .variation-actions button {
+  height: 28px; padding: 0 8px; border: 0; border-radius: 2px; color: var(--panel-secondary);
+  background: transparent; cursor: pointer; text-align: left; font-size: 10px;
+}
+.motion-studio .variation-actions button:hover { color: white; background: rgba(255,255,255,.07); }
+.motion-studio .variation-actions button.danger { color: #ff818b; }
+.motion-studio .variation-actions button:disabled { opacity: .28; cursor: default; }
+.motion-studio .inspector-tabs {
+  position: relative; top: auto; height: 36px; padding: 0 8px; display: grid; grid-template-columns: repeat(5,1fr);
+  background: #131517; border-bottom: 1px solid var(--panel-border);
+}
+.motion-studio .inspector-tabs button { color: var(--panel-muted); font-size: 10px; font-weight: 550; letter-spacing: 0; }
+.motion-studio .inspector-tabs button.active { color: var(--panel-text); }
+.motion-studio .inspector-tabs button.active::after { inset: auto 8px -1px; height: 2px; background: #4664ff; }
+.motion-studio .inspector-views { height: calc(100% - 128px); padding: 0; overflow: hidden; }
+.motion-studio .inspector-view { height: 100%; padding: 0 14px 24px; overflow-y: auto; }
+.motion-studio .studio-section { padding: 15px 0; border-bottom: 1px solid var(--panel-border); }
+.motion-studio .studio-section > header { margin-bottom: 9px; }
+.motion-studio .studio-section h2 { color: var(--panel-text); font-size: 12px; font-weight: 600; letter-spacing: 0; }
+.motion-studio .property-row {
+  min-height: 30px; grid-template-columns: 98px minmax(68px,1fr) 54px; gap: 7px;
+}
+.motion-studio .property-row label,
+.motion-studio .select-row span,
+.motion-studio .toggle-row,
+.motion-studio .color-property { color: var(--panel-secondary); font-size: 11px; }
+.motion-studio .property-row input[type="number"] { width: 54px; padding: 0 6px; text-align: right; cursor: ew-resize; }
+.motion-studio .select-row, .motion-studio .toggle-row, .motion-studio .color-property { min-height: 30px; gap: 8px; }
+.motion-studio .select-row select { width: min(190px, 58%); padding: 0 7px; }
+.motion-studio .toggle-row input { accent-color: #4664ff; }
+.motion-studio input:focus, .motion-studio select:focus { border-color: #4664ff; box-shadow: 0 0 0 1px rgba(70,100,255,.28); }
+.motion-studio .axis-contract { display: flex; flex-wrap: wrap; gap: 5px; }
+.motion-studio .axis-contract span {
+  height: 24px; padding: 0 7px; display: inline-flex; align-items: center;
+  border: 1px solid var(--panel-border); border-radius: 3px; color: var(--panel-secondary);
+  background: rgba(255,255,255,.025); font-size: 10px;
+}
+.motion-studio .compact-action,
+.motion-studio .render-region-actions button {
+  min-height: 28px; padding: 0 9px; border: 1px solid var(--panel-border); border-radius: 3px;
+  color: var(--panel-secondary); background: var(--panel-surface); cursor: pointer; font-size: 10px;
+}
+.motion-studio .compact-action { width: 100%; }
+.motion-studio .compact-action:hover, .motion-studio .render-region-actions button:hover { color: white; background: var(--panel-hover); }
+.motion-studio .contextual-advanced { border-bottom: 1px solid var(--panel-border); }
+.motion-studio .contextual-advanced > summary { min-height: 40px; }
+.motion-studio .contextual-advanced > summary strong { color: var(--panel-secondary); font-size: 11px; font-weight: 550; letter-spacing: 0; }
+.motion-studio .contextual-advanced > summary i { width: 5px; height: 5px; }
+.motion-studio .contextual-advanced .section-content { gap: 5px; padding-bottom: 14px; }
+.motion-studio .contextual-advanced .studio-section { padding-top: 6px; }
+.motion-studio .section-note { color: var(--panel-muted); font-size: 10px; line-height: 1.5; }
+.motion-studio .compact-segments { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; padding: 2px; background: #111315; border-radius: 3px; }
+.motion-studio .compact-segments button {
+  height: 26px; border: 0; border-radius: 2px; color: var(--panel-muted); background: transparent; cursor: pointer; font-size: 10px;
+}
+.motion-studio .compact-segments button.active { color: white; background: #2a2d32; box-shadow: inset 0 -1px 0 #4664ff; }
+.motion-studio .look-specific { position: static; border: 0; }
+.motion-studio .dimension-grid { margin: 4px 0; gap: 5px; }
+.motion-studio .dimension-grid label { grid-template-columns: 16px 1fr; font-size: 10px; }
+.motion-studio .color-property input { width: 38px; height: 24px; border-radius: 3px; }
+.motion-studio .export-summary { min-height: 34px; padding: 0; background: transparent; border-radius: 0; align-items: center; }
+.motion-studio .export-summary span { color: var(--panel-muted); font-size: 10px; }
+.motion-studio .export-summary b { color: var(--panel-text); font-size: 11px; font-weight: 520; }
+.motion-studio .render-workflow { padding: 15px 0; border-bottom: 1px solid var(--panel-border); }
+.motion-studio .render-primary {
+  width: 100%; height: 34px; border: 1px solid #4664ff; border-radius: 3px;
+  color: white; background: #2350ff; cursor: pointer; font-size: 11px; font-weight: 600;
+}
+.motion-studio .render-primary:hover { background: #315cff; }
+.motion-studio .render-primary:disabled { opacity: .45; cursor: default; }
+.motion-studio .render-cancel { width: 100%; height: 28px; margin-top: 5px; border: 0; color: var(--panel-secondary); background: transparent; cursor: pointer; font-size: 10px; }
+.motion-studio .render-progress { margin-top: 10px; }
+.motion-studio .render-progress > div { display: flex; justify-content: space-between; color: var(--panel-muted); font-size: 10px; }
+.motion-studio .render-progress b { color: var(--panel-secondary); font-weight: 500; }
+.motion-studio .render-progress > i { height: 2px; margin-top: 6px; display: block; overflow: hidden; background: rgba(255,255,255,.08); }
+.motion-studio .render-progress > i span { width: 0; height: 100%; display: block; background: #4664ff; transition: width .12s linear; }
+.motion-studio .render-quality-grid { gap: 4px; }
+.motion-studio .render-quality-grid button { min-height: 40px; border-radius: 3px; }
+.motion-studio .render-quality-grid strong { font-size: 10px; }
+.motion-studio .render-quality-grid span { font-size: 10px; }
+.motion-studio .render-region-actions { margin: 3px 0 7px; gap: 4px; }
+.motion-studio .unit-value { width: min(190px,58%); grid-template-columns: 1fr 26px; }
+.motion-studio .motion-region-grid { gap: 5px; }
+.motion-studio .motion-region-grid label { grid-template-columns: 14px 1fr 20px; font-size: 10px; }
+.motion-studio code { padding: 8px; border-radius: 3px; font-size: 10px; }
+.motion-studio .lighting-panel { padding: 0; }
+.motion-studio .light-toolbar { height: 40px; }
+.motion-studio .light-toolbar button { height: 26px; border-radius: 3px; font-size: 10px; }
+.motion-studio .light-toolbar span { font-size: 10px; }
+.motion-studio .lighting-panel .inspector-section > summary { min-height: 38px; }
+.motion-studio .lighting-panel .inspector-section > summary strong { font-size: 10px; letter-spacing: 0; }
+.motion-studio .lighting-panel .inspector-section > summary small { display: none; }
+.motion-studio .lighting-presets { display: grid; grid-template-columns: repeat(2,1fr); gap: 3px; }
+.motion-studio .lighting-presets button { height: 26px; border-radius: 3px; font-size: 10px; }
+.motion-studio .lighting-subhead.list-heading strong, .motion-studio .lighting-subhead.list-heading small { font-size: 10px; }
+.motion-studio .light-list-item { min-height: 34px; border-radius: 3px; }
+.motion-studio .light-select span, .motion-studio .light-select small { font-size: 10px; }
+.motion-studio .selected-light-head strong, .motion-studio .selected-light-head small { font-size: 10px; }
+.motion-studio .light-name, .motion-studio .light-type { font-size: 10px; }
+.motion-studio .palette-family > small, .motion-studio .selected-color-info strong, .motion-studio .selected-color-info small { font-size: 10px; }
+.motion-studio .motion-transport {
+  inset: auto var(--control-panel-width) 0 0; height: 42px; padding: 0 10px;
+  grid-template-columns: auto 132px 1fr auto auto; gap: 9px;
+  background: #131517; border-top: 1px solid var(--panel-border);
+}
+.motion-studio .transport-buttons { gap: 2px; }
+.motion-studio .transport-buttons button { width: 26px; height: 26px; border-radius: 3px; background: var(--panel-surface); }
+.motion-studio .motion-transport time, .motion-studio .motion-transport label, .motion-studio .motion-transport span { font-size: 10px; }
+.motion-studio.controls-hidden .pasteboard, .motion-studio.controls-hidden .topbar, .motion-studio.controls-hidden .motion-transport { right: 0; }
+@media (max-width: 900px) {
+  .motion-studio { --control-panel-width: min(360px, 82vw); }
+  .motion-studio .property-row { grid-template-columns: 92px 1fr 52px; }
+}
