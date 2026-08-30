@@ -34,6 +34,7 @@ export interface StudioVariation {
   id: string;
   label: string;
   builtin: boolean;
+  modeId: "glass-3d";
   snapshot: StudioVariationSnapshot;
 }
 
@@ -105,7 +106,7 @@ function softSpectralSnapshot(style: "subtle" | "balanced" | "active", artboard:
 }
 
 function builtins(): StudioVariation[] {
-  return [
+  const items = [
     { id: "builtin-prism-clean", label: "01  프리즘 클린", builtin: true, snapshot: prismSnapshot("clean", format("square", 1080, 1080, .82, .5)) },
     { id: "builtin-prism-rgb-edge", label: "02  프리즘 RGB 모서리", builtin: true, snapshot: prismSnapshot("rgb-edge", format("instagram-portrait", 1080, 1350, .8, .46)) },
     { id: "builtin-prism-immersive", label: "03  프리즘 몰입형", builtin: true, snapshot: prismSnapshot("immersive", format("vertical-9-16", 1080, 1920, 1.08, .49)) },
@@ -116,6 +117,7 @@ function builtins(): StudioVariation[] {
     { id: "builtin-soft-spectral-balanced", label: "08  소프트 스펙트럴 균형", builtin: true, snapshot: softSpectralSnapshot("balanced", format("instagram-portrait", 1080, 1350, .8, .46)) },
     { id: "builtin-soft-spectral-active", label: "09  소프트 스펙트럴 강조", builtin: true, snapshot: softSpectralSnapshot("active", format("vertical-9-16", 1080, 1920, .7, .48)) },
   ];
+  return items.map((item) => ({ ...item, modeId: "glass-3d" as const }));
 }
 
 function cloneSnapshot(snapshot: StudioVariationSnapshot): StudioVariationSnapshot {
@@ -131,7 +133,7 @@ export class StudioVariationStore {
   get(id: string): StudioVariation | null { return this.list().find((item) => item.id === id) ?? null; }
 
   save(label: string, snapshot: StudioVariationSnapshot): StudioVariation {
-    const variation: StudioVariation = { id: `user-${Date.now().toString(36)}`, label: label.slice(0, 48), builtin: false, snapshot: cloneSnapshot(snapshot) };
+    const variation: StudioVariation = { id: `user-${Date.now().toString(36)}`, label: label.slice(0, 48), builtin: false, modeId: "glass-3d", snapshot: cloneSnapshot(snapshot) };
     this.users.push(variation); this.persist(); return variation;
   }
 
@@ -159,7 +161,7 @@ export class StudioVariationStore {
   private load(): void {
     try {
       const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]") as StudioVariation[];
-      this.users = Array.isArray(parsed) ? parsed.filter((item) => item && !item.builtin && typeof item.id === "string" && typeof item.label === "string" && item.snapshot).slice(0, 24) : [];
+      this.users = Array.isArray(parsed) ? parsed.filter((item) => item && !item.builtin && typeof item.id === "string" && typeof item.label === "string" && item.snapshot).slice(0, 24).map((item) => ({ ...item, modeId: "glass-3d" })) : [];
     } catch { this.users = []; }
   }
 

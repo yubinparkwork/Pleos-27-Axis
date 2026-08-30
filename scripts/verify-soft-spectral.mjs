@@ -12,7 +12,7 @@ assert.match(shader, /cyan \* 1\.18[\s\S]*blue \* 1\.12[\s\S]*magenta \* \.34/);
 assert.match(files["src/crystal/CrystalAssembly.ts"], /"soft-spectral"[\s\S]*softSpectralMaterials/);
 assert.match(files["src/crystal/MotionStudioApp.ts"], /preset === "soft-spectral"[\s\S]*restoreRestPose/);
 assert.match(files["src/crystal/MotionStudioApp.ts"], /setSoftSpectralRuntime\(time, this\.settings\.motion\.duration/);
-for (const label of ["광량", "스펙트럼", "모서리", "어두움", "모션 깊이", "중심 반경", "모서리 부드러움"]) assert.ok(files["src/crystal/ui/StudioPanel.ts"].includes(label), `missing UI label: ${label}`);
+for (const label of ["Glow", "Spectrum", "Edge", "Darkness", "Motion depth", "Center radius", "Edge softness"]) assert.ok(files["src/crystal/ui/StudioPanel.ts"].includes(label), `missing UI label: ${label}`);
 for (const id of ["builtin-soft-spectral-subtle", "builtin-soft-spectral-balanced", "builtin-soft-spectral-active"]) assert.ok(files["src/crystal/variations/StudioVariation.ts"].includes(id), `missing variation: ${id}`);
 assert.match(files["src/main.ts"], /setSoftSpectralPreset/);
 const envelope = (time) => .5 - .5 * Math.cos(time / 8 * Math.PI * 2);

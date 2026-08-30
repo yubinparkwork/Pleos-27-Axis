@@ -1,468 +1,260 @@
 {
   "project": "PLEOS 27 Axis",
-  "generatedAt": "2026-08-28T05:30:03.242Z",
+  "generatedAt": "2026-08-28T09:56:04.834Z",
   "git": {
     "root": ".",
-    "projectPath": "new-axis-procedural",
+    "projectPath": ".",
     "branch": "main",
-    "sourceBaseCommit": "bca21b9662f1b18fd2c68478b57722c9bb04674b",
-    "remote": "https://github.com/vcodestudio/ae-mcp-student.git",
+    "sourceBaseCommit": "9b0dbc689e647128c98b60481d52573d5ae957cc",
+    "remote": "https://github.com/yubinparkwork/Pleos-27-Axis.git",
     "dirtyBeforeHandoff": true,
     "changedBeforeHandoff": [
       {
         "status": "M",
-        "file": "new-axis-procedural/.gitignore"
+        "file": "AGENTS.md"
       },
       {
         "status": "M",
-        "file": "new-axis-procedural/PROGRESS.md"
+        "file": "README.md"
       },
       {
         "status": "M",
-        "file": "new-axis-procedural/README.md"
+        "file": "artifacts/latest/runtime-state.json"
       },
       {
         "status": "M",
-        "file": "new-axis-procedural/package.json"
+        "file": "docs/AI_HANDOFF.md"
       },
       {
         "status": "M",
-        "file": "new-axis-procedural/src/crystal/CrystalApp.css"
+        "file": "package.json"
       },
       {
         "status": "M",
-        "file": "new-axis-procedural/src/crystal/CrystalAssembly.ts"
+        "file": "scripts/update-ai-handoff.mjs"
       },
       {
         "status": "M",
-        "file": "new-axis-procedural/src/crystal/InspectorPanel.ts"
+        "file": "scripts/verify-design-polish.mjs"
       },
       {
         "status": "M",
-        "file": "new-axis-procedural/src/crystal/LightingPanel.ts"
+        "file": "scripts/verify-pathtracer.mjs"
       },
       {
         "status": "M",
-        "file": "new-axis-procedural/src/crystal/LightingSystem.ts"
+        "file": "scripts/verify-soft-spectral.mjs"
       },
       {
         "status": "M",
-        "file": "new-axis-procedural/src/crystal/StudioEnvironment.ts"
+        "file": "scripts/verify-spectral-flow.mjs"
       },
       {
         "status": "M",
-        "file": "new-axis-procedural/src/main.ts"
+        "file": "src/crystal/CrystalApp.css"
       },
       {
         "status": "M",
-        "file": "new-axis-procedural/vite.config.ts"
+        "file": "src/crystal/InspectorPanel.ts"
       },
       {
-        "status": "??",
-        "file": "new-axis-procedural/AGENTS.md"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/design-polish/motion-explode.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/design-polish/motion-pulse.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/design-polish/motion-sweep.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/design-polish/prism-clean.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/design-polish/prism-immersive.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/design-polish/prism-rgb-edge.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/design-polish/spectral-active.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/design-polish/spectral-balanced.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/design-polish/spectral-subtle.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/design-polish/ui-format.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/design-polish/ui-look.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/design-polish/ui-motion.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/design-polish/ui-variations.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/latest/preview-4x5.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/latest/preview-9x16.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/latest/preview-main.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/latest/runtime-state.json"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/motion-v1/after/artboard-4x5.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/motion-v1/after/artboard-9x16.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/motion-v1/after/current-frame-high-quality.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/motion-v1/after/explode-rejoin.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/motion-v1/after/inspector-hidden.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/motion-v1/after/motion-off-prism.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/motion-v1/after/motion-studio-final.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/motion-v1/after/panel-export.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/motion-v1/after/panel-format.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/motion-v1/after/panel-look.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/motion-v1/after/panel-motion.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/motion-v1/after/panel-setup.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/motion-v1/after/render-region-restored.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/motion-v1/after/render-tools-restored.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/motion-v1/after/sequence-smoke/frame-000000.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/motion-v1/after/sequence-smoke/frame-000001.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/motion-v1/after/sequence-smoke/frame-000002.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/motion-v1/after/shared-vertex-pulse.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/motion-v1/after/spectral-axis-sweep.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/motion-v1/before/current-replaced-site.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/motion-v1/before/prism-static.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/soft-spectral/comparison.json"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/soft-spectral/soft-4x5.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/soft-spectral/soft-9x16.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/soft-spectral/soft-active.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/soft-spectral/soft-balanced.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/soft-spectral/soft-center-glow.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/soft-spectral/soft-dark-rest.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/soft-spectral/soft-edge-response.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/soft-spectral/soft-motion-25.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/soft-spectral/soft-motion-50.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/soft-spectral/soft-motion-75.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/soft-spectral/soft-subtle.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/soft-spectral/ui-soft-spectral.png"
-      },
-      {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/ui-redesign/export-custom-render.png"
+        "status": "M",
+        "file": "src/crystal/MotionStudioApp.ts"
       },
       {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/ui-redesign/export-panel.png"
+        "status": "M",
+        "file": "src/crystal/ui/StudioPanel.ts"
       },
       {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/ui-redesign/format-panel.png"
+        "status": "M",
+        "file": "src/crystal/variations/StudioVariation.ts"
       },
       {
-        "status": "??",
-        "file": "new-axis-procedural/artifacts/ui-redesign/inspector-collapsed.png"
+        "status": "M",
+        "file": "src/main.ts"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/artifacts/ui-redesign/lighting-advanced.png"
+        "file": "archive/legacy-three/package-lock.json"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/artifacts/ui-redesign/look-advanced.png"
+        "file": "artifacts/mode-studio/01-workspace.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/artifacts/ui-redesign/look-panel.png"
+        "file": "artifacts/mode-studio/02-glass3d-panel.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/artifacts/ui-redesign/motion-panel.png"
+        "file": "artifacts/mode-studio/03-glass3d-details.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/artifacts/ui-redesign/variation-menu.png"
+        "file": "artifacts/mode-studio/04-variation-menu.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/artifacts/ui-redesign/workspace.png"
+        "file": "artifacts/mode-studio/05-output.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/docs/AI_HANDOFF.md"
+        "file": "artifacts/mode-studio/06-motion-enabled.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/docs/motion-v1-current-state.md"
+        "file": "artifacts/mode-studio/07-motion-disabled-state.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/scripts/capture-design-polish.mjs"
+        "file": "artifacts/mode-studio/08-inspector-collapsed.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/scripts/capture-soft-spectral.mjs"
+        "file": "docs/MODE_ARCHITECTURE.md"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/scripts/capture-spectral-flow.mjs"
+        "file": "scripts/capture-mode-studio.mjs"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/scripts/capture-ui-redesign.mjs"
+        "file": "scripts/verify-mode-lifecycle.mjs"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/scripts/render-motion-sequence.mjs"
+        "file": "src/modes/glass-3d/Glass3DExportAdapter.ts"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/scripts/update-ai-handoff.mjs"
+        "file": "src/modes/glass-3d/Glass3DMode.ts"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/scripts/verify-design-polish.mjs"
+        "file": "src/modes/glass-3d/Glass3DPanel.ts"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/scripts/verify-motion-v1.mjs"
+        "file": "src/modes/glass-3d/Glass3DState.ts"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/scripts/verify-pathtracer.mjs"
+        "file": "src/studio/ModeRegistry.ts"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/scripts/verify-retained-rendering.mjs"
+        "file": "src/studio/ModeTypes.ts"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/scripts/verify-soft-spectral.mjs"
+        "file": "src/studio/StudioShell.ts"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/scripts/verify-spectral-flow.mjs"
+        "file": "src/studio/StudioState.ts"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/artboard/ArtboardState.ts"
+        "file": "tmp/export-qa.html"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/artboard/CompositionAdapter.ts"
+        "file": "tmp/pdfs/g25-contact.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/artboard/FormatPresetRegistry.ts"
+        "file": "tmp/pdfs/g25/p21.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/crystal/MotionStudioApp.ts"
+        "file": "tmp/pdfs/g25/p22.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/crystal/PrismMotionAdapter.ts"
+        "file": "tmp/pdfs/g25/p23.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/crystal/materials/SoftSpectralMaterial.ts"
+        "file": "tmp/pdfs/g25/p24.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/crystal/materials/SpectralFlowMaterial.ts"
+        "file": "tmp/pdfs/g25/p26.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/crystal/presets/PrismStylePresets.ts"
+        "file": "tmp/pdfs/g25/p28.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/crystal/ui/MotionPanel.ts"
+        "file": "tmp/pdfs/g25/p3.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/crystal/ui/StudioPanel.ts"
+        "file": "tmp/pdfs/g25/p31.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/crystal/ui/TransportBar.ts"
+        "file": "tmp/pdfs/g25/p32.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/crystal/variations/StudioVariation.ts"
+        "file": "tmp/pdfs/g25/p33.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/motion/MotionClock.ts"
+        "file": "tmp/pdfs/g25/p37.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/motion/MotionEngine.ts"
+        "file": "tmp/pdfs/g25/p8.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/motion/MotionPresetRegistry.ts"
+        "file": "tmp/pdfs/k27-contact.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/motion/constraints/AxisConstraintService.ts"
+        "file": "tmp/pdfs/k27/p10.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/motion/easing.ts"
+        "file": "tmp/pdfs/k27/p11.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/motion/modules/ExplodeRejoinMotion.ts"
+        "file": "tmp/pdfs/k27/p12.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/motion/modules/SharedVertexPulseMotion.ts"
+        "file": "tmp/pdfs/k27/p13.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/motion/modules/SpectralAxisSweepMotion.ts"
+        "file": "tmp/pdfs/k27/p3.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/motion/presets/explodeRejoin.ts"
+        "file": "tmp/pdfs/k27/p7.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/motion/presets/sharedVertexPulse.ts"
+        "file": "tmp/pdfs/k27/p8.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/motion/presets/spectralAxisSweep.ts"
+        "file": "tmp/pdfs/k27/p9.png"
       },
       {
         "status": "??",
-        "file": "new-axis-procedural/src/motion/types.ts"
+        "file": "tmp/spectral-qa.html"
       }
     ]
   },
   "app": {
     "entryPoint": "src/main.ts",
     "defaultRoute": "/",
-    "activeApplication": "MotionStudioApp",
+    "activeApplication": "Glass3DMode / MotionStudioApp",
     "renderer": "Three.js WebGLRenderer + three-gpu-pathtracer",
     "previewRenderer": "Three.js raster + EffectComposer + UnrealBloomPass",
     "projection": "orthographic",
@@ -488,7 +280,7 @@
     "app": {
       "entryPoint": "src/main.ts",
       "defaultRoute": "/",
-      "activeApplication": "MotionStudioApp",
+      "activeApplication": "Glass3DMode / MotionStudioApp",
       "renderer": "Three.js WebGLRenderer + three-gpu-pathtracer",
       "previewRenderer": "Three.js raster + EffectComposer + UnrealBloomPass",
       "projection": "orthographic",
@@ -834,68 +626,130 @@
     },
     "variations": {
       "selectedId": "",
+      "modeAware": true,
       "items": [
         {
           "id": "builtin-prism-clean",
           "label": "01  프리즘 클린",
-          "builtin": true
+          "builtin": true,
+          "modeId": "glass-3d"
         },
         {
           "id": "builtin-prism-rgb-edge",
           "label": "02  프리즘 RGB 모서리",
-          "builtin": true
+          "builtin": true,
+          "modeId": "glass-3d"
         },
         {
           "id": "builtin-prism-immersive",
           "label": "03  프리즘 몰입형",
-          "builtin": true
+          "builtin": true,
+          "modeId": "glass-3d"
         },
         {
           "id": "builtin-spectral-dark",
           "label": "04  스펙트럴 다크",
-          "builtin": true
+          "builtin": true,
+          "modeId": "glass-3d"
         },
         {
           "id": "builtin-spectral-balanced",
           "label": "05  스펙트럴 균형",
-          "builtin": true
+          "builtin": true,
+          "modeId": "glass-3d"
         },
         {
           "id": "builtin-spectral-active",
           "label": "06  스펙트럴 강조",
-          "builtin": true
+          "builtin": true,
+          "modeId": "glass-3d"
         },
         {
           "id": "builtin-soft-spectral-subtle",
           "label": "07  소프트 스펙트럴 절제",
-          "builtin": true
+          "builtin": true,
+          "modeId": "glass-3d"
         },
         {
           "id": "builtin-soft-spectral-balanced",
           "label": "08  소프트 스펙트럴 균형",
-          "builtin": true
+          "builtin": true,
+          "modeId": "glass-3d"
         },
         {
           "id": "builtin-soft-spectral-active",
           "label": "09  소프트 스펙트럴 강조",
-          "builtin": true
+          "builtin": true,
+          "modeId": "glass-3d"
         }
       ]
     },
     "sharedVertexValid": true,
     "inspector": {
-      "tabs": [
-        "setup",
-        "look",
-        "motion",
-        "format",
-        "export"
+      "layout": "left-structure / canvas / right-appearance",
+      "left": [
+        "geometry",
+        "camera",
+        "composition"
       ],
-      "advancedDrawer": false,
+      "right": [
+        "style",
+        "material",
+        "lighting",
+        "motion",
+        "output"
+      ],
+      "collapsible": true,
       "contextualAdvanced": true,
       "consolidatedExport": true
     },
-    "storageVersion": 2
+    "storageVersion": 2,
+    "studioMode": {
+      "activeMode": "glass-3d",
+      "modeLabel": "Glass 3D",
+      "capabilities": {
+        "motion": true,
+        "pathTracing": true,
+        "rasterExport": true,
+        "transparency": true,
+        "print": true
+      },
+      "registeredModes": [
+        {
+          "id": "glass-3d",
+          "label": "Glass 3D",
+          "description": "Three.js optical solids, branded light and path-traced output",
+          "capabilities": {
+            "motion": true,
+            "pathTracing": true,
+            "rasterExport": true,
+            "transparency": true,
+            "print": true
+          }
+        }
+      ],
+      "lifecycle": {
+        "mounted": true,
+        "canvasCount": 2
+      },
+      "sharedState": {
+        "artboard": {
+          "id": "square",
+          "width": 1080,
+          "height": 1080,
+          "fitMode": "contain",
+          "axisAnchor": {
+            "gridX": 0.5,
+            "gridY": 0.5
+          },
+          "scale": 0.82,
+          "background": "#050607",
+          "transparent": false,
+          "safeGuide": false,
+          "previewZoom": 1
+        }
+      }
+    }
   },
   "axis": {
     "family": "30deg",
@@ -1024,7 +878,7 @@
       "name": "typecheck",
       "command": "npm run typecheck",
       "status": "pass",
-      "durationMs": 1243,
+      "durationMs": 3248,
       "exitCode": 0,
       "outputTail": "> pleos-27-axis@1.0.0 typecheck\n> tsc -b --pretty false"
     },
@@ -1032,7 +886,7 @@
       "name": "verify",
       "command": "npm run verify",
       "status": "pass",
-      "durationMs": 57864,
+      "durationMs": 166909,
       "exitCode": 0,
       "outputTail": "    \"physical-unit-input\",\n    \"ppi-print-output\"\n  ],\n  \"raster\": [\n    160,\n    120\n  ],\n  \"fastPath\": [\n    160,\n    120\n  ]\n}"
     },
@@ -1040,9 +894,9 @@
       "name": "build",
       "command": "npm run build",
       "status": "pass",
-      "durationMs": 2292,
+      "durationMs": 6938,
       "exitCode": 0,
-      "outputTail": "dist/assets/LegacyArchiveView-CxfvYwCh.js    0.71 kB │ gzip:   0.41 kB\ndist/assets/index-kL8AJhWA.js                3.86 kB │ gzip:   1.67 kB\ndist/assets/index-Bgm4ANIy.js               33.37 kB │ gzip:   9.99 kB\ndist/assets/index-BJOUBGGp.js              119.59 kB │ gzip:  33.76 kB\ndist/assets/MotionStudioApp-ImvYdIQn.js    883.69 kB │ gzip: 230.51 kB\n✓ built in 951ms\n\n\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit."
+      "outputTail": "dist/assets/StudioShell-D6Vt7YV6.js          2.04 kB │ gzip:   0.76 kB\ndist/assets/index-DtxElRAp.js                4.16 kB │ gzip:   1.82 kB\ndist/assets/index-Bgm4ANIy.js               33.37 kB │ gzip:   9.99 kB\ndist/assets/index-BJOUBGGp.js              119.59 kB │ gzip:  33.76 kB\ndist/assets/Glass3DMode-DiRW8T6l.js        884.48 kB │ gzip: 231.06 kB\n✓ built in 2.81s\n\n\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit."
     }
   ],
   "browser": {

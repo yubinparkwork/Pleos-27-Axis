@@ -17,6 +17,8 @@ Preserve all existing user changes. Never run `git reset --hard`, `git clean -fd
 - The default route and active production application are documented in `docs/AI_HANDOFF.md`.
 - Preserve the approved Axis shared origin, 30° projection, three-solid relationship, default camera and silhouette unless the user explicitly requests a brand-structure change.
 - Treat materials, shaders, lighting, motion and artboard behavior as expression layers.
+- For every new visual reference, first decide whether it belongs in an existing mode or needs a new mode with its own renderer and inspector. Do not force every expression through Three.js or the Glass 3D renderer.
+- Keep Axis identity in the shared core; keep renderer-specific scene state, controls, variation payloads and exports inside the owning mode.
 - Raw and legacy routes are reference-only unless the user explicitly scopes work to them.
 
 ## Completion workflow

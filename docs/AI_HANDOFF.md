@@ -14,11 +14,12 @@ Production geometry and expression layers should remain separable so new Looks d
 
 - Entry point: `src/main.ts`
 - Default route: `/`
-- Active application: MotionStudioApp
+- Active application: Glass3DMode / MotionStudioApp
 - Renderer: Three.js WebGLRenderer + three-gpu-pathtracer
 - Preview: Three.js raster + EffectComposer + UnrealBloomPass
 - Camera: orthographic (OrthographicCamera)
 - Main scene: 3 closed optical solids meeting at one shared vertex
+- Studio mode: Glass 3D (renderer lifecycle owned by the active Mode)
 - Legacy routes: `?renderer=raw` and `?renderer=legacy` — Legacy / reference only
 
 ## Axis Identity
@@ -98,18 +99,22 @@ Production geometry and expression layers should remain separable so new Looks d
 
 ## Inspector / UI
 
-- SETUP — Axis state, cube gap, bevel, camera lock/reset.
-- LOOK — Clear, Prism, Spectral Flow, Smoked and expression-specific controls.
-- MOTION — preset, strength, duration, FPS, timeline, loop and transport.
-- FORMAT — virtual artboard size, fit, scale, preview zoom, safe guide and transparency.
-- EXPORT — raster, path-traced still, print and motion-sequence controls.
-- ADVANCED — path-tracing settings, pixel render region, unit conversion, PPI metadata and individual lights.
+- Top bar — Mode, Variation and the primary Export action.
+- Glass 3D Inspector — Style, Material, Lighting and Motion essentials in one continuous panel.
+- Contextual details — material, lighting, geometry, camera, motion, output, render region and print metadata.
+- Output — format, size, background, transparency and Mode-adapted export.
+- Technical values stay collapsed until explicitly requested.
 
 ## Important Files
 
 | File | Responsibility |
 | --- | --- |
 | `src/main.ts` | Production route selection and browser inspection/export API |
+| `src/studio/StudioShell.ts` | Common Mode lifecycle and active Mode state ownership |
+| `src/studio/ModeRegistry.ts` | Registered production Mode definitions |
+| `src/studio/ModeTypes.ts` | Mode instance, capability and export-adapter contracts |
+| `src/modes/glass-3d/Glass3DMode.ts` | First production Mode; owns the current Three.js optical environment |
+| `src/modes/glass-3d/Glass3DExportAdapter.ts` | Maps common output intent to Glass 3D render strategies |
 | `src/crystal/MotionStudioApp.ts` | Active scene, renderer lifecycle, UI binding, motion and export strategy |
 | `src/crystal/CrystalAssembly.ts` | Three-solid Axis geometry, physical Looks and shared-origin contract |
 | `src/crystal/materials/SpectralFlowMaterial.ts` | Independent Spectral Flow shader expression |
@@ -129,129 +134,24 @@ Production geometry and expression layers should remain separable so new Looks d
 
 ## Latest Task
 
-- User request: Refresh the AI handoff from the active production runtime.
-- What changed: Regenerated runtime inspection, latest previews, validation state, and the current-state handoff.
-- Why: Keep ChatGPT and Codex synchronized without manually copying project context.
-- Main implementation decisions: Use the production inspect/export API and deterministic hero time; do not capture editor UI.
+- User request: Direct render controls
+- What changed: Removed redundant quality presets and fast/high render buttons so PNG export directly uses the user-entered render scale, bounce count, and sample count
+- Why: The same quality decision should not be repeated through presets, buttons, and numeric controls
+- Main implementation decisions: Keep one PNG export action|Honor exact sample and bounce values for print output|Keep PPI pixel scaling independent from sampling quality|Hide path-tracing controls when raster or motion output is selected
 
 ## Files Changed
 
-- `new-axis-procedural/.gitignore` — Git status M
-- `new-axis-procedural/PROGRESS.md` — Git status M
-- `new-axis-procedural/README.md` — Git status M
-- `new-axis-procedural/package.json` — Git status M
-- `new-axis-procedural/src/crystal/CrystalApp.css` — Git status M
-- `new-axis-procedural/src/crystal/CrystalAssembly.ts` — Git status M
-- `new-axis-procedural/src/crystal/InspectorPanel.ts` — Git status M
-- `new-axis-procedural/src/crystal/LightingPanel.ts` — Git status M
-- `new-axis-procedural/src/crystal/LightingSystem.ts` — Git status M
-- `new-axis-procedural/src/crystal/StudioEnvironment.ts` — Git status M
-- `new-axis-procedural/src/main.ts` — Git status M
-- `new-axis-procedural/vite.config.ts` — Git status M
-- `new-axis-procedural/AGENTS.md` — Git status ??
-- `new-axis-procedural/artifacts/design-polish/motion-explode.png` — Git status ??
-- `new-axis-procedural/artifacts/design-polish/motion-pulse.png` — Git status ??
-- `new-axis-procedural/artifacts/design-polish/motion-sweep.png` — Git status ??
-- `new-axis-procedural/artifacts/design-polish/prism-clean.png` — Git status ??
-- `new-axis-procedural/artifacts/design-polish/prism-immersive.png` — Git status ??
-- `new-axis-procedural/artifacts/design-polish/prism-rgb-edge.png` — Git status ??
-- `new-axis-procedural/artifacts/design-polish/spectral-active.png` — Git status ??
-- `new-axis-procedural/artifacts/design-polish/spectral-balanced.png` — Git status ??
-- `new-axis-procedural/artifacts/design-polish/spectral-subtle.png` — Git status ??
-- `new-axis-procedural/artifacts/design-polish/ui-format.png` — Git status ??
-- `new-axis-procedural/artifacts/design-polish/ui-look.png` — Git status ??
-- `new-axis-procedural/artifacts/design-polish/ui-motion.png` — Git status ??
-- `new-axis-procedural/artifacts/design-polish/ui-variations.png` — Git status ??
-- `new-axis-procedural/artifacts/latest/preview-4x5.png` — Git status ??
-- `new-axis-procedural/artifacts/latest/preview-9x16.png` — Git status ??
-- `new-axis-procedural/artifacts/latest/preview-main.png` — Git status ??
-- `new-axis-procedural/artifacts/latest/runtime-state.json` — Git status ??
-- `new-axis-procedural/artifacts/motion-v1/after/artboard-4x5.png` — Git status ??
-- `new-axis-procedural/artifacts/motion-v1/after/artboard-9x16.png` — Git status ??
-- `new-axis-procedural/artifacts/motion-v1/after/current-frame-high-quality.png` — Git status ??
-- `new-axis-procedural/artifacts/motion-v1/after/explode-rejoin.png` — Git status ??
-- `new-axis-procedural/artifacts/motion-v1/after/inspector-hidden.png` — Git status ??
-- `new-axis-procedural/artifacts/motion-v1/after/motion-off-prism.png` — Git status ??
-- `new-axis-procedural/artifacts/motion-v1/after/motion-studio-final.png` — Git status ??
-- `new-axis-procedural/artifacts/motion-v1/after/panel-export.png` — Git status ??
-- `new-axis-procedural/artifacts/motion-v1/after/panel-format.png` — Git status ??
-- `new-axis-procedural/artifacts/motion-v1/after/panel-look.png` — Git status ??
-- `new-axis-procedural/artifacts/motion-v1/after/panel-motion.png` — Git status ??
-- `new-axis-procedural/artifacts/motion-v1/after/panel-setup.png` — Git status ??
-- `new-axis-procedural/artifacts/motion-v1/after/render-region-restored.png` — Git status ??
-- `new-axis-procedural/artifacts/motion-v1/after/render-tools-restored.png` — Git status ??
-- `new-axis-procedural/artifacts/motion-v1/after/sequence-smoke/frame-000000.png` — Git status ??
-- `new-axis-procedural/artifacts/motion-v1/after/sequence-smoke/frame-000001.png` — Git status ??
-- `new-axis-procedural/artifacts/motion-v1/after/sequence-smoke/frame-000002.png` — Git status ??
-- `new-axis-procedural/artifacts/motion-v1/after/shared-vertex-pulse.png` — Git status ??
-- `new-axis-procedural/artifacts/motion-v1/after/spectral-axis-sweep.png` — Git status ??
-- `new-axis-procedural/artifacts/motion-v1/before/current-replaced-site.png` — Git status ??
-- `new-axis-procedural/artifacts/motion-v1/before/prism-static.png` — Git status ??
-- `new-axis-procedural/artifacts/soft-spectral/comparison.json` — Git status ??
-- `new-axis-procedural/artifacts/soft-spectral/soft-4x5.png` — Git status ??
-- `new-axis-procedural/artifacts/soft-spectral/soft-9x16.png` — Git status ??
-- `new-axis-procedural/artifacts/soft-spectral/soft-active.png` — Git status ??
-- `new-axis-procedural/artifacts/soft-spectral/soft-balanced.png` — Git status ??
-- `new-axis-procedural/artifacts/soft-spectral/soft-center-glow.png` — Git status ??
-- `new-axis-procedural/artifacts/soft-spectral/soft-dark-rest.png` — Git status ??
-- `new-axis-procedural/artifacts/soft-spectral/soft-edge-response.png` — Git status ??
-- `new-axis-procedural/artifacts/soft-spectral/soft-motion-25.png` — Git status ??
-- `new-axis-procedural/artifacts/soft-spectral/soft-motion-50.png` — Git status ??
-- `new-axis-procedural/artifacts/soft-spectral/soft-motion-75.png` — Git status ??
-- `new-axis-procedural/artifacts/soft-spectral/soft-subtle.png` — Git status ??
-- `new-axis-procedural/artifacts/soft-spectral/ui-soft-spectral.png` — Git status ??
-- `new-axis-procedural/artifacts/ui-redesign/export-custom-render.png` — Git status ??
-- `new-axis-procedural/artifacts/ui-redesign/export-panel.png` — Git status ??
-- `new-axis-procedural/artifacts/ui-redesign/format-panel.png` — Git status ??
-- `new-axis-procedural/artifacts/ui-redesign/inspector-collapsed.png` — Git status ??
-- `new-axis-procedural/artifacts/ui-redesign/lighting-advanced.png` — Git status ??
-- `new-axis-procedural/artifacts/ui-redesign/look-advanced.png` — Git status ??
-- `new-axis-procedural/artifacts/ui-redesign/look-panel.png` — Git status ??
-- `new-axis-procedural/artifacts/ui-redesign/motion-panel.png` — Git status ??
-- `new-axis-procedural/artifacts/ui-redesign/variation-menu.png` — Git status ??
-- `new-axis-procedural/artifacts/ui-redesign/workspace.png` — Git status ??
-- `new-axis-procedural/docs/AI_HANDOFF.md` — Git status ??
-- `new-axis-procedural/docs/motion-v1-current-state.md` — Git status ??
-- `new-axis-procedural/scripts/capture-design-polish.mjs` — Git status ??
-- `new-axis-procedural/scripts/capture-soft-spectral.mjs` — Git status ??
-- `new-axis-procedural/scripts/capture-spectral-flow.mjs` — Git status ??
-- `new-axis-procedural/scripts/capture-ui-redesign.mjs` — Git status ??
-- `new-axis-procedural/scripts/render-motion-sequence.mjs` — Git status ??
-- `new-axis-procedural/scripts/update-ai-handoff.mjs` — Git status ??
-- `new-axis-procedural/scripts/verify-design-polish.mjs` — Git status ??
-- `new-axis-procedural/scripts/verify-motion-v1.mjs` — Git status ??
-- `new-axis-procedural/scripts/verify-pathtracer.mjs` — Git status ??
-- `new-axis-procedural/scripts/verify-retained-rendering.mjs` — Git status ??
-- `new-axis-procedural/scripts/verify-soft-spectral.mjs` — Git status ??
-- `new-axis-procedural/scripts/verify-spectral-flow.mjs` — Git status ??
-- `new-axis-procedural/src/artboard/ArtboardState.ts` — Git status ??
-- `new-axis-procedural/src/artboard/CompositionAdapter.ts` — Git status ??
-- `new-axis-procedural/src/artboard/FormatPresetRegistry.ts` — Git status ??
-- `new-axis-procedural/src/crystal/MotionStudioApp.ts` — Git status ??
-- `new-axis-procedural/src/crystal/PrismMotionAdapter.ts` — Git status ??
-- `new-axis-procedural/src/crystal/materials/SoftSpectralMaterial.ts` — Git status ??
-- `new-axis-procedural/src/crystal/materials/SpectralFlowMaterial.ts` — Git status ??
-- `new-axis-procedural/src/crystal/presets/PrismStylePresets.ts` — Git status ??
-- `new-axis-procedural/src/crystal/ui/MotionPanel.ts` — Git status ??
-- `new-axis-procedural/src/crystal/ui/StudioPanel.ts` — Git status ??
-- `new-axis-procedural/src/crystal/ui/TransportBar.ts` — Git status ??
-- `new-axis-procedural/src/crystal/variations/StudioVariation.ts` — Git status ??
-- `new-axis-procedural/src/motion/MotionClock.ts` — Git status ??
-- `new-axis-procedural/src/motion/MotionEngine.ts` — Git status ??
-- `new-axis-procedural/src/motion/MotionPresetRegistry.ts` — Git status ??
-- `new-axis-procedural/src/motion/constraints/AxisConstraintService.ts` — Git status ??
-- `new-axis-procedural/src/motion/easing.ts` — Git status ??
-- `new-axis-procedural/src/motion/modules/ExplodeRejoinMotion.ts` — Git status ??
-- `new-axis-procedural/src/motion/modules/SharedVertexPulseMotion.ts` — Git status ??
-- `new-axis-procedural/src/motion/modules/SpectralAxisSweepMotion.ts` — Git status ??
-- `new-axis-procedural/src/motion/presets/explodeRejoin.ts` — Git status ??
-- `new-axis-procedural/src/motion/presets/sharedVertexPulse.ts` — Git status ??
-- `new-axis-procedural/src/motion/presets/spectralAxisSweep.ts` — Git status ??
-- `new-axis-procedural/src/motion/types.ts` — Git status ??
+- `src/crystal/ui/StudioPanel.ts` — Direct render controls without quality presets
+- `src/crystal/MotionStudioApp.ts` — Single export workflow honoring manual values
+- `scripts/verify-design-polish.mjs` — Direct-control regression checks
+- `docs/AI_HANDOFF.md` — Generated current-state handoff
+- `artifacts/latest/runtime-state.json` — Generated validation and preview state
 
 ## Visual Changes
 
-No intentional visual changes
+- Quality dropdown and fast/high buttons removed
+- Render scale bounces and samples are directly visible
+- Single PNG export button remains
 
 ## Latest Previews
 
@@ -272,18 +172,17 @@ Validation values are generated from commands executed during this handoff. `NOT
 
 ## Known Issues
 
-- Git remote is `https://github.com/vcodestudio/ae-mcp-student.git`, not the requested `yubinparkwork/Pleos-27-Axis`; the handoff script does not modify remotes.
+None known
 
 ## Next Recommended Work
 
 - Review the three latest previews after meaningful visual work.
-- Resolve the repository remote mismatch before the next requested push.
 - Run handoff:full at the end of completed implementation work.
 
 ## ChatGPT Re-scan Notes
 
 - Read `artifacts/latest/runtime-state.json` for machine-readable branch, runtime, Look, motion, artboard, preview and validation state.
 - Inspect `artifacts/latest/preview-main.png`, then compare the 4:5 and 9:16 previews for framing consistency.
-- Treat `src/crystal/MotionStudioApp.ts` as the active production renderer; raw and legacy routes are reference only.
+- Start with `src/studio/StudioShell.ts` and `src/modes/glass-3d/Glass3DMode.ts`; `MotionStudioApp` is the current Glass 3D implementation.
 - Compare `src/crystal/materials/SpectralFlowMaterial.ts` with physical Look handling in `src/crystal/CrystalAssembly.ts`.
 - Check Git remote information before assuming this working tree is already connected to `yubinparkwork/Pleos-27-Axis`.

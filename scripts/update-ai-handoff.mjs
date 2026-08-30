@@ -8,12 +8,16 @@ import { chromium } from "playwright";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(scriptDirectory, "..");
+const expectedRepository = "github.com/yubinparkwork/Pleos-27-Axis";
 const gitRoot = runGit(["rev-parse", "--show-toplevel"]);
+const detectedRemote = runGit(["remote", "get-url", "origin"], "no-origin");
+if (resolve(gitRoot) !== projectRoot || !detectedRemote.includes(expectedRepository)) {
+  throw new Error(`Handoff repository mismatch: expected ${projectRoot} → yubinparkwork/Pleos-27-Axis, received ${gitRoot} → ${detectedRemote}`);
+}
 const projectPath = relative(gitRoot, projectRoot) || ".";
 const docsDirectory = resolve(projectRoot, "docs");
 const latestDirectory = resolve(projectRoot, "artifacts/latest");
 const appUrl = process.env.PLEOS_HANDOFF_URL ?? "http://127.0.0.1:5173/";
-const expectedRepository = "github.com/yubinparkwork/Pleos-27-Axis";
 
 function parseArguments(values) {
   const parsed = {};
@@ -241,6 +245,7 @@ Production geometry and expression layers should remain separable so new Looks d
 - Preview: ${app.previewRenderer ?? "Three.js raster preview"}
 - Camera: ${app.projection ?? "orthographic"} (${app.camera?.type ?? "unknown"})
 - Main scene: ${app.sceneStructure ?? "3 optical solids at a shared vertex"}
+- Studio mode: ${runtime.studioMode?.modeLabel ?? "Glass 3D"} (renderer lifecycle owned by the active Mode)
 - Legacy routes: \`?renderer=raw\` and \`?renderer=legacy\` — Legacy / reference only
 
 ## Axis Identity
@@ -282,18 +287,22 @@ ${lookSections}
 
 ## Inspector / UI
 
-- SETUP — Axis state, cube gap, bevel, camera lock/reset.
-- LOOK — Clear, Prism, Spectral Flow, Smoked and expression-specific controls.
-- MOTION — preset, strength, duration, FPS, timeline, loop and transport.
-- FORMAT — virtual artboard size, fit, scale, preview zoom, safe guide and transparency.
-- EXPORT — raster, path-traced still, print and motion-sequence controls.
-- ADVANCED — path-tracing settings, pixel render region, unit conversion, PPI metadata and individual lights.
+- Top bar — Mode, Variation and the primary Export action.
+- Glass 3D Inspector — Style, Material, Lighting and Motion essentials in one continuous panel.
+- Contextual details — material, lighting, geometry, camera, motion, output, render region and print metadata.
+- Output — format, size, background, transparency and Mode-adapted export.
+- Technical values stay collapsed until explicitly requested.
 
 ## Important Files
 
 | File | Responsibility |
 | --- | --- |
 | \`src/main.ts\` | Production route selection and browser inspection/export API |
+| \`src/studio/StudioShell.ts\` | Common Mode lifecycle and active Mode state ownership |
+| \`src/studio/ModeRegistry.ts\` | Registered production Mode definitions |
+| \`src/studio/ModeTypes.ts\` | Mode instance, capability and export-adapter contracts |
+| \`src/modes/glass-3d/Glass3DMode.ts\` | First production Mode; owns the current Three.js optical environment |
+| \`src/modes/glass-3d/Glass3DExportAdapter.ts\` | Maps common output intent to Glass 3D render strategies |
 | \`src/crystal/MotionStudioApp.ts\` | Active scene, renderer lifecycle, UI binding, motion and export strategy |
 | \`src/crystal/CrystalAssembly.ts\` | Three-solid Axis geometry, physical Looks and shared-origin contract |
 | \`src/crystal/materials/SpectralFlowMaterial.ts\` | Independent Spectral Flow shader expression |
@@ -350,7 +359,7 @@ ${markdownList(nextWork.slice(0, 5), "No immediate follow-up recommended")}
 
 - Read \`artifacts/latest/runtime-state.json\` for machine-readable branch, runtime, Look, motion, artboard, preview and validation state.
 - Inspect \`artifacts/latest/preview-main.png\`, then compare the 4:5 and 9:16 previews for framing consistency.
-- Treat \`src/crystal/MotionStudioApp.ts\` as the active production renderer; raw and legacy routes are reference only.
+- Start with \`src/studio/StudioShell.ts\` and \`src/modes/glass-3d/Glass3DMode.ts\`; \`MotionStudioApp\` is the current Glass 3D implementation.
 - Compare \`src/crystal/materials/SpectralFlowMaterial.ts\` with physical Look handling in \`src/crystal/CrystalAssembly.ts\`.
 - Check Git remote information before assuming this working tree is already connected to \`yubinparkwork/Pleos-27-Axis\`.
 `;
@@ -378,7 +387,7 @@ const statusBefore = runGitRaw(["status", "--porcelain=v1", "--untracked-files=a
 // than accidentally reporting the parent workspace remote.
 const branch = process.env.PLEOS_GIT_BRANCH ?? runGit(["rev-parse", "--abbrev-ref", "HEAD"]);
 const sourceBaseCommit = process.env.PLEOS_GIT_BASE ?? runGit(["rev-parse", "HEAD"]);
-const remote = process.env.PLEOS_GIT_REMOTE ?? runGit(["remote", "get-url", "origin"], "no-origin");
+const remote = process.env.PLEOS_GIT_REMOTE ?? detectedRemote;
 let capture;
 let captureFailure = null;
 try {
@@ -436,14 +445,10 @@ const requestedTask = {
 };
 const visualChanges = splitItems(args.visual ?? process.env.PLEOS_HANDOFF_VISUAL);
 const knownIssues = splitItems(args.issues ?? process.env.PLEOS_HANDOFF_ISSUES);
-if (!remote.includes(expectedRepository)) knownIssues.unshift(`Git remote is \`${remote}\`, not the requested \`yubinparkwork/Pleos-27-Axis\`; the handoff script does not modify remotes.`);
 if (captureFailure) knownIssues.unshift(`Latest preview/runtime capture failed: ${captureFailure}`);
 if (capture.browserErrors.length) knownIssues.push(`Browser console reported: ${capture.browserErrors.join(" | ")}`);
 const defaultNextWork = [
   "Review the three latest previews after meaningful visual work.",
-  ...(!remote.includes(expectedRepository)
-    ? ["Resolve the repository remote mismatch before the next requested push."]
-    : []),
   "Run handoff:full at the end of completed implementation work.",
 ];
 const nextWork = splitItems(args.next ?? process.env.PLEOS_HANDOFF_NEXT, defaultNextWork);

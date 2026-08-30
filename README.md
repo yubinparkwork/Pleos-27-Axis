@@ -1,6 +1,6 @@
-# PLEOS 27 Axis — Motion Studio V1
+# PLEOS 27 Axis — Multi-Mode Creative Studio
 
-Three.js와 `three-gpu-pathtracer`를 사용하는 PLEOS Axis 제작 도구입니다. 세 optical solid가 하나의 공유 꼭짓점에서 만나는 30° 구조를 정적 rest pose로 유지하면서, 결정론적 모션·virtual artboard·고품질 현재 프레임 렌더를 제공합니다.
+하나의 PLEOS Axis Identity를 공유하면서 레퍼런스에 맞는 독립적인 제작 환경을 선택할 수 있는 Mode 기반 제작 도구입니다. 첫 production Mode인 `Glass 3D`는 Three.js와 `three-gpu-pathtracer`를 사용하며, 세 optical solid가 하나의 공유 꼭짓점에서 만나는 30° 구조, 결정론적 모션, virtual artboard와 고품질 렌더를 유지합니다.
 
 ## 실행
 
@@ -19,9 +19,11 @@ npm run build
 npm run qa
 ```
 
-## Motion Studio
+## Mode Studio
 
-Inspector는 `SETUP / LOOK / MOTION / FORMAT / EXPORT`로 구성됩니다. 개별 light와 path-tracing 물리 파라미터는 우측 상단 톱니바퀴의 Advanced drawer에 있습니다.
+상단의 `Mode`가 렌더링 환경을 결정합니다. 현재 등록된 production Mode는 `Glass 3D` 하나이며 Clear, Prism, Smoked, Spectral Flow, Soft Spectral은 이 Mode의 Style로 관리됩니다. 새 레퍼런스가 기존 Mode에 적합하지 않을 때만 별도의 renderer·Inspector·Export adapter를 가진 Mode를 추가합니다.
+
+우측 Inspector는 영구 탭 없이 `Style / Material / Lighting / Motion / Output`의 핵심값만 먼저 보여줍니다. 물리 재질, 개별 조명, Geometry, Camera, render region, PPI 같은 기술 옵션은 같은 패널의 contextual details에서 필요할 때만 엽니다. 자세한 구조는 [`docs/MODE_ARCHITECTURE.md`](docs/MODE_ARCHITECTURE.md)를 참고하세요.
 
 SETUP의 `모델링 → 베벨 반경`에서 `0–0.15` 범위로 세 광학 육면체의 모서리를 조절합니다. 값 변경 시 폐쇄형 geometry를 재생성하고 실제 bevel 꼭지점을 원점에 재정렬하므로, `큐브 간격 0`에서는 베벨 값과 관계없이 세 모델이 정확히 맞닿습니다. 양수 간격은 베벨된 바운딩 중심이 아닌 승인된 화면 축 `90° / 210° / 330°`를 사용해 세 방향의 시각적 간격을 동일하게 유지합니다.
 
@@ -97,6 +99,8 @@ ffmpeg -framerate 30 -i frame-%06d.png -c:v libx264 -pix_fmt yuv420p pleos-axis.
 
 ```ts
 window.__pleos27Axis.inspect();
+window.__pleos27Axis.switchMode("glass-3d");
+window.__pleos27Axis.remountMode(); // lifecycle QA
 window.__pleos27Axis.setLook("prism");
 window.__pleos27Axis.setMotionPreset("spectral-axis-sweep");
 window.__pleos27Axis.setMotionStrength("balanced");

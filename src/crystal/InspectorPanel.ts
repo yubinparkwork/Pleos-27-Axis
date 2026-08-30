@@ -1,11 +1,9 @@
 export type InspectorTab = "setup" | "look" | "motion" | "format" | "export" | "object" | "material" | "light" | "render";
 
-const TABS: InspectorTab[] = ["setup", "look", "motion", "format", "export"];
-
 export class InspectorPanel {
   private readonly appRoot: HTMLElement;
   private readonly dock: HTMLElement;
-  private readonly toggleButton: HTMLButtonElement;
+  private readonly toggleButtons: HTMLButtonElement[];
   private readonly onStateChange: (tab: InspectorTab, collapsed: boolean) => void;
   private activeTab: InspectorTab;
   private collapsed: boolean;
@@ -13,20 +11,17 @@ export class InspectorPanel {
   constructor(appRoot: HTMLElement, activeTab: InspectorTab, collapsed: boolean, onStateChange: (tab: InspectorTab, collapsed: boolean) => void) {
     this.appRoot = appRoot;
     this.dock = this.require<HTMLElement>(".control-dock");
-    this.toggleButton = this.require<HTMLButtonElement>("[data-action='inspector-toggle']");
+    this.toggleButtons = Array.from(this.appRoot.querySelectorAll<HTMLButtonElement>("[data-action='inspector-toggle']"));
+    if (!this.toggleButtons.length) throw new Error("Missing inspector toggle");
     this.onStateChange = onStateChange;
-    this.activeTab = TABS.includes(activeTab) ? activeTab : "motion";
+    this.activeTab = activeTab;
     this.collapsed = collapsed;
-    this.dock.querySelectorAll<HTMLButtonElement>("[data-inspector-tab]").forEach((button) => {
-      button.addEventListener("click", () => this.setTab(button.dataset.inspectorTab as InspectorTab));
-    });
     this.dock.querySelector<HTMLButtonElement>("[data-action='inspector-close']")?.addEventListener("click", () => this.setCollapsed(true));
-    this.toggleButton.addEventListener("click", () => this.setCollapsed(!this.collapsed));
+    this.toggleButtons.forEach((button) => button.addEventListener("click", () => this.setCollapsed(!this.collapsed)));
     this.apply();
   }
 
   setTab(tab: InspectorTab): void {
-    if (!TABS.includes(tab)) return;
     this.activeTab = tab;
     if (this.collapsed) this.collapsed = false;
     this.apply(); this.onStateChange(this.activeTab, this.collapsed);
@@ -43,16 +38,10 @@ export class InspectorPanel {
 
   private apply(): void {
     this.appRoot.classList.toggle("controls-hidden", this.collapsed);
-    this.dock.querySelectorAll<HTMLButtonElement>("[data-inspector-tab]").forEach((button) => {
-      const active = button.dataset.inspectorTab === this.activeTab;
-      button.classList.toggle("active", active); button.setAttribute("aria-selected", String(active));
+    this.toggleButtons.forEach((button) => {
+      button.setAttribute("aria-expanded", String(!this.collapsed));
+      button.title = this.collapsed ? "외형 패널 열기 (Tab)" : "외형 패널 닫기 (Tab)";
     });
-    this.dock.querySelectorAll<HTMLElement>("[data-inspector-view]").forEach((view) => {
-      const active = view.dataset.inspectorView === this.activeTab;
-      view.classList.toggle("active", active); view.hidden = !active;
-    });
-    this.toggleButton.setAttribute("aria-expanded", String(!this.collapsed));
-    this.toggleButton.title = this.collapsed ? "Inspector 열기 (Tab)" : "Inspector 닫기 (Tab)";
   }
 
   private require<T extends Element>(selector: string): T {

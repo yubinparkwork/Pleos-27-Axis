@@ -5,6 +5,7 @@ import type { CrystalLook } from "./crystal/CrystalAssembly";
 import type { SpectralFlowPresetId, SpectralFlowState } from "./crystal/materials/SpectralFlowMaterial";
 import type { SoftSpectralPresetId, SoftSpectralState } from "./crystal/materials/SoftSpectralMaterial";
 import type { PrismStyleId } from "./crystal/presets/PrismStylePresets";
+import type { Glass3DMode } from "./modes/glass-3d/Glass3DMode";
 
 const root = document.querySelector<HTMLElement>("#app");
 if (!root) throw new Error("Missing #app root");
@@ -26,31 +27,38 @@ async function mount(): Promise<void> {
     new LegacyArchiveView(root!);
     return;
   }
-  const { MotionStudioApp } = await import("./crystal/MotionStudioApp");
-  const app = new MotionStudioApp(root!);
-  addEventListener("beforeunload", () => app.dispose(), { once: true });
+  const [{ StudioShell }, { ModeRegistry }, { GLASS_3D_MODE }] = await Promise.all([
+    import("./studio/StudioShell"), import("./studio/ModeRegistry"), import("./modes/glass-3d/Glass3DMode"),
+  ]);
+  const registry = new ModeRegistry().register(GLASS_3D_MODE);
+  const shell = new StudioShell(root!, registry, "glass-3d");
+  shell.mount();
+  const app = () => (shell.activeMode as Glass3DMode).controller;
+  addEventListener("beforeunload", () => shell.dispose(), { once: true });
   window.__pleos27Axis = {
-    inspect: () => app.inspect(),
-    setLook: (look) => app.setLook(look),
-    setPrismStyle: (style) => app.setPrismStyle(style),
-    applyVariation: (id) => app.applyVariation(id),
-    listVariations: () => app.listVariations(),
-    setSpectralFlow: (settings) => app.setSpectralFlow(settings),
-    setSpectralFlowPreset: (preset) => app.setSpectralFlowPreset(preset),
-    setSoftSpectral: (settings) => app.setSoftSpectral(settings),
-    setSoftSpectralPreset: (preset) => app.setSoftSpectralPreset(preset),
-    setMotionPreset: (preset) => app.setMotionPreset(preset),
-    setMotionStrength: (strength) => app.setMotionStrength(strength),
-    configureMotion: (settings) => app.configureMotion(settings),
-    play: () => app.play(), pause: () => app.pause(), resetMotion: () => app.resetMotion(),
-    seek: (time) => app.seek(time), stepFrame: (frames = 1) => app.stepFrame(frames),
-    setArtboard: (state) => app.setArtboard(state),
-    setRenderRegion: (state) => app.setRenderRegion(state),
-    renderPreview: (quality = "fast") => app.renderPreview(quality),
-    renderCurrentFrame: (download = false) => app.renderCurrentFrame(download),
-    renderPrintFrame: (download = false) => app.renderPrintFrame(download),
-    exportPng: (download = false) => app.exportPng(download),
-    getMotionState: () => app.getMotionState(),
+    inspect: () => ({ ...app().inspect(), studioMode: shell.inspect() }),
+    switchMode: (id) => shell.switchMode(id),
+    remountMode: () => shell.remountActiveMode(),
+    setLook: (look) => app().setLook(look),
+    setPrismStyle: (style) => app().setPrismStyle(style),
+    applyVariation: (id) => shell.applyVariation("glass-3d", id),
+    listVariations: () => app().listVariations(),
+    setSpectralFlow: (settings) => app().setSpectralFlow(settings),
+    setSpectralFlowPreset: (preset) => app().setSpectralFlowPreset(preset),
+    setSoftSpectral: (settings) => app().setSoftSpectral(settings),
+    setSoftSpectralPreset: (preset) => app().setSoftSpectralPreset(preset),
+    setMotionPreset: (preset) => app().setMotionPreset(preset),
+    setMotionStrength: (strength) => app().setMotionStrength(strength),
+    configureMotion: (settings) => app().configureMotion(settings),
+    play: () => app().play(), pause: () => app().pause(), resetMotion: () => app().resetMotion(),
+    seek: (time) => app().seek(time), stepFrame: (frames = 1) => app().stepFrame(frames),
+    setArtboard: (state) => app().setArtboard(state),
+    setRenderRegion: (state) => app().setRenderRegion(state),
+    renderPreview: (quality = "fast") => app().renderPreview(quality),
+    renderCurrentFrame: (download = false) => app().renderCurrentFrame(download),
+    renderPrintFrame: (download = false) => app().renderPrintFrame(download),
+    exportPng: (download = false) => app().exportPng(download),
+    getMotionState: () => app().getMotionState(),
   };
 }
 
@@ -60,10 +68,12 @@ declare global {
   interface Window {
     __pleos27Axis?: {
       inspect(): object;
+      switchMode(id: string): void;
+      remountMode(): void;
       setLook(look: CrystalLook): void;
       setPrismStyle(style: PrismStyleId): void;
       applyVariation(id: string): void;
-      listVariations(): Array<{ id: string; label: string; builtin: boolean }>;
+      listVariations(): Array<{ id: string; label: string; builtin: boolean; modeId: "glass-3d" }>;
       setSpectralFlow(settings: Partial<SpectralFlowState>): void;
       setSpectralFlowPreset(preset: SpectralFlowPresetId): void;
       setSoftSpectral(settings: Partial<SoftSpectralState>): void;

@@ -40,7 +40,7 @@ interface StudioSettingsV2 {
   format: ArtboardState;
   export: { ppi: number };
   advanced: { renderScale: number; bounces: number; targetSamples: number; renderRegion: RenderRegion };
-  ui: { activeTab: InspectorTab; inspectorCollapsed: boolean; advancedOpen: boolean; selectedVariationId: string };
+  ui: { activeTab: InspectorTab; inspectorCollapsed: boolean; structureCollapsed: boolean; advancedOpen: boolean; selectedVariationId: string };
 }
 
 type RenderQuality = "fast" | "high";
@@ -67,13 +67,18 @@ interface PathRenderJob {
   reject?: (reason: Error) => void;
 }
 
+export interface MotionStudioModeHeader {
+  activeModeId: string;
+  modes: Array<{ id: string; label: string }>;
+  onModeChange(id: string): void;
+  onVariationChange?(modeId: string, variationId: string): void;
+}
+
 const STORAGE_V2 = "pleos-27-axis-settings-v2";
 const STORAGE_V1 = "pleos-27-axis-settings-v1";
 const FAST_RENDER_SAMPLES = 16;
 const FAST_RENDER_SCALE = 0.5;
 const FAST_RENDER_BOUNCES = 4;
-const PRINT_RENDER_SAMPLES = 512;
-const PRINT_RENDER_BOUNCES = 12;
 const defaultMotion = (): MotionSettings => ({ enabled: false, preset: "spectral-axis-sweep", strengthMode: "balanced", strength: 0.5, duration: 7.2, fps: 30, speed: 1, seed: 27, loop: true, constraint: "strict", parameters: {} });
 const defaults = (): StudioSettingsV2 => ({
   version: 2,
@@ -84,7 +89,7 @@ const defaults = (): StudioSettingsV2 => ({
   format: { ...DEFAULT_ARTBOARD, axisAnchor: { ...DEFAULT_ARTBOARD.axisAnchor } },
   export: { ppi: 300 },
   advanced: { renderScale: 0.75, bounces: 8, targetSamples: 128, renderRegion: { enabled: false, x: -1, y: -1, width: 640, height: 480, unitPpi: 96 } },
-  ui: { activeTab: "look", inspectorCollapsed: false, advancedOpen: false, selectedVariationId: "" },
+  ui: { activeTab: "look", inspectorCollapsed: false, structureCollapsed: false, advancedOpen: false, selectedVariationId: "" },
 });
 
 function finite(value: unknown, fallback: number, min: number, max: number): number {
@@ -131,7 +136,7 @@ function loadSettingsV2(): StudioSettingsV2 {
           targetSamples: Math.round(finite(v2.advanced?.targetSamples, 128, 16, 512)),
           renderRegion: sanitizeRenderRegion(v2.advanced?.renderRegion, base.advanced.renderRegion),
         },
-        ui: { activeTab: v2.ui?.activeTab ?? "look", inspectorCollapsed: v2.ui?.inspectorCollapsed === true, advancedOpen: v2.ui?.advancedOpen === true, selectedVariationId: v2.ui?.selectedVariationId ?? "" },
+        ui: { activeTab: v2.ui?.activeTab ?? "look", inspectorCollapsed: v2.ui?.inspectorCollapsed === true, structureCollapsed: v2.ui?.structureCollapsed === true, advancedOpen: v2.ui?.advancedOpen === true, selectedVariationId: v2.ui?.selectedVariationId ?? "" },
       };
     }
     const v1 = JSON.parse(localStorage.getItem(STORAGE_V1) ?? "null") as Record<string, unknown> | null;
@@ -215,7 +220,7 @@ export class MotionStudioApp {
   private lastPatch: MotionPatch = {};
   private gestureZoomStart = 1;
 
-  constructor(private readonly root: HTMLElement) {
+  constructor(private readonly root: HTMLElement, private readonly modeHeader: MotionStudioModeHeader = { activeModeId: "glass-3d", modes: [{ id: "glass-3d", label: "Glass 3D" }], onModeChange: () => undefined }) {
     this.root.innerHTML = this.template();
     this.artboardShell = this.require(".artboard-shell");
     this.stage = this.require(".crystal-stage");
@@ -278,6 +283,7 @@ export class MotionStudioApp {
     this.pathComposer.addPass(new OutputPass());
     this.lightingPanel = new LightingPanel(this.require("[data-lighting-panel]"), this.lighting, () => undefined);
     this.inspector = new InspectorPanel(this.root, this.settings.ui.activeTab, this.settings.ui.inspectorCollapsed, (tab, collapsed) => { this.settings.ui.activeTab = tab; this.settings.ui.inspectorCollapsed = collapsed; this.persist(); this.resize(); });
+    this.root.classList.toggle("structure-hidden", this.settings.ui.structureCollapsed);
     this.bindUi();
     this.bindCanvasZoom();
     bindScrubbableNumbers(this.root);
@@ -291,10 +297,12 @@ export class MotionStudioApp {
   private template(): string {
     const globals = this.settings.lighting.globals;
     const region = this.settings.advanced.renderRegion;
+    const modeOptions = this.modeHeader.modes.map(({ id, label }) => `<option value="${id}" ${id === this.modeHeader.activeModeId ? "selected" : ""}>${label}</option>`).join("");
+    const variationOptions = `<option value="" ${this.settings.ui.selectedVariationId ? "" : "selected"}>현재 설정</option>` + this.variations.list().map(({ id, label, builtin }) => `<option value="${id}" ${id === this.settings.ui.selectedVariationId ? "selected" : ""}>${label}${builtin ? "" : " · 사용자"}</option>`).join("");
     return `<section class="crystal-app motion-studio">
-      <header class="topbar"><div class="wordmark"><strong>PLEOS 27 AXIS</strong></div><div class="topbar-actions"><div class="render-status"><span data-output="samples">Ready</span></div><span class="topbar-save" data-output="topbar-save">Saved</span><button data-action="inspector-toggle" aria-label="Inspector 표시 또는 숨기기">Inspector</button></div></header>
+      <header class="topbar"><div class="wordmark"><strong>PLEOS 27 AXIS</strong></div><div class="studio-context"><label><span>모드</span><select data-mode-select>${modeOptions}</select></label><label class="topbar-variation"><span>변형</span><select data-variation>${variationOptions}</select></label><details class="variation-actions topbar-variation-actions"><summary aria-label="변형 작업">•••</summary><div><button data-action="variation-save">현재 설정 저장</button><button data-action="variation-duplicate">복제</button><button data-action="variation-rename">이름 변경</button><button data-action="variation-delete" class="danger">삭제</button></div></details></div><div class="topbar-actions"><div class="render-status" hidden><span data-output="samples">준비됨</span></div><button class="topbar-export" data-action="export-focus">내보내기</button><button class="inspector-icon" data-action="inspector-toggle" aria-label="외형 패널 표시 또는 숨기기">◫</button></div></header>
       <main class="pasteboard"><div class="artboard-meta"><span data-output="format-name">Square 1:1</span><b data-output="artboard-size">${this.settings.format.width} × ${this.settings.format.height}px</b></div><div class="artboard-shell"><div class="crystal-stage" aria-label="Pleos Axis virtual artboard"><div class="safe-guide" data-safe-guide></div><div class="render-region-guide" data-render-region-guide><span data-output="region-size"></span></div></div></div></main>
-      ${studioPanelTemplate({ look: this.settings.look.preset, prismStyle: this.settings.look.prismStyle, physical: this.settings.look.physical, variations: this.variations.list().map(({ id, label, builtin }) => ({ id, label, builtin })), selectedVariationId: this.settings.ui.selectedVariationId, spectralFlow: this.settings.look.spectralFlow, softSpectral: this.settings.look.softSpectral, gap: this.settings.setup.gap, bevelRadius: this.settings.setup.bevelRadius, roughness: this.settings.look.roughness, dispersion: this.settings.look.dispersion, reflection: globals.reflectionStrength, refraction: globals.refractionStrength, exposure: globals.exposure, bloom: globals.bloomIntensity, saturation: globals.colorSaturation, environment: globals.environmentIntensity, motion: this.settings.motion, artboard: this.settings.format, activeTab: this.settings.ui.activeTab, outputSamples: this.settings.advanced.targetSamples, bounces: this.settings.advanced.bounces, renderScale: this.settings.advanced.renderScale, ppi: this.settings.export.ppi, renderRegion: region, printOutput: this.printOutputDescription() })}
+      ${studioPanelTemplate({ look: this.settings.look.preset, prismStyle: this.settings.look.prismStyle, physical: this.settings.look.physical, variations: this.variations.list().map(({ id, label, builtin }) => ({ id, label, builtin })), selectedVariationId: this.settings.ui.selectedVariationId, spectralFlow: this.settings.look.spectralFlow, softSpectral: this.settings.look.softSpectral, gap: this.settings.setup.gap, bevelRadius: this.settings.setup.bevelRadius, roughness: this.settings.look.roughness, dispersion: this.settings.look.dispersion, reflection: globals.reflectionStrength, refraction: globals.refractionStrength, exposure: globals.exposure, bloom: globals.bloomIntensity, saturation: globals.colorSaturation, environment: globals.environmentIntensity, motion: this.settings.motion, artboard: this.settings.format, activeTab: this.settings.ui.activeTab, outputSamples: this.settings.advanced.targetSamples, bounces: this.settings.advanced.bounces, renderScale: this.settings.advanced.renderScale, ppi: this.settings.export.ppi, viewLocked: this.settings.setup.viewLocked, renderRegion: region, printOutput: this.printOutputDescription() })}
       ${transportTemplate()}
     </section>`;
   }
@@ -313,14 +321,17 @@ export class MotionStudioApp {
   private bindUi(): void {
     const softLookButton = this.root.querySelector<HTMLButtonElement>("[data-look='soft-spectral']");
     if (softLookButton) softLookButton.textContent = "소프트 스펙트럴";
-    const softControls = this.root.querySelector<HTMLElement>("[data-soft-spectral-controls]");
-    const lookAdvanced = this.root.querySelector<HTMLElement>("[data-inspector-view='look'] .advanced-link");
-    if (softControls && lookAdvanced) lookAdvanced.before(softControls);
+    this.root.querySelector<HTMLSelectElement>("[data-mode-select]")?.addEventListener("change", (event) => this.modeHeader.onModeChange((event.currentTarget as HTMLSelectElement).value));
     this.root.querySelector<HTMLSelectElement>("[data-look-select]")?.addEventListener("change", (event) => this.setLook((event.currentTarget as HTMLSelectElement).value as CrystalLook));
     this.root.querySelector<HTMLSelectElement>("[data-prism-style-select]")?.addEventListener("change", (event) => this.setPrismStyle((event.currentTarget as HTMLSelectElement).value as PrismStyleId));
     this.root.querySelectorAll<HTMLButtonElement>("[data-look]").forEach((button) => button.addEventListener("click", () => this.setLook(button.dataset.look as CrystalLook)));
     this.root.querySelectorAll<HTMLButtonElement>("[data-prism-style]").forEach((button) => button.addEventListener("click", () => this.setPrismStyle(button.dataset.prismStyle as PrismStyleId)));
-    this.require<HTMLSelectElement>("[data-variation]").addEventListener("change", (event) => this.applyVariation((event.currentTarget as HTMLSelectElement).value));
+    this.require<HTMLSelectElement>("[data-variation]").addEventListener("change", (event) => {
+      const id = (event.currentTarget as HTMLSelectElement).value;
+      const variation = this.variations.get(id);
+      if (variation && this.modeHeader.onVariationChange) this.modeHeader.onVariationChange(variation.modeId, variation.id);
+      else this.applyVariation(id);
+    });
     this.bindNumber("gap", (value) => { this.settings.setup.gap = value; this.assembly.setGap(value); this.motionAdapter.captureRestPose(); this.motionClock.pause(); this.applyMotionAt(this.motionClock.time); });
     this.bindNumber("bevel-radius", (value) => { this.settings.setup.bevelRadius = value; this.assembly.setBevelRadius(value); this.motionAdapter.captureRestPose(); this.motionClock.pause(); this.applyMotionAt(this.motionClock.time); });
     this.bindNumber("roughness", (value) => { this.settings.look.roughness = value; this.assembly.setRoughness(value); });
@@ -401,11 +412,14 @@ export class MotionStudioApp {
     this.require<HTMLSelectElement>("[data-control='export-ppi']").addEventListener("change", (event) => { this.settings.export.ppi = Number((event.currentTarget as HTMLSelectElement).value); this.updateRenderUi(); this.persist(); });
     this.bindRenderRegionUi();
     this.root.querySelectorAll<HTMLButtonElement>("[data-action]").forEach((button) => button.addEventListener("click", () => this.handleAction(button.dataset.action ?? "")));
+    this.root.querySelectorAll<HTMLButtonElement>("[data-panel-jump]").forEach((button) => button.addEventListener("click", () => {
+      this.root.querySelector<HTMLElement>(`[data-panel-section='${button.dataset.panelJump}']`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }));
     this.root.querySelectorAll<HTMLDetailsElement>("[data-context-advanced]").forEach((details) => details.addEventListener("toggle", () => {
       this.settings.ui.advancedOpen = Array.from(this.root.querySelectorAll<HTMLDetailsElement>("[data-context-advanced]")).some((item) => item.open);
       this.updateAdvanced(); this.updateRenderRegion(); this.persist();
     }));
-    for (const selector of ["[data-export-type]", "[data-export-render]", "[data-export-quality]"]) {
+    for (const selector of ["[data-export-type]", "[data-export-render]"]) {
       this.root.querySelector<HTMLSelectElement>(selector)?.addEventListener("change", () => this.updateExportWorkflow());
     }
     window.addEventListener("keydown", this.onKeydown);
@@ -569,12 +583,9 @@ export class MotionStudioApp {
 
   private updateRenderUi(): void {
     const region = this.activeRegion();
-    const exportSize = this.root.querySelector<HTMLElement>("[data-output='export-size']");
-    if (exportSize) exportSize.textContent = `${region.width} × ${region.height}px`;
+    this.root.querySelectorAll<HTMLElement>("[data-output='export-size']").forEach((output) => { output.textContent = `${region.width} × ${region.height}px`; });
     const printSize = this.root.querySelector<HTMLElement>("[data-output='print-size']");
     if (printSize) printSize.textContent = this.printOutputDescription();
-    const fast = this.root.querySelector<HTMLButtonElement>("[data-action='render-fast']");
-    const high = this.root.querySelector<HTMLButtonElement>("[data-action='render-high']");
     const progressText = this.root.querySelector<HTMLElement>("[data-output='render-progress-text']");
     const progressPercent = this.root.querySelector<HTMLElement>("[data-output='render-progress-percent']");
     const progressBar = this.root.querySelector<HTMLElement>("[data-output='render-progress-bar']");
@@ -586,19 +597,6 @@ export class MotionStudioApp {
     if (progressBar) progressBar.style.width = `${progress * 100}%`;
     if (cancel) cancel.hidden = !this.renderJob;
     if (renderPrimary) renderPrimary.disabled = this.renderingHigh;
-    if (this.settings.look.preset === "spectral-flow" || this.settings.look.preset === "soft-spectral") {
-      if (fast) fast.innerHTML = `<strong>빠른 래스터</strong><span>실시간 셰이더</span>`;
-      if (high) high.innerHTML = `<strong>고품질 래스터</strong><span>노이즈 없음 · 100%</span>`;
-      fast?.classList.remove("active"); high?.classList.remove("active");
-      if (fast) fast.disabled = false; if (high) high.disabled = false;
-      return;
-    }
-    if (fast) fast.innerHTML = this.renderJob?.quality === "fast" ? `<strong>렌더링 중지</strong><span>${Math.floor(this.pathTracer.samples)} / ${this.renderJob.targetSamples} spp</span>` : `<strong>빠른 렌더링</strong><span>${FAST_RENDER_SAMPLES} spp · ${Math.round(FAST_RENDER_SCALE * 100)}%</span>`;
-    if (high) high.innerHTML = this.renderJob?.quality === "high" ? `<strong>렌더링 중지</strong><span>${Math.floor(this.pathTracer.samples)} / ${this.renderJob.targetSamples} spp</span>` : `<strong>고품질 렌더링</strong><span>${this.settings.advanced.targetSamples} spp · ${Math.round(this.settings.advanced.renderScale * 100)}%</span>`;
-    fast?.classList.toggle("active", this.renderJob?.quality === "fast");
-    high?.classList.toggle("active", this.renderJob?.quality === "high");
-    if (fast) fast.disabled = this.renderingHigh && this.renderJob?.quality !== "fast";
-    if (high) high.disabled = this.renderingHigh && this.renderJob?.quality !== "high";
     for (const selector of ["[data-action='export-raster']", "[data-action='render-current-high']", "[data-action='export-print']", "[data-action='render-export']"]) {
       const button = this.root.querySelector<HTMLButtonElement>(selector); if (button) button.disabled = this.renderingHigh;
     }
@@ -611,15 +609,14 @@ export class MotionStudioApp {
     else if (action === "frame-next") this.stepFrame(1);
     else if (action === "reset") this.resetCamera();
     else if (action === "scene-reset") { this.resetCamera(); this.resetMotion(); this.settings.setup.gap = 0; this.settings.setup.bevelRadius = .018; this.assembly.setGap(0); this.assembly.setBevelRadius(.018); this.motionAdapter.captureRestPose(); }
+    else if (action === "structure-close" || action === "structure-open") { this.settings.ui.structureCollapsed = action === "structure-close"; this.root.classList.toggle("structure-hidden", this.settings.ui.structureCollapsed); this.resize(); this.persist(); }
     else if (action === "variation-save") this.saveCurrentVariation();
     else if (action === "variation-duplicate") this.duplicateVariation();
     else if (action === "variation-rename") this.renameVariation();
     else if (action === "variation-delete") this.deleteVariation();
-    else if (action === "advanced-toggle" || action === "advanced-close") { this.settings.ui.advancedOpen = action === "advanced-toggle" ? !this.settings.ui.advancedOpen : false; this.updateAdvanced(); this.updateRenderRegion(); this.persist(); }
+    else if (action === "export-focus") { const output = this.root.querySelector<HTMLElement>("[data-output-section]"); output?.scrollIntoView({ behavior: "smooth", block: "start" }); }
     else if (action === "region-center") { this.centerRenderRegion(); this.updateRenderRegion(); this.persist(); }
     else if (action === "region-full") { this.settings.advanced.renderRegion = { ...this.settings.advanced.renderRegion, enabled: true, x: 0, y: 0, width: this.settings.format.width, height: this.settings.format.height }; this.syncRenderRegionInputs(); this.updateRenderRegion(); this.persist(); }
-    else if (action === "render-fast") this.togglePreviewRender("fast");
-    else if (action === "render-high") this.togglePreviewRender("high");
     else if (action === "export-raster") void this.exportPng(true).catch((error) => this.showPreview(`PNG 저장 실패 · ${error.message}`));
     else if (action === "render-current-high") void this.renderCurrentFrame(true).catch((error) => this.showPreview(`고품질 렌더링 실패 · ${error.message}`));
     else if (action === "export-print") void this.renderPrintFrame(true).catch((error) => this.showPreview(`인쇄용 렌더링 실패 · ${error.message}`));
@@ -630,30 +627,27 @@ export class MotionStudioApp {
 
   private updateExportWorkflow(): void {
     const type = this.root.querySelector<HTMLSelectElement>("[data-export-type]")?.value ?? "still";
-    const quality = this.root.querySelector<HTMLSelectElement>("[data-export-quality]")?.value ?? "high";
     const render = this.root.querySelector<HTMLSelectElement>("[data-export-render]");
+    const pathSettings = this.root.querySelector<HTMLElement>("[data-path-settings]");
     const button = this.root.querySelector<HTMLButtonElement>("[data-action='render-export']");
-    const custom = this.root.querySelector<HTMLDetailsElement>("[data-context-advanced='export-custom']");
     const motion = this.root.querySelector<HTMLDetailsElement>("[data-context-advanced='export-motion']");
     if (render) render.disabled = type === "motion";
-    if (button) button.textContent = type === "motion" ? "시퀀스 명령 복사" : quality === "print" ? "인쇄 렌더 및 내보내기" : "렌더 및 내보내기";
-    if (custom && quality === "custom") custom.open = true;
+    if (pathSettings) pathSettings.hidden = type === "motion" || render?.value === "raster";
+    if (button) button.textContent = type === "motion" ? "시퀀스 명령 복사" : "PNG 내보내기";
     if (motion) motion.classList.toggle("workflow-relevant", type === "motion");
   }
 
   private async runExportWorkflow(): Promise<void> {
     const type = this.root.querySelector<HTMLSelectElement>("[data-export-type]")?.value ?? "still";
     const render = this.root.querySelector<HTMLSelectElement>("[data-export-render]")?.value ?? "path";
-    const quality = this.root.querySelector<HTMLSelectElement>("[data-export-quality]")?.value ?? "high";
     if (type === "motion") {
       await navigator.clipboard.writeText(this.sequenceCommand());
       this.showPreview("PNG 시퀀스 명령을 복사했습니다.");
       return;
     }
-    if (quality === "print") { await this.renderPrintFrame(true); return; }
-    if (render === "raster" || quality === "draft") { await this.exportPng(true); return; }
-    if (quality === "preview") { await this.startPathRender("fast", true, 1, false); return; }
-    await this.renderCurrentFrame(true);
+    const printScale = this.settings.export.ppi / this.settings.advanced.renderRegion.unitPpi;
+    if (render === "raster") { await this.renderRasterFrame(true, printScale, true, "hq"); return; }
+    await this.renderPrintFrame(true);
   }
 
   private updatePhysical(patch: Partial<PhysicalLookParameters>): void {
@@ -690,15 +684,15 @@ export class MotionStudioApp {
     };
   }
 
-  applyVariation(id: string): void {
-    const variation = this.variations.get(id); if (!variation) return;
-    const snapshot = this.variations.sanitizeSnapshot(variation.snapshot);
+  serializeModeState(): StudioVariationSnapshot { return this.captureVariationSnapshot(); }
+
+  restoreModeState(value: StudioVariationSnapshot): void {
+    const snapshot = this.variations.sanitizeSnapshot(value);
     this.pause();
     this.settings.setup.gap = snapshot.setup.gap; this.settings.setup.bevelRadius = snapshot.setup.bevelRadius;
     this.settings.look = JSON.parse(JSON.stringify(snapshot.look)) as StudioSettingsV2["look"];
     this.settings.motion = JSON.parse(JSON.stringify(snapshot.motion)) as MotionSettings;
     this.settings.format = JSON.parse(JSON.stringify(snapshot.format)) as ArtboardState;
-    this.settings.ui.selectedVariationId = id;
     this.assembly.setGap(snapshot.setup.gap); this.assembly.setBevelRadius(snapshot.setup.bevelRadius);
     this.assembly.setSpectralFlowState(snapshot.look.spectralFlow); this.assembly.setSoftSpectralState(snapshot.look.softSpectral); this.assembly.setLook(snapshot.look.preset);
     this.assembly.setRoughness(snapshot.look.roughness); this.assembly.setDispersion(snapshot.look.dispersion); this.assembly.setPhysicalParameters(snapshot.look.physical);
@@ -709,8 +703,16 @@ export class MotionStudioApp {
     this.syncStudioUi(); this.resize(); this.persist();
   }
 
-  listVariations(): Array<{ id: string; label: string; builtin: boolean }> {
-    return this.variations.list().map(({ id, label, builtin }) => ({ id, label, builtin }));
+  applyVariation(id: string): void {
+    const variation = this.variations.get(id); if (!variation) return;
+    const currentArtboard = JSON.parse(JSON.stringify(this.settings.format)) as ArtboardState;
+    this.restoreModeState({ ...variation.snapshot, format: currentArtboard });
+    this.settings.ui.selectedVariationId = id;
+    this.syncStudioUi(); this.resize(); this.persist();
+  }
+
+  listVariations(): Array<{ id: string; label: string; builtin: boolean; modeId: "glass-3d" }> {
+    return this.variations.list().map(({ id, label, builtin, modeId }) => ({ id, label, builtin, modeId }));
   }
 
   private saveCurrentVariation(): void {
@@ -824,9 +826,11 @@ export class MotionStudioApp {
   }
 
   private resize(): void {
-    const panelWidth = this.inspector?.isCollapsed ? 0 : 360;
+    const layout = getComputedStyle(this.require<HTMLElement>(".motion-studio"));
+    const leftPanelWidth = Number.parseFloat(layout.getPropertyValue("--left-panel-space")) || 0;
+    const rightPanelWidth = Number.parseFloat(layout.getPropertyValue("--right-panel-space")) || 0;
     const transportHeight = this.settings.motion.enabled ? 48 : 0;
-    const width = Math.max(320, this.root.clientWidth - panelWidth);
+    const width = Math.max(240, this.root.clientWidth - leftPanelWidth - rightPanelWidth);
     const height = Math.max(240, this.root.clientHeight - transportHeight);
     const preview = this.composition.fitPreview(width, height, this.settings.format);
     this.artboardShell.style.width = `${preview.width}px`;
@@ -876,7 +880,8 @@ export class MotionStudioApp {
   }
 
   private timecode(seconds: number): string { const frames = Math.round(seconds * this.settings.motion.fps); const s = Math.floor(frames / this.settings.motion.fps); return `00:${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}:${String(frames % this.settings.motion.fps).padStart(2, "0")}`; }
-  private sequenceCommand(): string { return `npm run render:motion -- --look ${this.settings.look.preset} --preset ${this.settings.motion.preset} --width ${this.settings.format.width} --height ${this.settings.format.height} --fps ${this.settings.motion.fps} --duration ${this.settings.motion.duration} --quality raster --out artifacts/motion/${this.settings.look.preset}-${this.settings.motion.preset}`; }
+  getSequenceCommand(): string { return `npm run render:motion -- --look ${this.settings.look.preset} --preset ${this.settings.motion.preset} --width ${this.settings.format.width} --height ${this.settings.format.height} --fps ${this.settings.motion.fps} --duration ${this.settings.motion.duration} --quality raster --out artifacts/motion/${this.settings.look.preset}-${this.settings.motion.preset}`; }
+  private sequenceCommand(): string { return this.getSequenceCommand(); }
 
   play(): void { if (!this.settings.motion.enabled) { this.settings.motion.enabled = true; this.require<HTMLInputElement>("[data-motion='enabled']").checked = true; } this.showPreview(); this.controls.enabled = false; this.motionClock.setRealtime(); this.motionClock.play(); this.updateTransport(); }
   pause(): void { this.motionClock.pause(); this.controls.enabled = !this.settings.setup.viewLocked; this.updateTransport(); }
@@ -1082,23 +1087,13 @@ export class MotionStudioApp {
     return this.startPathRender("high", download, printScale, true);
   }
 
-  private togglePreviewRender(quality: RenderQuality): void {
-    if (this.settings.look.preset === "spectral-flow" || this.settings.look.preset === "soft-spectral") {
-      void this.renderRasterFrame(false, 1, false, quality === "high" ? "hq" : "raster").catch((error) => this.showPreview(`래스터 렌더링 실패 · ${error.message}`));
-      return;
-    }
-    if (this.renderJob?.quality === quality) { this.cancelPathRender("렌더링 중지됨"); return; }
-    if (this.renderJob) return;
-    void this.startPathRender(quality, false, 1, false).catch((error) => this.showPreview(`렌더링 실패 · ${error.message}`));
-  }
-
   private startPathRender(quality: RenderQuality, download: boolean, printScale: number, printOutput: boolean): Promise<string> {
     this.pause(); this.applyMotionAt(this.motionClock.time);
     const output = this.scaledOutput(printScale);
     const maxTextureSize = this.pathRenderer.capabilities.maxTextureSize;
     if (output.width > maxTextureSize || output.height > maxTextureSize) return Promise.reject(new Error(`${output.width} × ${output.height}px가 GPU 한계 ${maxTextureSize}px를 초과합니다.`));
-    const targetSamples = printOutput ? Math.max(this.settings.advanced.targetSamples, PRINT_RENDER_SAMPLES) : quality === "fast" ? FAST_RENDER_SAMPLES : this.settings.advanced.targetSamples;
-    const bounces = printOutput ? Math.max(this.settings.advanced.bounces, PRINT_RENDER_BOUNCES) : quality === "fast" ? FAST_RENDER_BOUNCES : this.settings.advanced.bounces;
+    const targetSamples = quality === "fast" ? FAST_RENDER_SAMPLES : this.settings.advanced.targetSamples;
+    const bounces = quality === "fast" ? FAST_RENDER_BOUNCES : this.settings.advanced.bounces;
     this.renderingHigh = true;
     this.previewRenderer.domElement.classList.remove("visible"); this.pathRenderer.domElement.classList.add("visible");
     this.pathRenderer.setPixelRatio(1); this.pathRenderer.setSize(output.width, output.height, false); this.pathComposer.setSize(output.width, output.height);
@@ -1106,11 +1101,8 @@ export class MotionStudioApp {
     this.pathCamera.setViewOffset(output.fullWidth, output.fullHeight, output.x, output.y, output.width, output.height);
     this.pathCamera.updateProjectionMatrix();
     this.applyPathCanvasFrame();
-    // Print output must be traced at the requested pixel dimensions. A lower
-    // renderScale only enlarges a smaller accumulation target and is not true
-    // 300ppi detail.
-    this.pathTracer.renderScale = printOutput ? 1 : quality === "fast" ? FAST_RENDER_SCALE : this.settings.advanced.renderScale;
-    this.pathTracer.filterGlossyFactor = printOutput ? .65 : quality === "high" ? .25 : 0;
+    this.pathTracer.renderScale = quality === "fast" ? FAST_RENDER_SCALE : this.settings.advanced.renderScale;
+    this.pathTracer.filterGlossyFactor = quality === "high" ? .25 : 0;
     this.pathTracer.bounces = bounces; this.pathTracer.transmissiveBounces = bounces + 4;
     this.pathDenoise.enabled = false;
     this.pathTracer.setScene(this.scene, this.pathCamera); this.pathTracer.reset(); this.pathTracer.pausePathTracing = false;
@@ -1214,7 +1206,7 @@ export class MotionStudioApp {
       app: {
         entryPoint: "src/main.ts",
         defaultRoute: "/",
-        activeApplication: "MotionStudioApp",
+        activeApplication: "Glass3DMode / MotionStudioApp",
         renderer: "Three.js WebGLRenderer + three-gpu-pathtracer",
         previewRenderer: "Three.js raster + EffectComposer + UnrealBloomPass",
         projection: "orthographic",
@@ -1231,9 +1223,9 @@ export class MotionStudioApp {
       pathTracing: { active: this.renderingHigh, samples: this.pathTracer.samples, quality: this.renderJob?.quality ?? null, output: this.renderJob ? [this.renderJob.width, this.renderJob.height] : null },
       assembly: this.assembly.inspect(),
       look: { ...this.settings.look, physical: { ...this.settings.look.physical }, spectralFlow: { ...this.settings.look.spectralFlow } },
-      variations: { selectedId: this.settings.ui.selectedVariationId, items: this.listVariations() },
+      variations: { selectedId: this.settings.ui.selectedVariationId, modeAware: true, items: this.listVariations() },
       sharedVertexValid: this.motionAdapter.getSharedCornerValidity(),
-      inspector: { tabs: ["setup", "look", "motion", "format", "export"], advancedDrawer: false, contextualAdvanced: true, consolidatedExport: true },
+      inspector: { layout: "left-structure / canvas / right-appearance", left: ["geometry", "camera", "composition"], right: ["style", "material", "lighting", "motion", "output"], collapsible: true, contextualAdvanced: true, consolidatedExport: true },
       storageVersion: 2,
     };
   }
