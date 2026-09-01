@@ -160,6 +160,37 @@ function cloneLight(light: PleosLightData): PleosLightData {
   return { ...light, id: lightId(), position: [...light.position], rotation: [...light.rotation] };
 }
 
+export function halveLightingRigDensity(state: LightingState): LightingState {
+  const selectedMap = new Map<string, string>();
+  const lights: PleosLightData[] = [];
+  for (let index = 0; index < state.lights.length; index += 2) {
+    const first = state.lights[index];
+    const second = state.lights[index + 1];
+    if (!second) { lights.push({ ...first, position: [...first.position], rotation: [...first.rotation] }); selectedMap.set(first.id, first.id); continue; }
+    const position: [number, number, number] = [
+      (first.position[0] + second.position[0]) * .5,
+      (first.position[1] + second.position[1]) * .5,
+      (first.position[2] + second.position[2]) * .5,
+    ];
+    const merged: PleosLightData = {
+      ...first,
+      name: first.name.replace(/\s*·\s*[AB]$/, ""),
+      position,
+      rotation: first.type === "point" ? [...first.rotation] : rotationTowardOrigin(position, first.rotation[2]),
+      intensity: first.intensity + second.intensity,
+    };
+    lights.push(merged);
+    selectedMap.set(first.id, merged.id);
+    selectedMap.set(second.id, merged.id);
+  }
+  return {
+    ...state,
+    globals: { ...state.globals },
+    lights,
+    selectedId: state.selectedId ? selectedMap.get(state.selectedId) ?? lights[0]?.id ?? null : lights[0]?.id ?? null,
+  };
+}
+
 export function createLightingPreset(name: Exclude<LightingPresetName, "custom"> = "pleos-rgb"): LightingState {
   // Preset coordinates were originally authored for a +Z camera. The
   // production camera is fixed at -Z, so mirror the complete rig into the
@@ -248,7 +279,9 @@ export class LightingSystem {
   private readonly overlayScene: THREE.Scene;
   private readonly onChange: (kind: LightingChangeKind) => void;
   private readonly runtime = new Map<string, RuntimeLight>();
+  private readonly pathSurrogates = new Map<string, ShapedAreaLight>();
   private editingVisible = false;
+  private pathTracingShapeMode = false;
 
   constructor(scene: THREE.Scene, overlayScene: THREE.Scene, initial: LightingState, onChange: (kind: LightingChangeKind) => void) {
     this.scene = scene;
@@ -262,6 +295,35 @@ export class LightingSystem {
   get selectedObject(): THREE.Object3D | null { return this.state.selectedId ? this.runtime.get(this.state.selectedId)?.object ?? null : null; }
 
   setEditingVisible(value: boolean): void { this.editingVisible = value; this.updateHelpers(); }
+
+  setPathTracingShapeMode(enabled: boolean): void {
+    this.pathTracingShapeMode = enabled;
+    this.clearPathSurrogates();
+    this.state.lights.forEach((data) => {
+      const runtime = this.runtime.get(data.id);
+      if (!runtime) return;
+      const source = runtime.object;
+      const replaceWithArea = source instanceof THREE.PointLight || source instanceof THREE.SpotLight;
+      source.visible = data.enabled && !(enabled && replaceWithArea);
+      if (!enabled || !data.enabled || !replaceWithArea) return;
+
+      // Path-traced point and spot lights create circular falloff patches on
+      // broad glass faces. A finite strip emitter preserves their color and
+      // direction while producing a photographic line / softbox reflection.
+      const length = source instanceof THREE.SpotLight
+        ? THREE.MathUtils.clamp(data.distance * .24, 2.6, 5.4)
+        : THREE.MathUtils.clamp(data.distance * .2, 2.2, 4.6);
+      const width = THREE.MathUtils.clamp(.16 + data.shadowSoftness * .055, .16, .72);
+      const surrogate = new ShapedAreaLight(source.color, source.intensity, length, width);
+      surrogate.name = `${data.name} Path Strip`;
+      surrogate.position.copy(source.position);
+      if (runtime.target) surrogate.lookAt(runtime.target.position);
+      else surrogate.lookAt(0, 0, 0);
+      surrogate.rotateZ(THREE.MathUtils.degToRad(data.rotation[2]));
+      this.scene.add(surrogate);
+      this.pathSurrogates.set(data.id, surrogate);
+    });
+  }
 
   select(id: string): void { this.state.selectedId = id; this.updateHelpers(); this.onChange("selection"); }
 
@@ -344,7 +406,8 @@ export class LightingSystem {
   private applyData(data: PleosLightData): void {
     const runtime = this.runtime.get(data.id); if (!runtime) return;
     const object = runtime.object;
-    object.name = data.name; object.visible = data.enabled; object.color.copy(colorWithSaturation(data.color, this.state.globals.colorSaturation));
+    const replacedInPathTrace = this.pathTracingShapeMode && (object instanceof THREE.PointLight || object instanceof THREE.SpotLight);
+    object.name = data.name; object.visible = data.enabled && !replacedInPathTrace; object.color.copy(colorWithSaturation(data.color, this.state.globals.colorSaturation));
     object.intensity = data.intensity * Math.pow(2, data.exposure) * this.state.globals.masterIntensity;
     object.position.fromArray(data.position);
     object.rotation.set(...data.rotation.map(THREE.MathUtils.degToRad) as [number, number, number]);
@@ -399,5 +462,10 @@ export class LightingSystem {
     if (runtime.object instanceof ShapedAreaLight) runtime.object.dispose(); this.runtime.delete(id);
   }
 
-  dispose(): void { [...this.runtime.keys()].forEach((id) => this.disposeRuntime(id)); }
+  private clearPathSurrogates(): void {
+    this.pathSurrogates.forEach((light) => { this.scene.remove(light); light.dispose(); });
+    this.pathSurrogates.clear();
+  }
+
+  dispose(): void { this.clearPathSurrogates(); [...this.runtime.keys()].forEach((id) => this.disposeRuntime(id)); }
 }

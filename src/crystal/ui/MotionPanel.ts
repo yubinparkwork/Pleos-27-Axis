@@ -6,6 +6,7 @@ export function renderMotionParameters(container: HTMLElement, settings: MotionS
   if (!preset) { container.innerHTML = `<p class="empty-state">모션이 꺼져 있습니다.</p>`; return; }
   const labels: Record<string, string> = {
     direction: "방향", sweepWidth: "이동 폭", spectralLag: "스펙트럴 지연", colorSaturation: "색상 채도", originPulse: "중심 맥동",
+    lightLength: "조명 길이", lightWidth: "조명 면 폭",
     amount: "양", frequency: "빈도", phase: "위상", materialResponse: "재질 반응", reflectionResponse: "반사 반응",
     distance: "거리", stagger: "시차", hold: "유지", rejoinImpact: "결합 충격", microRotation: "미세 회전",
   };

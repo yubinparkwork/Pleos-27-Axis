@@ -10,6 +10,14 @@ export type StudioExportQuality = "draft" | "high" | "print" | "custom";
 
 export interface StudioSharedState {
   artboard?: unknown;
+  inspectorCollapsed?: boolean;
+}
+
+export interface StudioVariationSummary {
+  id: string;
+  label: string;
+  builtin: boolean;
+  modeId: string;
 }
 
 export interface ModeExportAdapter {
@@ -23,6 +31,8 @@ export interface StudioModeContext {
   listModes(): readonly StudioModeDefinition[];
   requestMode(id: string): void;
   requestVariation(modeId: string, variationId: string): void;
+  notifyStateChange(): void;
+  requestUiRefresh(): void;
 }
 
 export interface StudioModeInstance {
@@ -35,6 +45,10 @@ export interface StudioModeInstance {
   setState(state: unknown): void;
   renderPreview(): void | Promise<void>;
   applyVariation?(id: string): void;
+  listVariations?(): StudioVariationSummary[];
+  focusExport?(): void;
+  inspect?(): object;
+  command?(name: string, payload?: unknown): unknown;
   getSharedState?(): StudioSharedState;
   setSharedState?(state: StudioSharedState): void;
   serialize(): unknown;
@@ -47,5 +61,6 @@ export interface StudioModeDefinition {
   label: string;
   description?: string;
   capabilities: StudioModeCapabilities;
+  ownsVariation?(id: string): boolean;
   create(context: StudioModeContext): StudioModeInstance;
 }

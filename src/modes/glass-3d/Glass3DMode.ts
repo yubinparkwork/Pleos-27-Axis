@@ -23,6 +23,7 @@ export class Glass3DMode implements StudioModeInstance {
       modes: this.context.listModes().map(({ id, label }) => ({ id, label })),
       onModeChange: (id) => this.context.requestMode(id),
       onVariationChange: (modeId, variationId) => this.context.requestVariation(modeId, variationId),
+      onStateChange: () => this.context.notifyStateChange(),
     });
   }
 
@@ -32,6 +33,36 @@ export class Glass3DMode implements StudioModeInstance {
   setState(state: unknown): void { this.restore(state); }
   renderPreview(): void { void this.controller.exportPng(false); }
   applyVariation(id: string): void { this.controller.applyVariation(id); }
+  listVariations() { return this.controller.listVariations(); }
+  focusExport(): void { this.context.root.querySelector<HTMLElement>("[data-inspector-tab='output']")?.click(); }
+  inspect(): object { return this.controller.inspect(); }
+  command(name: string, payload?: unknown): unknown {
+    const app = this.controller;
+    if (name === "setArtboard") return app.setArtboard(payload as never);
+    if (name === "setRenderRegion") return app.setRenderRegion(payload as never);
+    if (name === "export") return this.exportAdapter.exportStill(payload as Parameters<Glass3DExportAdapter["exportStill"]>[0]);
+    if (name === "setLook") return app.setLook(payload as never);
+    if (name === "setPrismStyle") return app.setPrismStyle(payload as never);
+    if (name === "setSpectralFlow") return app.setSpectralFlow(payload as never);
+    if (name === "setSpectralFlowPreset") return app.setSpectralFlowPreset(payload as never);
+    if (name === "setSoftSpectral") return app.setSoftSpectral(payload as never);
+    if (name === "setSoftSpectralPreset") return app.setSoftSpectralPreset(payload as never);
+    if (name === "setMotionPreset") return app.setMotionPreset(payload as never);
+    if (name === "setMotionStrength") return app.setMotionStrength(payload as never);
+    if (name === "configureMotion") return app.configureMotion(payload as never);
+    if (name === "play") return app.play();
+    if (name === "pause") return app.pause();
+    if (name === "seek") return app.seek(Number(payload ?? 0));
+    if (name === "resetMotion") return app.resetMotion();
+    if (name === "stepFrame") return app.stepFrame(Number(payload ?? 1));
+    if (name === "renderPreview") return app.renderPreview((payload as "fast" | "high") ?? "fast");
+    if (name === "renderCurrentFrame") return app.renderCurrentFrame(Boolean(payload));
+    if (name === "renderPrintFrame") return app.renderPrintFrame(Boolean(payload));
+    if (name === "exportPng") return app.exportPng(Boolean(payload));
+    if (name === "getMotionState") return app.getMotionState();
+    if (name === "getState") return this.getState();
+    return undefined;
+  }
   getSharedState(): StudioSharedState { return { artboard: this.controller.serializeModeState().format }; }
   setSharedState(state: StudioSharedState): void {
     if (!state.artboard) return;
@@ -53,5 +84,6 @@ export const GLASS_3D_MODE: StudioModeDefinition = {
   label: "Glass 3D",
   description: "Three.js optical solids, branded light and path-traced output",
   capabilities: { motion: true, pathTracing: true, rasterExport: true, transparency: true, print: true },
+  ownsVariation: (id) => id.startsWith("builtin-") || id.startsWith("user-"),
   create: (context) => new Glass3DMode(context),
 };

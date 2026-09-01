@@ -17,7 +17,7 @@ if (resolve(gitRoot) !== projectRoot || !detectedRemote.includes(expectedReposit
 const projectPath = relative(gitRoot, projectRoot) || ".";
 const docsDirectory = resolve(projectRoot, "docs");
 const latestDirectory = resolve(projectRoot, "artifacts/latest");
-const appUrl = process.env.PLEOS_HANDOFF_URL ?? "http://127.0.0.1:5173/";
+const appUrl = process.env.PLEOS_HANDOFF_URL ?? "http://127.0.0.1:41741/";
 
 function parseArguments(values) {
   const parsed = {};
@@ -93,7 +93,8 @@ async function reachable(url) {
 
 async function ensureServer() {
   if (await reachable(appUrl)) return null;
-  const server = spawn("npm", ["run", "dev", "--", "--host", "127.0.0.1"], {
+  const port = new URL(appUrl).port || "41741";
+  const server = spawn("npm", ["run", "dev", "--", "--host", "127.0.0.1", "--port", port, "--strictPort"], {
     cwd: projectRoot,
     stdio: ["ignore", "pipe", "pipe"],
     shell: process.platform === "win32",
@@ -126,22 +127,31 @@ async function captureRuntime(options = {}) {
   try {
     await page.goto(appUrl, { waitUntil: "load" });
     await page.waitForFunction(() => Boolean(window.__pleos27Axis?.inspect().ready), undefined, { timeout: 20_000 });
-    const initialRuntime = await page.evaluate(() => window.__pleos27Axis.inspect());
-    const activeLook = options.look ?? initialRuntime.assembly?.look ?? "prism";
-    const activeMotionPreset = options.motion ?? initialRuntime.motion?.preset ?? "off";
-    const duration = Number(initialRuntime.motion?.duration ?? 6);
+    const requestedMode = options.mode ?? "glass-3d";
+    await page.evaluate((mode) => window.__pleos27Axis.switchMode(mode), requestedMode);
+    await page.waitForFunction((mode) => window.__pleos27Axis?.getActiveMode() === mode, requestedMode);
+    await page.waitForFunction(() => window.__pleos27Axis?.inspect().ready === true, undefined, { timeout: 20_000 });
+    let initialRuntime = await page.evaluate(() => window.__pleos27Axis.inspect());
+    const activeLook = options.look ?? initialRuntime.assembly?.look ?? initialRuntime.preset ?? "iridescent-pulse";
+    const activeMotionPreset = options.motion ?? initialRuntime.motion?.preset ?? initialRuntime.motion?.kind ?? (requestedMode === "light-field" ? "field-loop" : "off");
+    const duration = Number(initialRuntime.motion?.duration ?? 9);
     const requestedHeroTime = Number(options.heroTime);
     const heroTime = Number.isFinite(requestedHeroTime) ? Math.max(0, Math.min(duration, requestedHeroTime)) : activeMotionPreset === "off" ? 0 : duration * 0.5;
 
-    await page.evaluate(({ look, preset, durationSeconds, time }) => {
+    await page.evaluate(({ mode, look, preset, durationSeconds, time }) => {
       const api = window.__pleos27Axis;
-      api.setRenderRegion({ enabled: false });
-      api.setLook(look);
-      if (preset !== "off") api.setMotionPreset(preset);
-      api.configureMotion({ duration: durationSeconds, loop: true, constraint: "strict" });
+      if (mode === "light-field") api.setLightFieldPreset(look);
+      else if (mode === "glass-prism") api.setGlassPrismPreset(look);
+      else if (mode === "kinetic-glass") api.setKineticGlassPreset(look);
+      else {
+        api.setRenderRegion({ enabled: false }); api.setLook(look);
+        if (preset !== "off") api.setMotionPreset(preset);
+        api.configureMotion({ duration: durationSeconds, loop: true, constraint: "strict" });
+      }
       api.pause();
       api.seek(time);
-    }, { look: activeLook, preset: activeMotionPreset, durationSeconds: duration, time: heroTime });
+    }, { mode: requestedMode, look: activeLook, preset: activeMotionPreset, durationSeconds: duration, time: heroTime });
+    initialRuntime = await page.evaluate(() => window.__pleos27Axis.inspect());
 
     const requestedPreviews = [
       { id: "main", file: "preview-main.png", width: Number(initialRuntime.artboard?.width ?? 1080), height: Number(initialRuntime.artboard?.height ?? 1080) },
@@ -153,7 +163,6 @@ async function captureRuntime(options = {}) {
       const dataUrl = await page.evaluate(async ({ width, height, time }) => {
         const api = window.__pleos27Axis;
         api.setArtboard({ id: "custom", width, height });
-        api.setRenderRegion({ enabled: false });
         api.pause();
         api.seek(time);
         return api.exportPng(false);
@@ -169,6 +178,7 @@ async function captureRuntime(options = {}) {
         heroTime,
         look: activeLook,
         motionPreset: activeMotionPreset,
+        mode: requestedMode,
       });
     }
 
@@ -201,10 +211,13 @@ function lookDescription(look, strategies) {
 }
 
 function makeHandoff({ runtimeState, task, filesChanged, visualChanges, knownIssues, nextWork }) {
-  const runtime = runtimeState.runtime;
+  const runtime = runtimeState.runtime ?? {};
   const app = runtime.app ?? {};
   const assembly = runtime.assembly ?? {};
   const motion = runtime.motion ?? {};
+  const isLightField = runtime.studioMode?.activeMode === "light-field";
+  const isGlassPrism = runtime.studioMode?.activeMode === "glass-prism";
+  const isKineticGlass = runtime.studioMode?.activeMode === "kinetic-glass";
   const looks = (assembly.supportedLooks ?? []).map((look) => lookDescription(look, assembly.renderStrategies));
   const validation = runtimeState.validation;
   const validationLines = [
@@ -214,15 +227,43 @@ function makeHandoff({ runtimeState, task, filesChanged, visualChanges, knownIss
     `Browser console — ${validation.browserConsole.toUpperCase()}`,
   ];
   const previewTable = runtimeState.previews.map((preview) => `| \`${preview.file}\` | ${preview.width} × ${preview.height} | ${preview.look} | ${preview.heroTime}s |`).join("\n");
-  const lookSections = looks.map((look) => `### ${look.look === "spectral-flow" ? "Spectral Flow" : look.look === "soft-spectral" ? "Soft Spectral" : look.look[0].toUpperCase() + look.look.slice(1)}
+  const glassLookSections = looks.map((look) => `### ${look.look === "spectral-flow" ? "Spectral Flow" : look.look === "soft-spectral" ? "Soft Spectral" : look.look[0].toUpperCase() + look.look.slice(1)}
 
 - Role: ${look.role}
 - Implementation: ${look.implementation}
 - Main file: \`${look.file}\`
 - Render strategy: ${look.strategy}
 - Motion support: ${look.motion ? "Yes, via the shared Motion system" : "No"}`).join("\n\n");
+  const lightFieldSection = `### Light Field
+
+- Role: Cables-inspired iridescent membrane mapped across the canonical three-cube Axis structure
+- Implementation: independent WebGL2 rounded-cube ray intersection with a world-space warped void, white crest, spectral layers and deterministic periodic motion
+- Main files: \`src/modes/light-field/LightFieldMode.ts\`, \`LightFieldRenderer.ts\`, \`shaders/field.frag.glsl\`
+- Render strategy: realtime raster WebGL2; no Three.js and no path tracing
+- Presets: Iridescent Pulse, Violet Membrane, Spectral White
+- Motion support: Yes, absolute-time configurable 8–16 second loop`;
+  const glassPrismSection = `### Glass Prism
+
+- Role: three-solid optical refraction of editable background typography
+- Implementation: independent Raw WebGL2 ray-box renderer using front/back thickness, RGB Snell refraction and Fresnel response
+- Main files: \`src/modes/glass-prism/GlassPrismMode.ts\`, \`GlassPrismRenderer.ts\`, \`shaders/prism.frag.glsl\`
+- Render strategy: realtime raster WebGL2 with deterministic exact-size PNG output
+- Presets: Clear Glass, RGB Prism, Frosted Prism, Dark Crystal
+- Motion support: Yes, rotation, shared-corner pulse and explode/rejoin`;
+  const kineticGlassSection = `### Kinetic Glass
+
+- Role: interactive optical-glass expression of the canonical PLEOS three-cube structure
+- Implementation: Three.js MeshPhysicalMaterial with zero-gravity Rapier rigid bodies, bounded pointer repulsion and spring return
+- Main files: \`src/modes/kinetic-glass/KineticGlassMode.ts\`, \`KineticGlassRenderer.ts\`, \`KineticGlassPanel.ts\`
+- Render strategy: realtime Three.js raster, PMREM studio environment and restrained bloom
+- Presets: Clear Attraction, PLEOS Prism, Dark Mass
+- Motion support: Yes, live pointer interaction with stable return to the approved 30° rest positions`;
+  const lookSections = [glassLookSections, lightFieldSection, glassPrismSection, kineticGlassSection].filter(Boolean).join("\n\n");
   const formats = (runtime.artboardPresets ?? []).map((format) => `${format.label} (${format.width} × ${format.height})`);
+  const formatSummary = formats.length ? formats.join("; ") : runtimeState.previews.map((preview) => `${preview.id} (${preview.width} × ${preview.height})`).join("; ");
   const motionPresets = (runtime.motionPresets ?? []).map((preset) => `${preset.id} — ${preset.duration}s, ${preset.constraint}`);
+  const motionRuntime = isLightField ? "LightFieldMode absolute-time field clock" : isGlassPrism ? "GlassPrismMode absolute-time optical motion clock" : isKineticGlass ? "Rapier fixed-step rigid-body clock with spring attraction" : "`MotionEngine` + `MotionClock`";
+  const motionPresetSummary = motionPresets.length ? motionPresets.join("; ") : isLightField ? "field-loop — 9s seamless loop" : isGlassPrism ? "rotate; shared-pulse; explode-rejoin" : isKineticGlass ? "pointer repulsion + spring attraction" : "None reported";
 
   return `# PLEOS 27 Axis — AI Handoff
 
@@ -240,21 +281,21 @@ Production geometry and expression layers should remain separable so new Looks d
 
 - Entry point: \`${app.entryPoint ?? "src/main.ts"}\`
 - Default route: \`${app.defaultRoute ?? "/"}\`
-- Active application: ${app.activeApplication ?? "MotionStudioApp"}
+- Active application: ${isLightField ? "LightFieldMode" : isGlassPrism ? "GlassPrismMode" : isKineticGlass ? "KineticGlassMode" : app.activeApplication ?? "MotionStudioApp"}
 - Renderer: ${app.renderer ?? runtime.renderer}
-- Preview: ${app.previewRenderer ?? "Three.js raster preview"}
-- Camera: ${app.projection ?? "orthographic"} (${app.camera?.type ?? "unknown"})
-- Main scene: ${app.sceneStructure ?? "3 optical solids at a shared vertex"}
+- Preview: ${isLightField ? "custom WebGL2 continuous field" : isGlassPrism ? "custom Raw WebGL2 thickness-aware refraction" : isKineticGlass ? "Three.js physical-glass raster with Rapier interaction" : app.previewRenderer ?? "Three.js raster preview"}
+- Projection: ${isLightField || isGlassPrism || isKineticGlass ? runtime.projection : `${app.projection ?? "orthographic"} (${app.camera?.type ?? "unknown"})`}
+- Main structure: ${isLightField ? "three canonical Axis lobes sharing one origin in normalized artboard space" : isGlassPrism ? "three ray-intersected optical cubes meeting at one shared corner" : isKineticGlass ? "three physical glass cubes attracted to canonical 90° / 210° / 330° rest positions" : app.sceneStructure ?? "3 optical solids at a shared vertex"}
 - Studio mode: ${runtime.studioMode?.modeLabel ?? "Glass 3D"} (renderer lifecycle owned by the active Mode)
 - Legacy routes: \`?renderer=raw\` and \`?renderer=legacy\` — Legacy / reference only
 
 ## Axis Identity
 
 - Axis family: 30deg
-- Shared origin valid: ${runtime.sharedVertexValid === true ? "Yes" : "No"}
+- Shared origin valid: ${isLightField ? "Yes, sourced from src/axis" : isKineticGlass ? runtime.sharedOrigin === true ? "Yes" : "No" : runtime.sharedVertexValid === true ? "Yes" : "No"}
 - Shared-origin contract: ${assembly.sharedCorner ? `[${assembly.sharedCorner.join(", ")}]` : "runtime-controlled"}
-- Projected directions: ${(assembly.projectedAxisAngles ?? []).map((angle) => `${angle}°`).join(", ")}
-- Geometry relationship: three closed optical solids meet at one shared vertex.
+- Projected directions: ${isLightField ? "derived from axis-30-basic at runtime" : (assembly.projectedAxisAngles ?? []).map((angle) => `${angle}°`).join(", ")}
+- Geometry relationship: ${isLightField ? "three continuous field lobes share one origin; renderer-local angles are not hardcoded" : "three closed optical solids meet at one shared vertex."}
 - Do not change the approved shared origin, 30° projection, default camera, or three-solid silhouette without an explicit brand-structure request.
 - Materials, shaders, lighting, motion, and artboard treatment are expression layers and may evolve while the Axis contract remains fixed.
 
@@ -264,22 +305,22 @@ ${lookSections}
 
 ## Motion System
 
-- Runtime: \`MotionEngine\` + \`MotionClock\`
-- Current preset: \`${motion.preset ?? "off"}\`
-- Available presets: ${motionPresets.join("; ")}
+- Runtime: ${motionRuntime}
+- Current preset: \`${motion.preset ?? (isLightField ? "field-loop" : "off")}\`
+- Available presets: ${motionPresetSummary}
 - Determinism: absolute-time evaluation; fixed export time is \`frameIndex / fps\`.
-- Current duration / FPS: ${motion.duration ?? "unknown"}s / ${motion.fps ?? "unknown"} fps
+- Current duration / FPS: ${motion.duration ?? "unknown"}s / ${motion.fps ?? (isLightField ? 30 : "unknown")} fps
 - Playback: realtime raster preview.
 - Sequence export: fixed-timestep raster PNG frames.
-- Path-traced stills: current absolute motion frame is synchronized before accumulation.
+- Path-traced stills: ${isLightField ? "Not supported by this Mode." : "current absolute motion frame is synchronized before accumulation."}
 
 ## Artboard / Export
 
 - Virtual artboard: Yes; framing is independent from viewport and Inspector width.
-- Supported formats: ${formats.join("; ")}
-- Raster PNG: exact artboard or render-region pixels.
-- Path-traced still: Clear, Prism, and Smoked.
-- High-resolution raster: Spectral Flow.
+- Supported formats: ${formatSummary}
+- Raster PNG: ${isLightField ? "exact artboard pixels with optional transparency." : "exact artboard or render-region pixels."}
+- Path-traced still: Glass 3D Clear, Prism, and Smoked only; absent from Light Field workflow.
+- High-resolution raster: ${isLightField ? "Light Field exact-size WebGL2 output." : "Spectral Flow and Soft Spectral."}
 - Motion sequence: deterministic PNG sequence.
 - Transparency: supported.
 - PPI: PNG pHYs metadata plus physical-size print scaling.
@@ -288,8 +329,8 @@ ${lookSections}
 ## Inspector / UI
 
 - Top bar — Mode, Variation and the primary Export action.
-- Glass 3D Inspector — Style, Material, Lighting and Motion essentials in one continuous panel.
-- Contextual details — material, lighting, geometry, camera, motion, output, render region and print metadata.
+- Active Inspector — ${isLightField ? "Preset, Flow Structure, Color/Light and Motion in task order, with advanced surface controls collapsed." : "Style, Material, Lighting and Motion essentials in one continuous panel."}
+- Contextual details — ${isLightField ? "membrane scale, warped void, white rim, spectral layers, artboard, transparency, PPI and deterministic sequence output." : "material, lighting, geometry, camera, motion, output, render region and print metadata."}
 - Output — format, size, background, transparency and Mode-adapted export.
 - Technical values stay collapsed until explicitly requested.
 
@@ -303,6 +344,13 @@ ${lookSections}
 | \`src/studio/ModeTypes.ts\` | Mode instance, capability and export-adapter contracts |
 | \`src/modes/glass-3d/Glass3DMode.ts\` | First production Mode; owns the current Three.js optical environment |
 | \`src/modes/glass-3d/Glass3DExportAdapter.ts\` | Maps common output intent to Glass 3D render strategies |
+| \`src/modes/light-field/LightFieldMode.ts\` | Independent Light Field lifecycle, state, motion and variations |
+| \`src/modes/light-field/LightFieldRenderer.ts\` | Raw WebGL2 fullscreen renderer and exact-size raster output |
+| \`src/modes/light-field/PngMetadata.ts\` | Print PPI metadata injection for Light Field PNG output |
+| \`src/modes/light-field/shaders/field.frag.glsl\` | Continuous inward field, spectral response, seams and origin compression |
+| \`src/modes/glass-prism/GlassPrismMode.ts\` | Glass Prism lifecycle, state, variations, camera interaction and export |
+| \`src/modes/glass-prism/GlassPrismRenderer.ts\` | Raw WebGL2 thickness-aware RGB refraction renderer |
+| \`src/modes/glass-prism/shaders/prism.frag.glsl\` | Ray-box intersections, Snell refraction, Fresnel and dispersion |
 | \`src/crystal/MotionStudioApp.ts\` | Active scene, renderer lifecycle, UI binding, motion and export strategy |
 | \`src/crystal/CrystalAssembly.ts\` | Three-solid Axis geometry, physical Looks and shared-origin contract |
 | \`src/crystal/materials/SpectralFlowMaterial.ts\` | Independent Spectral Flow shader expression |
@@ -359,7 +407,7 @@ ${markdownList(nextWork.slice(0, 5), "No immediate follow-up recommended")}
 
 - Read \`artifacts/latest/runtime-state.json\` for machine-readable branch, runtime, Look, motion, artboard, preview and validation state.
 - Inspect \`artifacts/latest/preview-main.png\`, then compare the 4:5 and 9:16 previews for framing consistency.
-- Start with \`src/studio/StudioShell.ts\` and \`src/modes/glass-3d/Glass3DMode.ts\`; \`MotionStudioApp\` is the current Glass 3D implementation.
+- Start with \`src/studio/StudioShell.ts\`, then compare \`src/modes/glass-3d/Glass3DMode.ts\` and \`src/modes/light-field/LightFieldMode.ts\` as independent production Modes.
 - Compare \`src/crystal/materials/SpectralFlowMaterial.ts\` with physical Look handling in \`src/crystal/CrystalAssembly.ts\`.
 - Check Git remote information before assuming this working tree is already connected to \`yubinparkwork/Pleos-27-Axis\`.
 `;
@@ -391,7 +439,7 @@ const remote = process.env.PLEOS_GIT_REMOTE ?? detectedRemote;
 let capture;
 let captureFailure = null;
 try {
-  capture = await captureRuntime({ look: args.look, motion: args.motion, heroTime: args["hero-time"] });
+  capture = await captureRuntime({ mode: args.mode, look: args.look, motion: args.motion, heroTime: args["hero-time"] });
   validation.browserConsole = capture.browserErrors.length ? "fail" : "pass";
 } catch (error) {
   captureFailure = error instanceof Error ? error.message : String(error);
@@ -400,6 +448,11 @@ try {
 }
 
 const generatedAt = new Date().toISOString();
+const capturedRuntime = capture.heroRuntime ?? capture.initialRuntime;
+const capturedMode = capturedRuntime?.studioMode?.activeMode ?? null;
+const capturedIsLightField = capturedMode === "light-field";
+const capturedIsGlassPrism = capturedMode === "glass-prism";
+const capturedIsKineticGlass = capturedMode === "kinetic-glass";
 const runtimeState = {
   project: "PLEOS 27 Axis",
   generatedAt,
@@ -412,18 +465,25 @@ const runtimeState = {
     dirtyBeforeHandoff: statusBefore.length > 0,
     changedBeforeHandoff: statusBefore,
   },
-  app: capture.heroRuntime?.app ?? null,
-  runtime: capture.heroRuntime ?? capture.initialRuntime,
-  axis: capture.heroRuntime ? {
+  app: capturedRuntime?.app ?? (capturedRuntime ? {
+    entryPoint: "src/main.ts",
+    defaultRoute: "/",
+    activeApplication: capturedIsLightField ? "LightFieldMode" : capturedIsGlassPrism ? "GlassPrismMode" : capturedIsKineticGlass ? "KineticGlassMode" : "Glass3DMode",
+    renderer: capturedRuntime.renderer,
+    projection: capturedRuntime.projection,
+  } : null),
+  runtime: capturedRuntime,
+  axis: capturedRuntime ? {
     family: "30deg",
-    sharedOrigin: capture.heroRuntime.sharedVertexValid === true,
-    projectionAngles: capture.heroRuntime.assembly?.projectedAxisAngles ?? [],
+    sharedOrigin: capturedIsLightField ? capturedRuntime.axis?.sharedOrigin === true : capturedIsKineticGlass ? capturedRuntime.sharedOrigin === true : capturedRuntime.sharedVertexValid === true,
+    projectionAngles: capturedRuntime.assembly?.projectedAxisAngles ?? capturedRuntime.axis?.projectedAngles ?? [],
+    source: capturedRuntime.axis?.source ?? "src/axis",
   } : null,
   artboard: capture.initialRuntime?.artboard ?? null,
-  looks: capture.heroRuntime?.assembly?.supportedLooks ?? [],
-  motionPresets: capture.heroRuntime?.motionPresets ?? [],
-  activeExpression: capture.heroRuntime?.assembly?.look ?? null,
-  motion: capture.heroRuntime?.motion ?? null,
+  looks: capturedRuntime?.assembly?.supportedLooks ?? (capturedIsLightField ? ["iridescent-pulse", "violet-membrane", "spectral-white"] : capturedIsKineticGlass ? ["clear-attraction", "pleos-prism", "dark-mass"] : []),
+  motionPresets: capturedRuntime?.motionPresets ?? (capturedIsLightField ? ["field-loop"] : capturedIsKineticGlass ? ["pointer-attraction"] : []),
+  activeExpression: capturedRuntime?.assembly?.look ?? capturedRuntime?.preset ?? null,
+  motion: capturedRuntime?.motion ?? null,
   previews: capture.previews,
   validation,
   validationRuns,

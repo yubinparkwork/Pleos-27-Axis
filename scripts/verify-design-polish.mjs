@@ -13,6 +13,13 @@ for (const action of ["variation-save", "variation-rename", "variation-duplicate
 for (const section of ["look-material", "look-lighting", "motion-advanced", "export-region"]) assert.ok(panel.includes(`\"${section}\"`), `missing contextual advanced section ${section}`);
 for (const control of ["data-look-select", "data-prism-style-select", "data-export-type", "data-export-render", "target-samples", "render-export"]) assert.ok(panel.includes(control), `missing compact workflow control ${control}`);
 for (const region of ["structure-panel", "control-dock", "panel-nav", "data-panel-section='geometry'", "data-panel-section='output'"]) assert.ok(panel.includes(region), `missing creative-tool region ${region}`);
+for (const control of ["카메라 수평 이동", "카메라 수직 이동", "camera-pan-center"]) assert.ok(panel.includes(control), `missing camera pan control ${control}`);
+const cameraSection = panel.match(/section\("카메라", `([\s\S]*?)`, "data-panel-section='camera'"\)/)?.[1] ?? "";
+const compositionSection = panel.match(/section\("구도", `([\s\S]*?)`, "data-panel-section='composition'"\)/)?.[1] ?? "";
+assert.ok(cameraSection.includes("camera-pan-x") && cameraSection.includes("camera-pan-y"), "True camera pan controls must live in the camera section");
+assert.ok(!cameraSection.includes("axis-anchor-x") && !cameraSection.includes("axis-anchor-y"), "Artboard composition controls must not masquerade as camera pan");
+assert.ok(compositionSection.includes("axis-anchor-x") && compositionSection.includes("axis-anchor-y"), "Artboard composition controls must remain in composition");
+assert.match(app, /controls\.target\.add\(this\.camera\.position\.clone\(\)\.sub\(cameraPositionBeforeComposition\)\)/, "Camera position and target must translate by the same delta");
 assert.ok(!panel.includes("data-advanced hidden"), "legacy modal-style advanced drawer remains");
 assert.match(app, /applyVariation\(id: string\)/);
 assert.match(app, /lighting\.applyState/);

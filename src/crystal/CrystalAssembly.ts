@@ -47,13 +47,12 @@ const TOUCH_CORNERS: Array<[number, number, number]> = [
 const SCREEN_GAP_ANGLES = [90, 210, 330] as const;
 
 // A rounded corner loses more apparent width on the two upper diagonal seams
-// than it does on the near-vertical seam between the lower solids. Equal
-// radial translations therefore make the lower pair read as if it has a
-// smaller gap. Redistribute the radial travel while keeping the layout
-// centroid fixed. The correction fades to zero with the gap so gap 0 remains
-// an exact three-corner contact, independent of bevel radius.
-const BEVEL_GAP_RESPONSE = 0.55;
-const BEVEL_GAP_MAX_RATIO = 1.3;
+// than it does on the near-vertical seam between the lower solids. The
+// geometry-derived projected inset below is solved back into unequal radial
+// travel so all three negative-space seams read at the same width.
+const BEVEL_GAP_ACTIVATION_RANGE = 0.06;
+const BEVEL_GAP_SOLVER_ITERATIONS = 18;
+const BEVEL_GAP_SOLVER_SAFETY = 0.995;
 
 function smoothstep01(value: number): number {
   const t = THREE.MathUtils.clamp(value, 0, 1);
@@ -65,15 +64,28 @@ function makeScreenGapDirection(index: number): THREE.Vector3 {
   return new THREE.Vector3(Math.cos(radians), Math.sin(radians), 0);
 }
 
-function makeScreenGapOffsets(gap: number, bevelRadius: number): THREE.Vector3[] {
-  const activation = smoothstep01(gap / 0.06);
-  const bevelToGap = bevelRadius / Math.max(gap, 1e-6);
-  // tanh gives continuous live correction while preventing a large bevel at
-  // a small gap from suddenly throwing the lower pair too far apart.
-  const differential = gap
-    * BEVEL_GAP_MAX_RATIO
-    * Math.tanh(bevelToGap * BEVEL_GAP_RESPONSE)
-    * activation;
+function pairSeparationDifference(gap: number, differential: number): number {
+  const upperRadius = Math.max(0, gap - differential * (2 / 3));
+  const lowerRadius = gap + differential / 3;
+  const upperPair = Math.hypot(Math.sqrt(.75) * lowerRadius, upperRadius + .5 * lowerRadius);
+  const lowerPair = Math.sqrt(3) * lowerRadius;
+  return lowerPair - upperPair;
+}
+
+function makeScreenGapOffsets(gap: number, projectedInsetBias: number): THREE.Vector3[] {
+  if (gap <= 1e-8) return SCREEN_GAP_ANGLES.map(() => new THREE.Vector3());
+  const activation = smoothstep01(gap / BEVEL_GAP_ACTIVATION_RANGE);
+  const maximumDifferential = gap * 1.5;
+  const maximumBias = pairSeparationDifference(gap, maximumDifferential) * BEVEL_GAP_SOLVER_SAFETY;
+  const targetBias = Math.min(Math.max(0, projectedInsetBias) * activation, maximumBias);
+  let low = 0;
+  let high = maximumDifferential;
+  for (let iteration = 0; iteration < BEVEL_GAP_SOLVER_ITERATIONS; iteration += 1) {
+    const candidate = (low + high) * .5;
+    if (pairSeparationDifference(gap, candidate) < targetBias) low = candidate;
+    else high = candidate;
+  }
+  const differential = (low + high) * .5;
   const upperRadius = Math.max(0, gap - differential * (2 / 3));
   const lowerRadius = gap + differential / 3;
   const offsets = SCREEN_GAP_ANGLES.map((_, index) => (
@@ -200,6 +212,32 @@ function nearestGeometryVertex(geometry: THREE.BufferGeometry, target: THREE.Vec
   return nearest;
 }
 
+function measureProjectedBevelGapBias(geometry: THREE.BufferGeometry, basis: THREE.Vector3[]): number {
+  const position = geometry.getAttribute("position") as THREE.BufferAttribute;
+  const projectedVertices = TOUCH_CORNERS.map((corner) => {
+    const idealTouchCorner = new THREE.Vector3()
+      .addScaledVector(basis[0], corner[0])
+      .addScaledVector(basis[1], corner[1])
+      .addScaledVector(basis[2], corner[2]);
+    const touchCorner = nearestGeometryVertex(geometry, idealTouchCorner);
+    const vertices: THREE.Vector2[] = [];
+    for (let index = 0; index < position.count; index += 1) {
+      vertices.push(new THREE.Vector2(position.getX(index) - touchCorner.x, position.getY(index) - touchCorner.y));
+    }
+    return vertices;
+  });
+  const gapDirections = SCREEN_GAP_ANGLES.map((_, index) => makeScreenGapDirection(index));
+  const supportGap = (first: number, second: number): number => {
+    const direction = gapDirections[second].clone().sub(gapDirections[first]).normalize();
+    const firstSupport = Math.max(...projectedVertices[first].map((point) => point.dot(direction)));
+    const secondSupport = Math.min(...projectedVertices[second].map((point) => point.dot(direction)));
+    return secondSupport - firstSupport;
+  };
+  const upperPairInset = (supportGap(0, 1) + supportGap(0, 2)) * .5;
+  const lowerPairInset = supportGap(1, 2);
+  return Math.max(0, upperPairInset - lowerPairInset);
+}
+
 export class CrystalAssembly extends THREE.Group {
   private readonly materials: CrystalMaterial[] = [];
   private readonly spectralMaterials: SpectralFlowMaterial[] = [];
@@ -210,6 +248,7 @@ export class CrystalAssembly extends THREE.Group {
   private look: CrystalLook = "prism";
   private gap = 0;
   private bevelRadius = 0.018;
+  private projectedBevelGapBias = 0;
   private reflectionStrength = 1;
   private refractionStrength = 1;
   private physicalParameters: PhysicalLookParameters = { ior: 1.52, thickness: 2.45, attenuationDistance: 3.8, iridescence: .14 };
@@ -223,6 +262,7 @@ export class CrystalAssembly extends THREE.Group {
       const spectralMaterial = new SpectralFlowMaterial(createSpectralFlowState());
       const softSpectralMaterial = new SoftSpectralMaterial(createSoftSpectralState());
       const geometry = transformOpticalCube(CUBE_BASIS, this.span, this.bevelRadius);
+      if (index === 0) this.projectedBevelGapBias = measureProjectedBevelGapBias(geometry, basis);
       const pivot = new THREE.Group();
       pivot.name = `SharedVertexPivot${index + 1}`;
       const solid = new THREE.Group();
@@ -258,7 +298,7 @@ export class CrystalAssembly extends THREE.Group {
 
   setGap(value: number): void {
     this.gap = THREE.MathUtils.clamp(value, 0, 0.45);
-    const offsets = makeScreenGapOffsets(this.gap, this.bevelRadius);
+    const offsets = makeScreenGapOffsets(this.gap, this.projectedBevelGapBias);
     this.solids.forEach((solid, index) => {
       solid.position.copy(offsets[index]);
     });
@@ -275,6 +315,7 @@ export class CrystalAssembly extends THREE.Group {
       const mesh = this.meshes[index];
       const offsetGroup = pivot.userData.offsetGroup as THREE.Group;
       const geometry = transformOpticalCube(CUBE_BASIS, this.span, this.bevelRadius);
+      if (index === 0) this.projectedBevelGapBias = measureProjectedBevelGapBias(geometry, basis);
       const corner = TOUCH_CORNERS[index];
       const idealTouchCorner = new THREE.Vector3()
         .addScaledVector(basis[0], corner[0])
@@ -310,7 +351,7 @@ export class CrystalAssembly extends THREE.Group {
 
   applyRuntimeGap(value: number): void {
     const runtimeGap = THREE.MathUtils.clamp(this.gap + value, 0, 0.65);
-    const offsets = makeScreenGapOffsets(runtimeGap, this.bevelRadius);
+    const offsets = makeScreenGapOffsets(runtimeGap, this.projectedBevelGapBias);
     this.solids.forEach((solid, index) => {
       solid.position.copy(offsets[index]);
     });
@@ -425,6 +466,16 @@ export class CrystalAssembly extends THREE.Group {
   }
 
   inspect(): object {
+    const cornerPositions = this.getSharedCornerPositions();
+    const projectedPairDistance = (first: number, second: number) => Math.hypot(
+      cornerPositions[first].x - cornerPositions[second].x,
+      cornerPositions[first].y - cornerPositions[second].y,
+    );
+    const upperPairDistance = (projectedPairDistance(0, 1) + projectedPairDistance(0, 2)) * .5;
+    const lowerPairDistance = projectedPairDistance(1, 2);
+    const activation = smoothstep01(this.gap / BEVEL_GAP_ACTIVATION_RANGE);
+    const maximumBias = pairSeparationDifference(this.gap, this.gap * 1.5) * BEVEL_GAP_SOLVER_SAFETY;
+    const targetBias = Math.min(this.projectedBevelGapBias * activation, maximumBias);
     return {
       look: this.look,
       supportedLooks: [...CRYSTAL_LOOKS],
@@ -433,11 +484,15 @@ export class CrystalAssembly extends THREE.Group {
       gap: this.gap,
       bevelRadius: this.bevelRadius,
       sharedCorner: this.gap === 0 ? [0, 0, 0] : null,
-      cornerPositions: this.getSharedCornerPositions().map((position) => position.toArray()),
+      cornerPositions: cornerPositions.map((position) => position.toArray()),
       screenGapAngles: [...SCREEN_GAP_ANGLES],
       bevelGapCompensation: {
-        response: BEVEL_GAP_RESPONSE,
-        maxRatio: BEVEL_GAP_MAX_RATIO,
+        strategy: "projected-geometry-solver",
+        projectedInsetBias: this.projectedBevelGapBias,
+        activationRange: BEVEL_GAP_ACTIVATION_RANGE,
+        targetBias,
+        resolvedBias: lowerPairDistance - upperPairDistance,
+        residual: Math.abs((lowerPairDistance - upperPairDistance) - targetBias),
       },
       projectedAxisAngles: [30, 90, 150, 210, 270, 330],
       linePrimitives: 0,

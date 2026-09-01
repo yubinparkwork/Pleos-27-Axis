@@ -2,7 +2,7 @@ import * as THREE from "three";
 import type { ArtboardState } from "./ArtboardState";
 
 export class CompositionAdapter {
-  apply(camera: THREE.OrthographicCamera, artboard: ArtboardState): void {
+  apply(camera: THREE.OrthographicCamera, artboard: ArtboardState, cameraPan: { x: number; y: number } = { x: 0, y: 0 }): void {
     const aspect = artboard.width / artboard.height;
     const baseHeight = 6.7 / Math.max(0.2, artboard.scale);
     const baseWidth = baseHeight * aspect;
@@ -14,8 +14,8 @@ export class CompositionAdapter {
     const centerY = (0.5 - artboard.axisAnchor.gridY) * baseHeight;
     camera.setViewOffset(artboard.width, artboard.height, centerX, centerY, artboard.width, artboard.height);
     camera.clearViewOffset();
-    camera.position.x = centerX;
-    camera.position.y = centerY;
+    camera.position.x = centerX + cameraPan.x;
+    camera.position.y = centerY + cameraPan.y;
     camera.updateProjectionMatrix();
   }
 

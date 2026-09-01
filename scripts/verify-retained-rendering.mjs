@@ -2,7 +2,8 @@ import { spawn } from "node:child_process";
 import { chromium } from "playwright";
 import { PNG } from "pngjs";
 
-const url = process.env.PLEOS_URL ?? "http://127.0.0.1:5173/";
+const port = Number(process.env.PLEOS_RENDER_TOOLS_PORT ?? 41750);
+const url = process.env.PLEOS_URL ?? `http://127.0.0.1:${port}/`;
 
 async function reachable() {
   try { return (await fetch(url)).ok; } catch { return false; }
@@ -10,7 +11,7 @@ async function reachable() {
 
 let server = null;
 if (!(await reachable())) {
-  server = spawn("npm", ["run", "dev", "--", "--host", "127.0.0.1"], { stdio: "inherit", shell: process.platform === "win32" });
+  server = spawn("npm", ["run", "dev", "--", "--host", "127.0.0.1", "--port", String(port), "--strictPort"], { stdio: "inherit", shell: process.platform === "win32" });
   const deadline = Date.now() + 20_000;
   while (!(await reachable())) {
     if (Date.now() > deadline) throw new Error(`Dev server did not become ready at ${url}`);
@@ -25,6 +26,8 @@ try {
   page.on("pageerror", (error) => errors.push(error.message));
   page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
   await page.goto(url, { waitUntil: "load" });
+  await page.waitForFunction(() => Boolean(window.__pleos27Axis));
+  await page.evaluate(() => window.__pleos27Axis.switchMode("glass-3d"));
   await page.waitForFunction(() => Boolean(window.__pleos27Axis?.inspect().ready));
   await page.evaluate(() => {
     const api = window.__pleos27Axis;

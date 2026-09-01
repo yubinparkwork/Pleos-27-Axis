@@ -19,6 +19,9 @@ export interface MotionLightPatch {
   whitePulse: number;
   spectralIntensity: number;
   direction: number;
+  travel: number;
+  emitterLength: number;
+  emitterWidth: number;
 }
 
 export interface MotionPatch {

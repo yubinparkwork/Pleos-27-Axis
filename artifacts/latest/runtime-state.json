@@ -1,21 +1,29 @@
 {
   "project": "PLEOS 27 Axis",
-  "generatedAt": "2026-08-28T09:56:04.834Z",
+  "generatedAt": "2026-09-01T11:16:53.422Z",
   "git": {
     "root": ".",
     "projectPath": ".",
     "branch": "main",
-    "sourceBaseCommit": "9b0dbc689e647128c98b60481d52573d5ae957cc",
+    "sourceBaseCommit": "ece8031b567ac24dfc5df97dccd68be372334cda",
     "remote": "https://github.com/yubinparkwork/Pleos-27-Axis.git",
     "dirtyBeforeHandoff": true,
     "changedBeforeHandoff": [
       {
         "status": "M",
-        "file": "AGENTS.md"
+        "file": "README.md"
       },
       {
         "status": "M",
-        "file": "README.md"
+        "file": "artifacts/latest/preview-4x5.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/latest/preview-9x16.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/latest/preview-main.png"
       },
       {
         "status": "M",
@@ -27,7 +35,19 @@
       },
       {
         "status": "M",
+        "file": "docs/MODE_ARCHITECTURE.md"
+      },
+      {
+        "status": "M",
+        "file": "package-lock.json"
+      },
+      {
+        "status": "M",
         "file": "package.json"
+      },
+      {
+        "status": "M",
+        "file": "scripts/render-motion-sequence.mjs"
       },
       {
         "status": "M",
@@ -39,15 +59,19 @@
       },
       {
         "status": "M",
+        "file": "scripts/verify-mode-lifecycle.mjs"
+      },
+      {
+        "status": "M",
         "file": "scripts/verify-pathtracer.mjs"
       },
       {
         "status": "M",
-        "file": "scripts/verify-soft-spectral.mjs"
+        "file": "scripts/verify-retained-rendering.mjs"
       },
       {
         "status": "M",
-        "file": "scripts/verify-spectral-flow.mjs"
+        "file": "src/artboard/CompositionAdapter.ts"
       },
       {
         "status": "M",
@@ -55,11 +79,19 @@
       },
       {
         "status": "M",
-        "file": "src/crystal/InspectorPanel.ts"
+        "file": "src/crystal/CrystalAssembly.ts"
+      },
+      {
+        "status": "M",
+        "file": "src/crystal/LightingSystem.ts"
       },
       {
         "status": "M",
         "file": "src/crystal/MotionStudioApp.ts"
+      },
+      {
+        "status": "M",
+        "file": "src/crystal/ui/MotionPanel.ts"
       },
       {
         "status": "M",
@@ -74,84 +106,520 @@
         "file": "src/main.ts"
       },
       {
+        "status": "M",
+        "file": "src/modes/glass-3d/Glass3DMode.ts"
+      },
+      {
+        "status": "M",
+        "file": "src/motion/modules/SpectralAxisSweepMotion.ts"
+      },
+      {
+        "status": "M",
+        "file": "src/motion/presets/spectralAxisSweep.ts"
+      },
+      {
+        "status": "M",
+        "file": "src/motion/types.ts"
+      },
+      {
+        "status": "M",
+        "file": "src/studio/ModeTypes.ts"
+      },
+      {
+        "status": "M",
+        "file": "src/studio/StudioShell.ts"
+      },
+      {
+        "status": "M",
+        "file": "src/studio/StudioState.ts"
+      },
+      {
+        "status": "M",
+        "file": "vite.config.ts"
+      },
+      {
         "status": "??",
         "file": "archive/legacy-three/package-lock.json"
       },
       {
         "status": "??",
-        "file": "artifacts/mode-studio/01-workspace.png"
+        "file": "artifacts/axis-habitat/axis-habitat-blue-observatory.png"
       },
       {
         "status": "??",
-        "file": "artifacts/mode-studio/02-glass3d-panel.png"
+        "file": "artifacts/axis-habitat/luminous-drawing-preview-v2.png"
       },
       {
         "status": "??",
-        "file": "artifacts/mode-studio/03-glass3d-details.png"
+        "file": "artifacts/axis-habitat/luminous-drawing-preview-v3.png"
       },
       {
         "status": "??",
-        "file": "artifacts/mode-studio/04-variation-menu.png"
+        "file": "artifacts/axis-habitat/luminous-drawing-preview-v4.png"
       },
       {
         "status": "??",
-        "file": "artifacts/mode-studio/05-output.png"
+        "file": "artifacts/axis-habitat/luminous-drawing-preview.png"
       },
       {
         "status": "??",
-        "file": "artifacts/mode-studio/06-motion-enabled.png"
+        "file": "artifacts/axis-habitat/luminous-final-drawing.png"
       },
       {
         "status": "??",
-        "file": "artifacts/mode-studio/07-motion-disabled-state.png"
+        "file": "artifacts/axis-habitat/luminous-final-material.png"
       },
       {
         "status": "??",
-        "file": "artifacts/mode-studio/08-inspector-collapsed.png"
+        "file": "artifacts/axis-habitat/luminous-final-suspended.png"
       },
       {
         "status": "??",
-        "file": "docs/MODE_ARCHITECTURE.md"
+        "file": "artifacts/axis-habitat/luminous-isolate.png"
       },
       {
         "status": "??",
-        "file": "scripts/capture-mode-studio.mjs"
+        "file": "artifacts/axis-habitat/luminous-material-preview.png"
       },
       {
         "status": "??",
-        "file": "scripts/verify-mode-lifecycle.mjs"
+        "file": "artifacts/axis-habitat/luminous-raw-preview.png"
       },
       {
         "status": "??",
-        "file": "src/modes/glass-3d/Glass3DExportAdapter.ts"
+        "file": "artifacts/axis-habitat/luminous-suspended-preview.png"
       },
       {
         "status": "??",
-        "file": "src/modes/glass-3d/Glass3DMode.ts"
+        "file": "artifacts/axis-habitat/luminous-tuned-preview.png"
       },
       {
         "status": "??",
-        "file": "src/modes/glass-3d/Glass3DPanel.ts"
+        "file": "artifacts/axis-habitat/luminous-visual-panel.png"
       },
       {
         "status": "??",
-        "file": "src/modes/glass-3d/Glass3DState.ts"
+        "file": "artifacts/axis-habitat/pleos-formation-material-hold.png"
       },
       {
         "status": "??",
-        "file": "src/studio/ModeRegistry.ts"
+        "file": "artifacts/axis-habitat/pleos-formation-motion-panel.png"
       },
       {
         "status": "??",
-        "file": "src/studio/ModeTypes.ts"
+        "file": "artifacts/axis-habitat/pleos-formation-suspended.png"
       },
       {
         "status": "??",
-        "file": "src/studio/StudioShell.ts"
+        "file": "artifacts/axis-habitat/pleos-formation-wire.png"
       },
       {
         "status": "??",
-        "file": "src/studio/StudioState.ts"
+        "file": "artifacts/axis-trails/axis-trails-pleos-blue.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/glass-prism/formats/portrait-4x5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/glass-prism/formats/square.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/glass-prism/formats/vertical-9x16.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/glass-prism/motion/frame-000.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/glass-prism/motion/frame-025.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/glass-prism/motion/frame-050.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/glass-prism/motion/frame-075.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/glass-prism/motion/frame-100.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/glass-prism/presets/clear-glass.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/glass-prism/presets/dark-crystal.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/glass-prism/presets/frosted-prism.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/glass-prism/presets/rgb-prism.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/glass-prism/ui/glass-prism-default.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/light-field/formats/portrait-4x5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/light-field/formats/square.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/light-field/formats/vertical-9x16.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/light-field/lifecycle/glass-before.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/light-field/lifecycle/glass-restored.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/light-field/lifecycle/light-field.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/light-field/motion/frame-000.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/light-field/motion/frame-025.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/light-field/motion/frame-050.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/light-field/motion/frame-075.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/light-field/motion/frame-100.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/light-field/presets/blue-core.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/light-field/presets/dark-spectral.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/light-field/presets/iridescent-pulse.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/light-field/presets/spectral-white.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/light-field/presets/violet-membrane.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/light-field/presets/warm-fold.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/light-field/ui/field-details.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/light-field/ui/inspector-collapsed.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/light-field/ui/light-field-default.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/light-field/ui/output.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/light-field/ui/variation-menu.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/renders/pleos-27-axis-brand-light-4k-square-midpoint.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/renders/pleos-27-axis-brand-light-4k-square.mp4"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000000.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000001.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000002.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000003.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000004.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000005.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000006.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000030.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000060.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000090.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000120.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000150.png"
+      },
+      {
+        "status": "??",
+        "file": "docs/axis-habitat-research.md"
+      },
+      {
+        "status": "??",
+        "file": "scripts/capture-glass-prism.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/capture-light-field.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/render-glass-prism-sequence.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/render-light-field-sequence.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-axis-habitat-runtime.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-axis-habitat.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-axis-megastructure.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-axis-trails.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-glass-prism.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-kinetic-glass.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-light-field.mjs"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/axis-habitat/AxisFormationPanel.svelte"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/axis-habitat/AxisHabitat.css"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/axis-habitat/AxisHabitatExportAdapter.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/axis-habitat/AxisHabitatMode.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/axis-habitat/AxisHabitatPanel.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/axis-habitat/AxisHabitatRenderer.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/axis-habitat/AxisHabitatState.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/axis-megastructure/AxisMegastructure.css"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/axis-megastructure/AxisMegastructureExportAdapter.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/axis-megastructure/AxisMegastructureMode.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/axis-megastructure/AxisMegastructurePanel.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/axis-megastructure/AxisMegastructureRenderer.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/axis-megastructure/AxisMegastructureState.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/axis-trails/AxisTrailsExportAdapter.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/axis-trails/AxisTrailsMode.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/axis-trails/AxisTrailsPanel.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/axis-trails/AxisTrailsRenderer.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/axis-trails/AxisTrailsState.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/glass-prism/GlassPrismExportAdapter.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/glass-prism/GlassPrismMode.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/glass-prism/GlassPrismPanel.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/glass-prism/GlassPrismRenderer.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/glass-prism/GlassPrismState.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/glass-prism/shaders/prism.frag.glsl"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/kinetic-glass/KineticGlassExportAdapter.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/kinetic-glass/KineticGlassMode.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/kinetic-glass/KineticGlassPanel.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/kinetic-glass/KineticGlassRenderer.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/kinetic-glass/KineticGlassState.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/light-field/LightFieldExportAdapter.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/light-field/LightFieldMode.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/light-field/LightFieldPanel.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/light-field/LightFieldRenderer.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/light-field/LightFieldState.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/light-field/PngMetadata.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/light-field/shaders/blur.frag.glsl"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/light-field/shaders/composite.frag.glsl"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/light-field/shaders/field.frag.glsl"
+      },
+      {
+        "status": "??",
+        "file": "src/modes/light-field/shaders/fullscreen.vert.glsl"
+      },
+      {
+        "status": "??",
+        "file": "svelte.config.js"
       },
       {
         "status": "??",
@@ -248,6 +716,10 @@
       {
         "status": "??",
         "file": "tmp/spectral-qa.html"
+      },
+      {
+        "status": "??",
+        "file": "tmp/verify-video.log"
       }
     ]
   },
@@ -261,13 +733,13 @@
     "camera": {
       "type": "OrthographicCamera",
       "position": [
-        1.4695761589768238e-15,
-        7.347880794884119e-16,
+        0,
+        0,
         -12
       ],
       "target": [
-        0,
-        0,
+        -1.4695761589768238e-15,
+        0.019999999999999307,
         0
       ],
       "zoom": 1
@@ -287,13 +759,13 @@
       "camera": {
         "type": "OrthographicCamera",
         "position": [
-          1.4695761589768238e-15,
-          7.347880794884119e-16,
+          0,
+          0,
           -12
         ],
         "target": [
-          0,
-          0,
+          -1.4695761589768238e-15,
+          0.019999999999999307,
           0
         ],
         "zoom": 1
@@ -310,6 +782,7 @@
       "duration": 7.2,
       "fps": 30,
       "seed": 27,
+      "preview": "realtime-optical",
       "patch": {
         "solidPhase": [
           0,
@@ -317,14 +790,17 @@
           0.18
         ],
         "originPulse": 0.17870715173017626,
-        "spectralSweep": 0.22866534116580886,
-        "dispersionOffset": 0.012576593764119487,
-        "reflectionOffset": 0.14073619239953233,
-        "bloomOffset": 0.04346264765279675,
+        "spectralSweep": 0.2863749126021065,
+        "dispersionOffset": 0.01575062019311586,
+        "reflectionOffset": 0.09055143013528072,
+        "bloomOffset": 0.03043139881931061,
         "lightRig": {
-          "whitePulse": 0.41392997764568334,
-          "spectralIntensity": 0.09603944328963972,
-          "direction": -90
+          "whitePulse": 0.22766148770512587,
+          "spectralIntensity": 0.12027746329288473,
+          "direction": -90,
+          "travel": 2.220446049250313e-16,
+          "emitterLength": 0.72,
+          "emitterWidth": 0.34
         },
         "microRotation": [
           0,
@@ -436,6 +912,7 @@
       "ppi": 300,
       "rasterPng": true,
       "pathTracedStill": true,
+      "pathTracedMp4": true,
       "fixedTimestepSequence": true,
       "transparency": true
     },
@@ -492,8 +969,12 @@
         330
       ],
       "bevelGapCompensation": {
-        "response": 0.55,
-        "maxRatio": 1.3
+        "strategy": "projected-geometry-solver",
+        "projectedInsetBias": 0.012844673265906086,
+        "activationRange": 0.06,
+        "targetBias": 0,
+        "resolvedBias": 0,
+        "residual": 0
       },
       "projectedAxisAngles": [
         30,
@@ -510,21 +991,21 @@
           "transmission": 0.96,
           "roughness": 0.052,
           "thickness": 2.15,
-          "dispersion": 0.057576593764119485
+          "dispersion": 0.06075062019311586
         },
         {
           "ior": 1.51,
           "transmission": 0.96,
           "roughness": 0.052,
           "thickness": 2.15,
-          "dispersion": 0.057576593764119485
+          "dispersion": 0.06075062019311586
         },
         {
           "ior": 1.51,
           "transmission": 0.96,
           "roughness": 0.052,
           "thickness": 2.15,
-          "dispersion": 0.057576593764119485
+          "dispersion": 0.06075062019311586
         }
       ],
       "physicalParameters": {
@@ -726,6 +1207,78 @@
             "transparency": true,
             "print": true
           }
+        },
+        {
+          "id": "light-field",
+          "label": "Light Field",
+          "description": "PLEOS cubes with a loopable iridescent membrane field",
+          "capabilities": {
+            "motion": true,
+            "pathTracing": false,
+            "rasterExport": true,
+            "transparency": true,
+            "print": true
+          }
+        },
+        {
+          "id": "glass-prism",
+          "label": "Glass Prism",
+          "description": "Raw WebGL2 thickness-aware RGB refraction",
+          "capabilities": {
+            "motion": true,
+            "pathTracing": false,
+            "rasterExport": true,
+            "transparency": true,
+            "print": true
+          }
+        },
+        {
+          "id": "kinetic-glass",
+          "label": "Kinetic Glass",
+          "description": "PLEOS three-cube glass attraction with Three.js and Rapier",
+          "capabilities": {
+            "motion": true,
+            "pathTracing": false,
+            "rasterExport": true,
+            "transparency": true,
+            "print": true
+          }
+        },
+        {
+          "id": "axis-trails",
+          "label": "Axis Trails",
+          "description": "Cursor-following luminous trails constrained to the PLEOS 30° axis family",
+          "capabilities": {
+            "motion": true,
+            "pathTracing": false,
+            "rasterExport": true,
+            "transparency": true,
+            "print": true
+          }
+        },
+        {
+          "id": "axis-habitat",
+          "label": "Formation Loop",
+          "description": "PLEOS solids drawn as wire, assembled from instanced fragments, materialized, disassembled and returned in a GSAP-controlled WebGL2 loop",
+          "capabilities": {
+            "motion": true,
+            "pathTracing": false,
+            "rasterExport": true,
+            "transparency": false,
+            "print": true
+          }
+        },
+        {
+          "id": "axis-megastructure",
+          "label": "Axis Megastructure",
+          "description": "An immense recursive computational environment generated outward from one readable PLEOS AXIS",
+          "capabilities": {
+            "motion": true,
+            "pathTracing": false,
+            "rasterExport": true,
+            "transparency": false,
+            "print": true
+          }
         }
       ],
       "lifecycle": {
@@ -734,7 +1287,113 @@
       },
       "sharedState": {
         "artboard": {
-          "id": "square",
+          "id": "custom",
+          "width": 1080,
+          "height": 1920,
+          "fitMode": "contain",
+          "axisAnchor": {
+            "gridX": 0.5,
+            "gridY": 0.5
+          },
+          "scale": 0.82,
+          "background": "#050607",
+          "transparent": false,
+          "safeGuide": false,
+          "previewZoom": 1
+        }
+      },
+      "persistence": {
+        "version": 2,
+        "storageKey": "pleos-27-axis-studio-state-v2",
+        "modeNamespaces": [
+          "glass-3d"
+        ]
+      },
+      "mode": {
+        "ready": true,
+        "project": "PLEOS 27 Axis",
+        "app": {
+          "entryPoint": "src/main.ts",
+          "defaultRoute": "/",
+          "activeApplication": "Glass3DMode / MotionStudioApp",
+          "renderer": "Three.js WebGLRenderer + three-gpu-pathtracer",
+          "previewRenderer": "Three.js raster + EffectComposer + UnrealBloomPass",
+          "projection": "orthographic",
+          "camera": {
+            "type": "OrthographicCamera",
+            "position": [
+              0,
+              0,
+              -12
+            ],
+            "target": [
+              -1.4695761589768238e-15,
+              0.019999999999999307,
+              0
+            ],
+            "zoom": 1
+          },
+          "sceneStructure": "3 closed optical solids meeting at one shared vertex"
+        },
+        "renderer": "Three.js + three-gpu-pathtracer",
+        "motion": {
+          "preset": "spectral-axis-sweep",
+          "enabled": true,
+          "playing": false,
+          "time": 3.6,
+          "frame": 108,
+          "duration": 7.2,
+          "fps": 30,
+          "seed": 27,
+          "preview": "realtime-optical",
+          "patch": {
+            "solidPhase": [
+              0,
+              0.09,
+              0.18
+            ],
+            "originPulse": 0.17870715173017626,
+            "spectralSweep": 0.2863749126021065,
+            "dispersionOffset": 0.01575062019311586,
+            "reflectionOffset": 0.09055143013528072,
+            "bloomOffset": 0.03043139881931061,
+            "lightRig": {
+              "whitePulse": 0.22766148770512587,
+              "spectralIntensity": 0.12027746329288473,
+              "direction": -90,
+              "travel": 2.220446049250313e-16,
+              "emitterLength": 0.72,
+              "emitterWidth": 0.34
+            },
+            "microRotation": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "motionPresets": [
+          {
+            "id": "spectral-axis-sweep",
+            "label": "스펙트럴 축 이동",
+            "duration": 7.2,
+            "constraint": "strict"
+          },
+          {
+            "id": "shared-vertex-pulse",
+            "label": "공유 꼭짓점 맥동",
+            "duration": 5.6,
+            "constraint": "strict"
+          },
+          {
+            "id": "explode-rejoin",
+            "label": "분해 후 결합",
+            "duration": 6.4,
+            "constraint": "anchored"
+          }
+        ],
+        "artboard": {
+          "id": "custom",
           "width": 1080,
           "height": 1080,
           "fitMode": "contain",
@@ -747,7 +1406,348 @@
           "transparent": false,
           "safeGuide": false,
           "previewZoom": 1
-        }
+        },
+        "artboardPresets": [
+          {
+            "id": "square",
+            "label": "정사각형 1:1",
+            "shortLabel": "1:1",
+            "width": 1080,
+            "height": 1080,
+            "scale": 0.82,
+            "gridY": 0.5
+          },
+          {
+            "id": "instagram-portrait",
+            "label": "인스타그램 4:5",
+            "shortLabel": "4:5",
+            "width": 1080,
+            "height": 1350,
+            "scale": 0.8,
+            "gridY": 0.46
+          },
+          {
+            "id": "portrait-3-4",
+            "label": "세로형 3:4",
+            "shortLabel": "3:4",
+            "width": 1080,
+            "height": 1440,
+            "scale": 0.76,
+            "gridY": 0.47
+          },
+          {
+            "id": "landscape-16-9",
+            "label": "가로형 16:9",
+            "shortLabel": "16:9",
+            "width": 1920,
+            "height": 1080,
+            "scale": 0.72,
+            "gridY": 0.5
+          },
+          {
+            "id": "vertical-9-16",
+            "label": "세로형 9:16",
+            "shortLabel": "9:16",
+            "width": 1080,
+            "height": 1920,
+            "scale": 0.68,
+            "gridY": 0.48
+          },
+          {
+            "id": "custom",
+            "label": "사용자 설정",
+            "shortLabel": "직접 입력",
+            "width": 1080,
+            "height": 1080,
+            "scale": 0.82,
+            "gridY": 0.5
+          }
+        ],
+        "renderRegion": {
+          "enabled": false,
+          "x": 220,
+          "y": 300,
+          "width": 640,
+          "height": 480,
+          "unitPpi": 96
+        },
+        "export": {
+          "ppi": 300,
+          "rasterPng": true,
+          "pathTracedStill": true,
+          "pathTracedMp4": true,
+          "fixedTimestepSequence": true,
+          "transparency": true
+        },
+        "pathTracing": {
+          "active": false,
+          "samples": 0,
+          "quality": null,
+          "output": null
+        },
+        "assembly": {
+          "look": "prism",
+          "supportedLooks": [
+            "clear",
+            "prism",
+            "spectral-flow",
+            "soft-spectral",
+            "smoked"
+          ],
+          "renderStrategies": {
+            "clear": "path-traced-still+raster-preview",
+            "prism": "path-traced-still+raster-preview",
+            "spectral-flow": "high-resolution-raster",
+            "soft-spectral": "high-resolution-raster",
+            "smoked": "path-traced-still+raster-preview"
+          },
+          "solids": 3,
+          "gap": 0,
+          "bevelRadius": 0.018,
+          "sharedCorner": [
+            0,
+            0,
+            0
+          ],
+          "cornerPositions": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "screenGapAngles": [
+            90,
+            210,
+            330
+          ],
+          "bevelGapCompensation": {
+            "strategy": "projected-geometry-solver",
+            "projectedInsetBias": 0.012844673265906086,
+            "activationRange": 0.06,
+            "targetBias": 0,
+            "resolvedBias": 0,
+            "residual": 0
+          },
+          "projectedAxisAngles": [
+            30,
+            90,
+            150,
+            210,
+            270,
+            330
+          ],
+          "linePrimitives": 0,
+          "material": [
+            {
+              "ior": 1.51,
+              "transmission": 0.96,
+              "roughness": 0.052,
+              "thickness": 2.15,
+              "dispersion": 0.06075062019311586
+            },
+            {
+              "ior": 1.51,
+              "transmission": 0.96,
+              "roughness": 0.052,
+              "thickness": 2.15,
+              "dispersion": 0.06075062019311586
+            },
+            {
+              "ior": 1.51,
+              "transmission": 0.96,
+              "roughness": 0.052,
+              "thickness": 2.15,
+              "dispersion": 0.06075062019311586
+            }
+          ],
+          "physicalParameters": {
+            "ior": 1.51,
+            "thickness": 2.15,
+            "attenuationDistance": 5.2,
+            "iridescence": 0.035
+          },
+          "spectralFlow": {
+            "preset": "balanced",
+            "flowPosition": 0,
+            "flowDirection": "axis-30",
+            "flowSpeed": 0.68,
+            "flowWidth": 0.6,
+            "flowSoftness": 0.7,
+            "spectrumSpread": 0.78,
+            "spectrumSeparation": 0.32,
+            "saturation": 0.72,
+            "spectralLag": 0.16,
+            "coreIntensity": 2.5,
+            "coreWidth": 0.22,
+            "falloff": 1.9,
+            "edgeAttraction": 1.32,
+            "reflection": 1.3,
+            "darkness": 0.63,
+            "bloom": 0.16
+          },
+          "softSpectral": {
+            "preset": "balanced",
+            "glow": 1.08,
+            "spectrum": 0.76,
+            "edge": 0.58,
+            "darkness": 0.74,
+            "motionDepth": 0.52,
+            "centerRadius": 0.86,
+            "centerSoftness": 0.76,
+            "spectrumSpread": 0.92,
+            "spectrumSeparation": 0.27,
+            "saturation": 0.78,
+            "phaseOffset": 0,
+            "edgeAttraction": 0.72,
+            "edgeSoftness": 0.78,
+            "reflection": 1.32,
+            "roughness": 0.15,
+            "falloff": 1.82,
+            "bloom": 0.13
+          }
+        },
+        "look": {
+          "preset": "prism",
+          "prismStyle": "clean",
+          "roughness": 0.052,
+          "dispersion": 0.045,
+          "physical": {
+            "ior": 1.51,
+            "thickness": 2.15,
+            "attenuationDistance": 5.2,
+            "iridescence": 0.035
+          },
+          "spectralFlow": {
+            "preset": "balanced",
+            "flowPosition": 0,
+            "flowDirection": "axis-30",
+            "flowSpeed": 0.68,
+            "flowWidth": 0.6,
+            "flowSoftness": 0.7,
+            "spectrumSpread": 0.78,
+            "spectrumSeparation": 0.32,
+            "saturation": 0.72,
+            "spectralLag": 0.16,
+            "coreIntensity": 2.5,
+            "coreWidth": 0.22,
+            "falloff": 1.9,
+            "edgeAttraction": 1.32,
+            "reflection": 1.3,
+            "darkness": 0.63,
+            "bloom": 0.16
+          },
+          "softSpectral": {
+            "preset": "balanced",
+            "glow": 1.08,
+            "spectrum": 0.76,
+            "edge": 0.58,
+            "darkness": 0.74,
+            "motionDepth": 0.52,
+            "centerRadius": 0.86,
+            "centerSoftness": 0.76,
+            "spectrumSpread": 0.92,
+            "spectrumSeparation": 0.27,
+            "saturation": 0.78,
+            "phaseOffset": 0,
+            "edgeAttraction": 0.72,
+            "edgeSoftness": 0.78,
+            "reflection": 1.32,
+            "roughness": 0.15,
+            "falloff": 1.82,
+            "bloom": 0.13
+          }
+        },
+        "variations": {
+          "selectedId": "",
+          "modeAware": true,
+          "items": [
+            {
+              "id": "builtin-prism-clean",
+              "label": "01  프리즘 클린",
+              "builtin": true,
+              "modeId": "glass-3d"
+            },
+            {
+              "id": "builtin-prism-rgb-edge",
+              "label": "02  프리즘 RGB 모서리",
+              "builtin": true,
+              "modeId": "glass-3d"
+            },
+            {
+              "id": "builtin-prism-immersive",
+              "label": "03  프리즘 몰입형",
+              "builtin": true,
+              "modeId": "glass-3d"
+            },
+            {
+              "id": "builtin-spectral-dark",
+              "label": "04  스펙트럴 다크",
+              "builtin": true,
+              "modeId": "glass-3d"
+            },
+            {
+              "id": "builtin-spectral-balanced",
+              "label": "05  스펙트럴 균형",
+              "builtin": true,
+              "modeId": "glass-3d"
+            },
+            {
+              "id": "builtin-spectral-active",
+              "label": "06  스펙트럴 강조",
+              "builtin": true,
+              "modeId": "glass-3d"
+            },
+            {
+              "id": "builtin-soft-spectral-subtle",
+              "label": "07  소프트 스펙트럴 절제",
+              "builtin": true,
+              "modeId": "glass-3d"
+            },
+            {
+              "id": "builtin-soft-spectral-balanced",
+              "label": "08  소프트 스펙트럴 균형",
+              "builtin": true,
+              "modeId": "glass-3d"
+            },
+            {
+              "id": "builtin-soft-spectral-active",
+              "label": "09  소프트 스펙트럴 강조",
+              "builtin": true,
+              "modeId": "glass-3d"
+            }
+          ]
+        },
+        "sharedVertexValid": true,
+        "inspector": {
+          "layout": "left-structure / canvas / right-appearance",
+          "left": [
+            "geometry",
+            "camera",
+            "composition"
+          ],
+          "right": [
+            "style",
+            "material",
+            "lighting",
+            "motion",
+            "output"
+          ],
+          "collapsible": true,
+          "contextualAdvanced": true,
+          "consolidatedExport": true
+        },
+        "storageVersion": 2
       }
     }
   },
@@ -761,7 +1761,8 @@
       210,
       270,
       330
-    ]
+    ],
+    "source": "src/axis"
   },
   "artboard": {
     "id": "square",
@@ -815,6 +1816,7 @@
     "duration": 7.2,
     "fps": 30,
     "seed": 27,
+    "preview": "realtime-optical",
     "patch": {
       "solidPhase": [
         0,
@@ -822,14 +1824,17 @@
         0.18
       ],
       "originPulse": 0.17870715173017626,
-      "spectralSweep": 0.22866534116580886,
-      "dispersionOffset": 0.012576593764119487,
-      "reflectionOffset": 0.14073619239953233,
-      "bloomOffset": 0.04346264765279675,
+      "spectralSweep": 0.2863749126021065,
+      "dispersionOffset": 0.01575062019311586,
+      "reflectionOffset": 0.09055143013528072,
+      "bloomOffset": 0.03043139881931061,
       "lightRig": {
-        "whitePulse": 0.41392997764568334,
-        "spectralIntensity": 0.09603944328963972,
-        "direction": -90
+        "whitePulse": 0.22766148770512587,
+        "spectralIntensity": 0.12027746329288473,
+        "direction": -90,
+        "travel": 2.220446049250313e-16,
+        "emitterLength": 0.72,
+        "emitterWidth": 0.34
       },
       "microRotation": [
         0,
@@ -846,7 +1851,8 @@
       "height": 1080,
       "heroTime": 3.6,
       "look": "prism",
-      "motionPreset": "spectral-axis-sweep"
+      "motionPreset": "spectral-axis-sweep",
+      "mode": "glass-3d"
     },
     {
       "id": "4x5",
@@ -855,7 +1861,8 @@
       "height": 1350,
       "heroTime": 3.6,
       "look": "prism",
-      "motionPreset": "spectral-axis-sweep"
+      "motionPreset": "spectral-axis-sweep",
+      "mode": "glass-3d"
     },
     {
       "id": "9x16",
@@ -864,7 +1871,8 @@
       "height": 1920,
       "heroTime": 3.6,
       "look": "prism",
-      "motionPreset": "spectral-axis-sweep"
+      "motionPreset": "spectral-axis-sweep",
+      "mode": "glass-3d"
     }
   ],
   "validation": {
@@ -878,7 +1886,7 @@
       "name": "typecheck",
       "command": "npm run typecheck",
       "status": "pass",
-      "durationMs": 3248,
+      "durationMs": 1659,
       "exitCode": 0,
       "outputTail": "> pleos-27-axis@1.0.0 typecheck\n> tsc -b --pretty false"
     },
@@ -886,7 +1894,7 @@
       "name": "verify",
       "command": "npm run verify",
       "status": "pass",
-      "durationMs": 166909,
+      "durationMs": 133965,
       "exitCode": 0,
       "outputTail": "    \"physical-unit-input\",\n    \"ppi-print-output\"\n  ],\n  \"raster\": [\n    160,\n    120\n  ],\n  \"fastPath\": [\n    160,\n    120\n  ]\n}"
     },
@@ -894,13 +1902,13 @@
       "name": "build",
       "command": "npm run build",
       "status": "pass",
-      "durationMs": 6938,
+      "durationMs": 4237,
       "exitCode": 0,
-      "outputTail": "dist/assets/StudioShell-D6Vt7YV6.js          2.04 kB │ gzip:   0.76 kB\ndist/assets/index-DtxElRAp.js                4.16 kB │ gzip:   1.82 kB\ndist/assets/index-Bgm4ANIy.js               33.37 kB │ gzip:   9.99 kB\ndist/assets/index-BJOUBGGp.js              119.59 kB │ gzip:  33.76 kB\ndist/assets/Glass3DMode-DiRW8T6l.js        884.48 kB │ gzip: 231.06 kB\n✓ built in 2.81s\n\n\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit."
+      "outputTail": "dist/assets/AxisHabitatMode-BRFG-4qY.js          189.32 kB │ gzip:  66.92 kB\ndist/assets/OutputPass-DAyENkIO.js               250.27 kB │ gzip: 102.49 kB\ndist/assets/Glass3DMode-0IdCtaId.js              515.51 kB │ gzip: 138.21 kB\ndist/assets/UnrealBloomPass-7DkBDB5j.js          541.30 kB │ gzip: 135.43 kB\ndist/assets/KineticGlassMode-C7iCD2bg.js       2,257.66 kB │ gzip: 838.38 kB\n✓ built in 2.25s\n\n\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit."
     }
   ],
   "browser": {
-    "url": "http://127.0.0.1:5173/",
+    "url": "http://127.0.0.1:41741/",
     "consoleErrors": []
   }
 }

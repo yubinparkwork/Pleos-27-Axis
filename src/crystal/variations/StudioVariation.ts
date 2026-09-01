@@ -1,7 +1,7 @@
 import type { ArtboardState } from "../../artboard/ArtboardState";
 import type { MotionSettings } from "../../motion/types";
 import type { CrystalLook } from "../CrystalAssembly";
-import { createLightingPreset, sanitizeLightingState, type LightingState } from "../LightingSystem";
+import { createLightingPreset, halveLightingRigDensity, sanitizeLightingState, type LightingState } from "../LightingSystem";
 import { createSpectralFlowState, type SpectralFlowState } from "../materials/SpectralFlowMaterial";
 import { createSoftSpectralState, sanitizeSoftSpectralState, type SoftSpectralState } from "../materials/SoftSpectralMaterial";
 import { PRISM_STYLE_PRESETS, type PhysicalLookParameters, type PrismStyleId } from "../presets/PrismStylePresets";
@@ -13,7 +13,7 @@ export interface VariationCameraState {
 }
 
 export interface StudioVariationSnapshot {
-  setup: { gap: number; bevelRadius: number };
+  setup: { gap: number; bevelRadius: number; lightingRigVersion?: number; cameraPan: { x: number; y: number } };
   look: {
     preset: CrystalLook;
     prismStyle: PrismStyleId;
@@ -54,7 +54,7 @@ function prismSnapshot(style: PrismStyleId, artboard: ArtboardState): StudioVari
   const lighting = createLightingPreset(preset.lightingPreset);
   Object.assign(lighting.globals, preset.lightingGlobals);
   return {
-    setup: { gap: style === "immersive" ? .018 : 0, bevelRadius: style === "clean" ? .026 : .042 },
+    setup: { gap: style === "immersive" ? .018 : 0, bevelRadius: style === "clean" ? .026 : .042, lightingRigVersion: 4, cameraPan: { x: 0, y: 0 } },
     look: { preset: "prism", prismStyle: style, roughness: preset.roughness, dispersion: preset.dispersion, physical: { ...preset.physical }, spectralFlow: createSpectralFlowState("balanced"), softSpectral: createSoftSpectralState("balanced") },
     lighting,
     motion: motion("spectral-axis-sweep", false, "restrained", .42, 6.8),
@@ -74,7 +74,7 @@ function spectralSnapshot(style: "subtle" | "balanced" | "active", artboard: Art
       ? { masterIntensity: .8, environmentIntensity: .24, exposure: .96, bloomIntensity: .06, colorSaturation: .62 }
       : { masterIntensity: .86, environmentIntensity: .2, exposure: .98, bloomIntensity: .08, colorSaturation: .78 });
   return {
-    setup: { gap: 0, bevelRadius: .034 },
+    setup: { gap: 0, bevelRadius: .034, lightingRigVersion: 4, cameraPan: { x: 0, y: 0 } },
     look: { preset: "spectral-flow", prismStyle: "clean", roughness: prism.roughness, dispersion: prism.dispersion, physical: { ...prism.physical }, spectralFlow: spectral, softSpectral: createSoftSpectralState("balanced") },
     lighting,
     motion: motion("spectral-axis-sweep", true, style === "active" ? "balanced" : "restrained", style === "subtle" ? .32 : style === "balanced" ? .5 : .68, 7.2),
@@ -95,7 +95,7 @@ function softSpectralSnapshot(style: "subtle" | "balanced" | "active", artboard:
       ? { masterIntensity: .68, environmentIntensity: .22, exposure: .96, bloomIntensity: .035, colorSaturation: .24 }
       : { masterIntensity: .76, environmentIntensity: .2, exposure: .98, bloomIntensity: .05, colorSaturation: .3 });
   return {
-    setup: { gap: 0, bevelRadius: style === "subtle" ? .072 : style === "balanced" ? .092 : .112 },
+    setup: { gap: 0, bevelRadius: style === "subtle" ? .072 : style === "balanced" ? .092 : .112, lightingRigVersion: 4, cameraPan: { x: 0, y: 0 } },
     look: { preset: "soft-spectral", prismStyle: "clean", roughness: prism.roughness, dispersion: prism.dispersion, physical: { ...prism.physical }, spectralFlow: createSpectralFlowState("balanced"), softSpectral },
     lighting,
     motion: motion("spectral-axis-sweep", true, style === "active" ? "balanced" : "restrained", style === "subtle" ? .28 : style === "balanced" ? .46 : .64, 8),
@@ -154,8 +154,16 @@ export class StudioVariationStore {
 
   sanitizeSnapshot(snapshot: StudioVariationSnapshot): StudioVariationSnapshot {
     const cloned = cloneSnapshot(snapshot);
+    const cameraPan = cloned.setup?.cameraPan;
+    cloned.setup.cameraPan = {
+      x: typeof cameraPan?.x === "number" && Number.isFinite(cameraPan.x) ? Math.max(-3, Math.min(3, cameraPan.x)) : 0,
+      y: typeof cameraPan?.y === "number" && Number.isFinite(cameraPan.y) ? Math.max(-3, Math.min(3, cameraPan.y)) : 0,
+    };
+    const lighting = sanitizeLightingState(snapshot.lighting);
+    const migratedLighting = cloned.setup.lightingRigVersion === 3 ? halveLightingRigDensity(lighting) : lighting;
+    cloned.setup.lightingRigVersion = 4;
     cloned.look.softSpectral = sanitizeSoftSpectralState(cloned.look.softSpectral);
-    return { ...cloned, lighting: sanitizeLightingState(snapshot.lighting) };
+    return { ...cloned, lighting: migratedLighting };
   }
 
   private load(): void {

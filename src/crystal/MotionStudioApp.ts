@@ -1,13 +1,15 @@
 import "./CrystalApp.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { RectAreaLightUniformsLib } from "three/addons/lights/RectAreaLightUniformsLib.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
 import { TexturePass } from "three/addons/postprocessing/TexturePass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
-import { DenoiseMaterial, WebGLPathTracer } from "three-gpu-pathtracer";
+import { DenoiseMaterial, ShapedAreaLight, WebGLPathTracer } from "three-gpu-pathtracer";
+import { BufferTarget, CanvasSource, Mp4OutputFormat, Output, Quality } from "mediabunny";
 import { DEFAULT_ARTBOARD, type ArtboardPresetId, type ArtboardState } from "../artboard/ArtboardState";
 import { CompositionAdapter } from "../artboard/CompositionAdapter";
 import { FormatPresetRegistry } from "../artboard/FormatPresetRegistry";
@@ -19,7 +21,7 @@ import { STRENGTH_VALUES, type MotionPatch, type MotionPresetId, type MotionSett
 import { CrystalAssembly, type CrystalLook } from "./CrystalAssembly";
 import { InspectorPanel, type InspectorTab } from "./InspectorPanel";
 import { LightingPanel } from "./LightingPanel";
-import { createLightingPreset, LightingSystem, migrateLightingRigToMainCamera, sanitizeLightingState, type LightingState } from "./LightingSystem";
+import { createLightingPreset, halveLightingRigDensity, LightingSystem, migrateLightingRigToMainCamera, sanitizeLightingState, type LightingState } from "./LightingSystem";
 import { PrismMotionAdapter } from "./PrismMotionAdapter";
 import { installStudioEnvironment, type PathTracingStudioEnvironment } from "./StudioEnvironment";
 import { bindScrubbableNumbers } from "./InspectorScrub";
@@ -33,7 +35,7 @@ import { transportTemplate } from "./ui/TransportBar";
 
 interface StudioSettingsV2 {
   version: 2;
-  setup: { gap: number; bevelRadius: number; lightingRigVersion: number; viewLocked: boolean };
+  setup: { gap: number; bevelRadius: number; lightingRigVersion: number; viewLocked: boolean; cameraPan: { x: number; y: number } };
   look: { preset: CrystalLook; prismStyle: PrismStyleId; roughness: number; dispersion: number; physical: PhysicalLookParameters; spectralFlow: SpectralFlowState; softSpectral: SoftSpectralState };
   lighting: LightingState;
   motion: MotionSettings;
@@ -67,11 +69,18 @@ interface PathRenderJob {
   reject?: (reason: Error) => void;
 }
 
+interface VideoExportJob {
+  cancelled: boolean;
+  completedFrames: number;
+  totalFrames: number;
+}
+
 export interface MotionStudioModeHeader {
   activeModeId: string;
   modes: Array<{ id: string; label: string }>;
   onModeChange(id: string): void;
   onVariationChange?(modeId: string, variationId: string): void;
+  onStateChange?(): void;
 }
 
 const STORAGE_V2 = "pleos-27-axis-settings-v2";
@@ -79,10 +88,49 @@ const STORAGE_V1 = "pleos-27-axis-settings-v1";
 const FAST_RENDER_SAMPLES = 16;
 const FAST_RENDER_SCALE = 0.5;
 const FAST_RENDER_BOUNCES = 4;
+const MOTION_STRIP_LENGTH_SCALE = [1, .9, 1.08] as const;
+const MOTION_STRIP_WIDTH_SCALE = [1, 1.18, .88] as const;
+const MOTION_STRIP_COLOR_WEIGHT = [1.08, .96, .9] as const;
+const SPECTRAL_SUPPORT_SHARE = .12;
+const SPECTRAL_DOMINANT_SHARE = .76;
+
+function smoothUnit(value: number): number {
+  const clamped = THREE.MathUtils.clamp(value, 0, 1);
+  return clamped * clamped * (3 - 2 * clamped);
+}
+
+function colorDominanceWeights(time: number, duration: number): [number, number, number] {
+  const progress = ((time / Math.max(duration, .001)) % 1 + 1) % 1;
+  if (progress < .24) return [SPECTRAL_DOMINANT_SHARE, SPECTRAL_SUPPORT_SHARE, SPECTRAL_SUPPORT_SHARE];
+  if (progress < .42) {
+    const mix = smoothUnit((progress - .24) / .18);
+    return [
+      THREE.MathUtils.lerp(SPECTRAL_DOMINANT_SHARE, SPECTRAL_SUPPORT_SHARE, mix),
+      THREE.MathUtils.lerp(SPECTRAL_SUPPORT_SHARE, SPECTRAL_DOMINANT_SHARE, mix),
+      SPECTRAL_SUPPORT_SHARE,
+    ];
+  }
+  if (progress < .69) {
+    const mix = smoothUnit((progress - .42) / .27);
+    return [
+      SPECTRAL_SUPPORT_SHARE,
+      THREE.MathUtils.lerp(SPECTRAL_DOMINANT_SHARE, SPECTRAL_SUPPORT_SHARE, mix),
+      THREE.MathUtils.lerp(SPECTRAL_SUPPORT_SHARE, SPECTRAL_DOMINANT_SHARE, mix),
+    ];
+  }
+  if (progress >= .83) return [SPECTRAL_DOMINANT_SHARE, SPECTRAL_SUPPORT_SHARE, SPECTRAL_SUPPORT_SHARE];
+  const mix = smoothUnit((progress - .69) / .14);
+  return [
+    THREE.MathUtils.lerp(SPECTRAL_SUPPORT_SHARE, SPECTRAL_DOMINANT_SHARE, mix),
+    SPECTRAL_SUPPORT_SHARE,
+    THREE.MathUtils.lerp(SPECTRAL_DOMINANT_SHARE, SPECTRAL_SUPPORT_SHARE, mix),
+  ];
+}
+
 const defaultMotion = (): MotionSettings => ({ enabled: false, preset: "spectral-axis-sweep", strengthMode: "balanced", strength: 0.5, duration: 7.2, fps: 30, speed: 1, seed: 27, loop: true, constraint: "strict", parameters: {} });
 const defaults = (): StudioSettingsV2 => ({
   version: 2,
-  setup: { gap: 0, bevelRadius: 0.018, lightingRigVersion: 2, viewLocked: true },
+  setup: { gap: 0, bevelRadius: 0.018, lightingRigVersion: 4, viewLocked: true, cameraPan: { x: 0, y: 0 } },
   look: { preset: "prism", prismStyle: "clean", roughness: PRISM_STYLE_PRESETS.clean.roughness, dispersion: PRISM_STYLE_PRESETS.clean.dispersion, physical: { ...PRISM_STYLE_PRESETS.clean.physical }, spectralFlow: createSpectralFlowState("balanced"), softSpectral: createSoftSpectralState("balanced") },
   lighting: createLightingPreset("pleos-prism"),
   motion: defaultMotion(),
@@ -102,15 +150,20 @@ function loadSettingsV2(): StudioSettingsV2 {
     const v2 = JSON.parse(localStorage.getItem(STORAGE_V2) ?? "null") as Partial<StudioSettingsV2> | null;
     if (v2?.version === 2) {
       let lighting = sanitizeLightingState(v2.lighting);
-      const lightingRigVersion = v2.setup?.lightingRigVersion === 2 ? 2 : 1;
+      const lightingRigVersion = v2.setup?.lightingRigVersion === 4 ? 4 : v2.setup?.lightingRigVersion === 3 ? 3 : v2.setup?.lightingRigVersion === 2 ? 2 : 1;
       if (lightingRigVersion < 2 && v2.lighting) lighting = migrateLightingRigToMainCamera(lighting);
+      if (lightingRigVersion === 3 && v2.lighting) lighting = halveLightingRigDensity(lighting);
       return {
         version: 2,
         setup: {
           gap: finite(v2.setup?.gap, base.setup.gap, 0, 0.45),
           bevelRadius: finite(v2.setup?.bevelRadius, base.setup.bevelRadius, 0, 0.15),
-          lightingRigVersion: 2,
+          lightingRigVersion: 4,
           viewLocked: v2.setup?.viewLocked !== false,
+          cameraPan: {
+            x: finite(v2.setup?.cameraPan?.x, base.setup.cameraPan.x, -3, 3),
+            y: finite(v2.setup?.cameraPan?.y, base.setup.cameraPan.y, -3, 3),
+          },
         },
         look: {
           preset: v2.look?.preset === "clear" || v2.look?.preset === "smoked" || v2.look?.preset === "spectral-flow" || v2.look?.preset === "soft-spectral" ? v2.look.preset : "prism",
@@ -133,7 +186,7 @@ function loadSettingsV2(): StudioSettingsV2 {
         advanced: {
           renderScale: finite(v2.advanced?.renderScale, .75, .4, 1),
           bounces: Math.round(finite(v2.advanced?.bounces, 8, 3, 14)),
-          targetSamples: Math.round(finite(v2.advanced?.targetSamples, 128, 16, 512)),
+          targetSamples: Math.round(finite(v2.advanced?.targetSamples, 128, 16, 2048)),
           renderRegion: sanitizeRenderRegion(v2.advanced?.renderRegion, base.advanced.renderRegion),
         },
         ui: { activeTab: v2.ui?.activeTab ?? "look", inspectorCollapsed: v2.ui?.inspectorCollapsed === true, structureCollapsed: v2.ui?.structureCollapsed === true, advancedOpen: v2.ui?.advancedOpen === true, selectedVariationId: v2.ui?.selectedVariationId ?? "" },
@@ -150,7 +203,7 @@ function loadSettingsV2(): StudioSettingsV2 {
       if (v1.lighting) base.lighting = migrateLightingRigToMainCamera(sanitizeLightingState(v1.lighting));
       base.advanced.renderScale = finite(v1.scale, .75, .4, 1);
       base.advanced.bounces = Math.round(finite(v1.bounces, 8, 3, 14));
-      base.advanced.targetSamples = Math.round(finite(v1.targetSamples, 128, 16, 512));
+      base.advanced.targetSamples = Math.round(finite(v1.targetSamples, 128, 16, 2048));
       const legacyRegion = v1.renderRegion as Partial<RenderRegion> | undefined;
       if (legacyRegion) base.advanced.renderRegion = sanitizeRenderRegion({ ...legacyRegion, enabled: true, unitPpi: finite(v1.unitPpi, 96, 36, 1200) }, base.advanced.renderRegion);
       base.export.ppi = finite(v1.exportPpi, 300, 36, 1200);
@@ -211,12 +264,16 @@ export class MotionStudioApp {
   private readonly artboardShell: HTMLElement;
   private readonly stage: HTMLElement;
   private readonly motionRig = new THREE.Group();
-  private readonly motionLights: THREE.PointLight[] = [];
+  private readonly motionLights: Array<THREE.PointLight | THREE.SpotLight> = [];
+  private readonly pathMotionRig = new THREE.Group();
+  private readonly pathMotionLights: ShapedAreaLight[] = [];
   private readonly resizeObserver: ResizeObserver;
   private raf = 0;
+  private disposed = false;
   private saveTimer = 0;
   private renderingHigh = false;
   private renderJob: PathRenderJob | null = null;
+  private videoExportJob: VideoExportJob | null = null;
   private lastPatch: MotionPatch = {};
   private gestureZoomStart = 1;
 
@@ -224,6 +281,10 @@ export class MotionStudioApp {
     this.root.innerHTML = this.template();
     this.artboardShell = this.require(".artboard-shell");
     this.stage = this.require(".crystal-stage");
+    // The production lighting rigs are dominated by Rect Area Lights. The
+    // path tracer supports them directly, while Three.js' raster preview
+    // requires the LTC lookup tables to be installed explicitly.
+    RectAreaLightUniformsLib.init();
     this.previewRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance", preserveDrawingBuffer: true });
     this.pathRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance", preserveDrawingBuffer: true });
     for (const renderer of [this.previewRenderer, this.pathRenderer]) {
@@ -232,6 +293,10 @@ export class MotionStudioApp {
       renderer.toneMappingExposure = this.settings.lighting.globals.exposure;
       renderer.setClearColor(this.settings.format.background, this.settings.format.transparent ? 0 : 1);
     }
+    // Transmission is evaluated every preview frame. A slightly reduced
+    // buffer keeps motion responsive without changing the final path-traced
+    // render or exported resolution.
+    this.previewRenderer.transmissionResolutionScale = 0.72;
     this.previewRenderer.domElement.className = "preview-canvas";
     this.pathRenderer.domElement.className = "pathtrace-canvas";
     this.stage.append(this.previewRenderer.domElement, this.pathRenderer.domElement);
@@ -242,6 +307,8 @@ export class MotionStudioApp {
     this.controls.enablePan = false;
     this.controls.enabled = !this.settings.setup.viewLocked;
     this.controls.enableZoom = false;
+    this.controls.target.set(0, .02, 0);
+    this.controls.update();
     this.assembly.setSpectralFlowState(this.settings.look.spectralFlow);
     this.assembly.setSoftSpectralState(this.settings.look.softSpectral);
     this.assembly.setLook(this.settings.look.preset);
@@ -302,7 +369,7 @@ export class MotionStudioApp {
     return `<section class="crystal-app motion-studio">
       <header class="topbar"><div class="wordmark"><strong>PLEOS 27 AXIS</strong></div><div class="studio-context"><label><span>모드</span><select data-mode-select>${modeOptions}</select></label><label class="topbar-variation"><span>변형</span><select data-variation>${variationOptions}</select></label><details class="variation-actions topbar-variation-actions"><summary aria-label="변형 작업">•••</summary><div><button data-action="variation-save">현재 설정 저장</button><button data-action="variation-duplicate">복제</button><button data-action="variation-rename">이름 변경</button><button data-action="variation-delete" class="danger">삭제</button></div></details></div><div class="topbar-actions"><div class="render-status" hidden><span data-output="samples">준비됨</span></div><button class="topbar-export" data-action="export-focus">내보내기</button><button class="inspector-icon" data-action="inspector-toggle" aria-label="외형 패널 표시 또는 숨기기">◫</button></div></header>
       <main class="pasteboard"><div class="artboard-meta"><span data-output="format-name">Square 1:1</span><b data-output="artboard-size">${this.settings.format.width} × ${this.settings.format.height}px</b></div><div class="artboard-shell"><div class="crystal-stage" aria-label="Pleos Axis virtual artboard"><div class="safe-guide" data-safe-guide></div><div class="render-region-guide" data-render-region-guide><span data-output="region-size"></span></div></div></div></main>
-      ${studioPanelTemplate({ look: this.settings.look.preset, prismStyle: this.settings.look.prismStyle, physical: this.settings.look.physical, variations: this.variations.list().map(({ id, label, builtin }) => ({ id, label, builtin })), selectedVariationId: this.settings.ui.selectedVariationId, spectralFlow: this.settings.look.spectralFlow, softSpectral: this.settings.look.softSpectral, gap: this.settings.setup.gap, bevelRadius: this.settings.setup.bevelRadius, roughness: this.settings.look.roughness, dispersion: this.settings.look.dispersion, reflection: globals.reflectionStrength, refraction: globals.refractionStrength, exposure: globals.exposure, bloom: globals.bloomIntensity, saturation: globals.colorSaturation, environment: globals.environmentIntensity, motion: this.settings.motion, artboard: this.settings.format, activeTab: this.settings.ui.activeTab, outputSamples: this.settings.advanced.targetSamples, bounces: this.settings.advanced.bounces, renderScale: this.settings.advanced.renderScale, ppi: this.settings.export.ppi, viewLocked: this.settings.setup.viewLocked, renderRegion: region, printOutput: this.printOutputDescription() })}
+      ${studioPanelTemplate({ look: this.settings.look.preset, prismStyle: this.settings.look.prismStyle, physical: this.settings.look.physical, variations: this.variations.list().map(({ id, label, builtin }) => ({ id, label, builtin })), selectedVariationId: this.settings.ui.selectedVariationId, spectralFlow: this.settings.look.spectralFlow, softSpectral: this.settings.look.softSpectral, gap: this.settings.setup.gap, bevelRadius: this.settings.setup.bevelRadius, roughness: this.settings.look.roughness, dispersion: this.settings.look.dispersion, reflection: globals.reflectionStrength, refraction: globals.refractionStrength, exposure: globals.exposure, bloom: globals.bloomIntensity, saturation: globals.colorSaturation, environment: globals.environmentIntensity, motion: this.settings.motion, artboard: this.settings.format, activeTab: this.settings.ui.activeTab, outputSamples: this.settings.advanced.targetSamples, bounces: this.settings.advanced.bounces, renderScale: this.settings.advanced.renderScale, ppi: this.settings.export.ppi, viewLocked: this.settings.setup.viewLocked, cameraPan: this.settings.setup.cameraPan, renderRegion: region, printOutput: this.printOutputDescription() })}
       ${transportTemplate()}
     </section>`;
   }
@@ -310,12 +377,35 @@ export class MotionStudioApp {
   private createMotionLightRig(): void {
     const colors = [0xffffff, 0x4664ff, 0xfa293c, 0x0adc91];
     colors.forEach((color, index) => {
-      const light = new THREE.PointLight(color, 0, 12, 2);
-      light.name = `MotionLight${index}`;
-      this.motionRig.add(light);
-      this.motionLights.push(light);
+      // Preserve the established realtime look. These lights are preview-only
+      // and are explicitly excluded from path-traced renders.
+      const previewLight = index === 0
+        ? new THREE.PointLight(color, 0, 12, 2)
+        : new THREE.SpotLight(color, 0, 12, THREE.MathUtils.degToRad(31), .72, 2);
+      previewLight.name = `MotionPreviewLight${index}`;
+      this.motionRig.add(previewLight);
+      if (previewLight instanceof THREE.SpotLight) {
+        previewLight.target.name = `MotionPreviewLightTarget${index}`;
+        previewLight.target.position.set(0, 0, 0);
+        this.motionRig.add(previewLight.target);
+      }
+      this.motionLights.push(previewLight);
+
+      // Path tracing receives physical strip / softbox emitters. Their finite
+      // area produces linear or planar reflections without a radial hotspot.
+      const pathLight = new ShapedAreaLight(color, 0, index === 0 ? 6.4 : 4.2, index === 0 ? 4.6 : .34);
+      pathLight.name = `MotionPathStrip${index}`;
+      pathLight.visible = false;
+      this.pathMotionRig.add(pathLight);
+      this.pathMotionLights.push(pathLight);
     });
-    this.scene.add(this.motionRig);
+    this.scene.add(this.motionRig, this.pathMotionRig);
+  }
+
+  private setMotionLightRenderMode(mode: "preview" | "path"): void {
+    const previewVisible = mode === "preview";
+    this.motionLights.forEach((light) => { light.visible = previewVisible; });
+    this.pathMotionLights.forEach((light) => { light.visible = !previewVisible; });
   }
 
   private bindUi(): void {
@@ -378,6 +468,8 @@ export class MotionStudioApp {
     this.bindNumber("artboard-scale", (value) => { this.settings.format.scale = value; this.resize(); });
     this.bindNumber("axis-anchor-x", (value) => { this.settings.format.axisAnchor.gridX = value; this.resize(); });
     this.bindNumber("axis-anchor-y", (value) => { this.settings.format.axisAnchor.gridY = value; this.resize(); });
+    this.bindNumber("camera-pan-x", (value) => { this.settings.setup.cameraPan.x = value; this.resize(); });
+    this.bindNumber("camera-pan-y", (value) => { this.settings.setup.cameraPan.y = value; this.resize(); });
     this.bindNumber("preview-zoom", (value) => { this.settings.format.previewZoom = value; this.resize(); });
     this.bindNumber("scale", (value) => { this.settings.advanced.renderScale = value; this.pathTracer.renderScale = value; this.updateRenderUi(); });
     this.bindNumber("bounces", (value) => { this.settings.advanced.bounces = Math.round(value); this.pathTracer.bounces = Math.round(value); });
@@ -591,12 +683,17 @@ export class MotionStudioApp {
     const progressBar = this.root.querySelector<HTMLElement>("[data-output='render-progress-bar']");
     const cancel = this.root.querySelector<HTMLButtonElement>("[data-action='cancel-render']");
     const renderPrimary = this.root.querySelector<HTMLButtonElement>("[data-action='render-export']");
-    const progress = this.renderJob ? Math.min(1, this.pathTracer.samples / this.renderJob.targetSamples) : 0;
-    if (progressText) progressText.textContent = this.renderJob ? `${this.renderJob.quality === "fast" ? "Preview" : "High"} · ${Math.floor(this.pathTracer.samples)} / ${this.renderJob.targetSamples} spp` : "준비됨";
+    const frameProgress = this.renderJob ? Math.min(1, this.pathTracer.samples / this.renderJob.targetSamples) : 0;
+    const progress = this.videoExportJob
+      ? Math.min(1, (this.videoExportJob.completedFrames + frameProgress) / this.videoExportJob.totalFrames)
+      : frameProgress;
+    if (progressText) progressText.textContent = this.videoExportJob
+      ? `영상 렌더링 ${Math.min(this.videoExportJob.completedFrames + 1, this.videoExportJob.totalFrames)} / ${this.videoExportJob.totalFrames} · ${Math.floor(this.pathTracer.samples)} / ${this.settings.advanced.targetSamples} spp`
+      : this.renderJob ? `${this.renderJob.quality === "fast" ? "Preview" : "High"} · ${Math.floor(this.pathTracer.samples)} / ${this.renderJob.targetSamples} spp` : "준비됨";
     if (progressPercent) progressPercent.textContent = `${Math.round(progress * 100)}%`;
     if (progressBar) progressBar.style.width = `${progress * 100}%`;
-    if (cancel) cancel.hidden = !this.renderJob;
-    if (renderPrimary) renderPrimary.disabled = this.renderingHigh;
+    if (cancel) cancel.hidden = !this.renderJob && !this.videoExportJob;
+    if (renderPrimary) renderPrimary.disabled = this.renderingHigh || Boolean(this.videoExportJob);
     for (const selector of ["[data-action='export-raster']", "[data-action='render-current-high']", "[data-action='export-print']", "[data-action='render-export']"]) {
       const button = this.root.querySelector<HTMLButtonElement>(selector); if (button) button.disabled = this.renderingHigh;
     }
@@ -608,7 +705,12 @@ export class MotionStudioApp {
     else if (action === "frame-prev") this.stepFrame(-1);
     else if (action === "frame-next") this.stepFrame(1);
     else if (action === "reset") this.resetCamera();
-    else if (action === "scene-reset") { this.resetCamera(); this.resetMotion(); this.settings.setup.gap = 0; this.settings.setup.bevelRadius = .018; this.assembly.setGap(0); this.assembly.setBevelRadius(.018); this.motionAdapter.captureRestPose(); }
+    else if (action === "camera-pan-center") {
+      this.settings.setup.cameraPan = { x: 0, y: 0 };
+      this.syncNumeric("camera-pan-x", 0); this.syncNumeric("camera-pan-y", 0);
+      this.resize(); this.persist();
+    }
+    else if (action === "scene-reset") { this.settings.setup.cameraPan = { x: 0, y: 0 }; this.resetCamera(); this.resetMotion(); this.settings.setup.gap = 0; this.settings.setup.bevelRadius = .018; this.assembly.setGap(0); this.assembly.setBevelRadius(.018); this.motionAdapter.captureRestPose(); }
     else if (action === "structure-close" || action === "structure-open") { this.settings.ui.structureCollapsed = action === "structure-close"; this.root.classList.toggle("structure-hidden", this.settings.ui.structureCollapsed); this.resize(); this.persist(); }
     else if (action === "variation-save") this.saveCurrentVariation();
     else if (action === "variation-duplicate") this.duplicateVariation();
@@ -621,7 +723,7 @@ export class MotionStudioApp {
     else if (action === "render-current-high") void this.renderCurrentFrame(true).catch((error) => this.showPreview(`고품질 렌더링 실패 · ${error.message}`));
     else if (action === "export-print") void this.renderPrintFrame(true).catch((error) => this.showPreview(`인쇄용 렌더링 실패 · ${error.message}`));
     else if (action === "render-export") void this.runExportWorkflow().catch((error) => this.showPreview(`렌더링 실패 · ${error.message}`));
-    else if (action === "cancel-render") this.cancelPathRender("렌더링 취소됨");
+    else if (action === "cancel-render") this.cancelActiveRender();
     else if (action === "copy-sequence") void navigator.clipboard.writeText(this.sequenceCommand());
   }
 
@@ -631,20 +733,18 @@ export class MotionStudioApp {
     const pathSettings = this.root.querySelector<HTMLElement>("[data-path-settings]");
     const button = this.root.querySelector<HTMLButtonElement>("[data-action='render-export']");
     const motion = this.root.querySelector<HTMLDetailsElement>("[data-context-advanced='export-motion']");
-    if (render) render.disabled = type === "motion";
-    if (pathSettings) pathSettings.hidden = type === "motion" || render?.value === "raster";
-    if (button) button.textContent = type === "motion" ? "시퀀스 명령 복사" : "PNG 내보내기";
-    if (motion) motion.classList.toggle("workflow-relevant", type === "motion");
+    const videoSettings = this.root.querySelector<HTMLElement>("[data-video-settings]");
+    if (render) { if (type === "video") render.value = "path"; render.disabled = type === "video"; }
+    if (pathSettings) pathSettings.hidden = render?.value === "raster";
+    if (videoSettings) videoSettings.hidden = type !== "video";
+    if (button) button.textContent = type === "video" ? "패스트레이싱 MP4 만들기" : "PNG 내보내기";
+    if (motion) motion.classList.toggle("workflow-relevant", type === "video");
   }
 
   private async runExportWorkflow(): Promise<void> {
     const type = this.root.querySelector<HTMLSelectElement>("[data-export-type]")?.value ?? "still";
     const render = this.root.querySelector<HTMLSelectElement>("[data-export-render]")?.value ?? "path";
-    if (type === "motion") {
-      await navigator.clipboard.writeText(this.sequenceCommand());
-      this.showPreview("PNG 시퀀스 명령을 복사했습니다.");
-      return;
-    }
+    if (type === "video") { await this.exportPathTracedVideo(); return; }
     const printScale = this.settings.export.ppi / this.settings.advanced.renderRegion.unitPpi;
     if (render === "raster") { await this.renderRasterFrame(true, printScale, true, "hq"); return; }
     await this.renderPrintFrame(true);
@@ -674,7 +774,7 @@ export class MotionStudioApp {
 
   private captureVariationSnapshot(): StudioVariationSnapshot {
     return {
-      setup: { gap: this.settings.setup.gap, bevelRadius: this.settings.setup.bevelRadius },
+      setup: { gap: this.settings.setup.gap, bevelRadius: this.settings.setup.bevelRadius, lightingRigVersion: 4, cameraPan: { ...this.settings.setup.cameraPan } },
       look: JSON.parse(JSON.stringify(this.settings.look)) as StudioVariationSnapshot["look"],
       lighting: JSON.parse(JSON.stringify(this.lighting.state)) as LightingState,
       motion: JSON.parse(JSON.stringify(this.settings.motion)) as MotionSettings,
@@ -689,7 +789,7 @@ export class MotionStudioApp {
   restoreModeState(value: StudioVariationSnapshot): void {
     const snapshot = this.variations.sanitizeSnapshot(value);
     this.pause();
-    this.settings.setup.gap = snapshot.setup.gap; this.settings.setup.bevelRadius = snapshot.setup.bevelRadius;
+    this.settings.setup.gap = snapshot.setup.gap; this.settings.setup.bevelRadius = snapshot.setup.bevelRadius; this.settings.setup.cameraPan = { ...snapshot.setup.cameraPan };
     this.settings.look = JSON.parse(JSON.stringify(snapshot.look)) as StudioSettingsV2["look"];
     this.settings.motion = JSON.parse(JSON.stringify(snapshot.motion)) as MotionSettings;
     this.settings.format = JSON.parse(JSON.stringify(snapshot.format)) as ArtboardState;
@@ -759,7 +859,7 @@ export class MotionStudioApp {
     this.root.querySelector<HTMLElement>("[data-soft-spectral-controls]")?.toggleAttribute("hidden", this.settings.look.preset !== "soft-spectral");
     this.root.querySelector<HTMLElement>("[data-physical-optics]")?.toggleAttribute("hidden", this.settings.look.preset === "spectral-flow" || this.settings.look.preset === "soft-spectral");
     this.root.querySelector<HTMLElement>("[data-prism-style-panel]")?.toggleAttribute("hidden", this.settings.look.preset !== "prism");
-    [["gap", this.settings.setup.gap], ["bevel-radius", this.settings.setup.bevelRadius], ["roughness", this.settings.look.roughness], ["dispersion", this.settings.look.dispersion], ["ior", this.settings.look.physical.ior], ["thickness", this.settings.look.physical.thickness], ["attenuation-distance", this.settings.look.physical.attenuationDistance], ["iridescence", this.settings.look.physical.iridescence], ["motion-strength", this.settings.motion.strength], ["motion-duration", this.settings.motion.duration], ["motion-fps", this.settings.motion.fps], ["artboard-scale", this.settings.format.scale], ["axis-anchor-x", this.settings.format.axisAnchor.gridX], ["axis-anchor-y", this.settings.format.axisAnchor.gridY]].forEach(([name, value]) => this.syncNumeric(name as string, value as number));
+    [["gap", this.settings.setup.gap], ["bevel-radius", this.settings.setup.bevelRadius], ["roughness", this.settings.look.roughness], ["dispersion", this.settings.look.dispersion], ["ior", this.settings.look.physical.ior], ["thickness", this.settings.look.physical.thickness], ["attenuation-distance", this.settings.look.physical.attenuationDistance], ["iridescence", this.settings.look.physical.iridescence], ["motion-strength", this.settings.motion.strength], ["motion-duration", this.settings.motion.duration], ["motion-fps", this.settings.motion.fps], ["artboard-scale", this.settings.format.scale], ["axis-anchor-x", this.settings.format.axisAnchor.gridX], ["axis-anchor-y", this.settings.format.axisAnchor.gridY], ["camera-pan-x", this.settings.setup.cameraPan.x], ["camera-pan-y", this.settings.setup.cameraPan.y]].forEach(([name, value]) => this.syncNumeric(name as string, value as number));
     const motionPreset = this.root.querySelector<HTMLSelectElement>("[data-motion='preset']"); if (motionPreset) motionPreset.value = this.settings.motion.preset;
     const motionEnabled = this.root.querySelector<HTMLInputElement>("[data-motion='enabled']"); if (motionEnabled) motionEnabled.checked = this.settings.motion.enabled;
     const strength = this.root.querySelector<HTMLSelectElement>("[data-motion='strength-mode']"); if (strength) strength.value = this.settings.motion.strengthMode;
@@ -792,23 +892,72 @@ export class MotionStudioApp {
     this.assembly.setDispersion(this.settings.look.dispersion + (patch.dispersionOffset ?? 0));
     this.assembly.setSpectralFlowRuntime(time, this.settings.motion.duration, this.settings.motion.enabled, patch.spectralSweep ?? 0);
     this.assembly.setSoftSpectralRuntime(time, this.settings.motion.duration, this.settings.motion.enabled, patch.spectralSweep ?? 0);
-    this.applyMotionLights(patch);
+    this.applyMotionLights(patch, time);
     const spectralBloom = this.settings.look.preset === "spectral-flow" ? this.settings.look.spectralFlow.bloom : this.settings.look.preset === "soft-spectral" ? this.settings.look.softSpectral.bloom : 0;
     this.previewBloom.strength = this.settings.lighting.globals.bloomIntensity + spectralBloom + (patch.bloomOffset ?? 0);
     this.showPreview();
     this.updateTransport();
   }
 
-  private applyMotionLights(patch: MotionPatch): void {
+  private applyMotionLights(patch: MotionPatch, time = this.motionClock.time): void {
     const rig = patch.lightRig;
     const radians = THREE.MathUtils.degToRad(rig?.direction ?? 30);
-    const direction = new THREE.Vector3(Math.cos(radians), Math.sin(radians), 1).normalize();
+    const progress = THREE.MathUtils.clamp(((rig?.travel ?? -1) + 1) * .5, 0, 1);
+    const orbit = progress * Math.PI * 2;
+    const stripLength = THREE.MathUtils.lerp(2.4, 6.2, rig?.emitterLength ?? .72);
+    const stripWidth = THREE.MathUtils.lerp(.08, 1.35, rig?.emitterWidth ?? .34);
+    const dominanceWeights = colorDominanceWeights(time, this.settings.motion.duration);
     this.motionLights.forEach((light, index) => {
-      const phase = index === 0 ? 0 : (index - 1) * Math.PI * 2 / 3;
-      light.position.set(Math.cos(radians + phase) * 3.6, Math.sin(radians + phase) * 3.6, 2.5);
-      light.intensity = index === 0 ? (rig?.whitePulse ?? 0) * 45 : (rig?.spectralIntensity ?? 0) * 18;
+      const pathLight = this.pathMotionLights[index];
+      if (index === 0) {
+        // White stays broad and slow: it supports the glass silhouette but no
+        // longer drives the look.
+        light.position.set(
+          -2.9 + Math.cos(orbit * .42) * .55,
+          4.1 + Math.sin(orbit * .42) * .38,
+          -4.2 + Math.sin(orbit * .3) * .28,
+        );
+        light.intensity = (rig?.whitePulse ?? 0) * 260;
+        pathLight.position.copy(light.position);
+        pathLight.width = 6.4;
+        pathLight.height = 4.6;
+        pathLight.lookAt(0, .1, 0);
+        pathLight.rotateZ(orbit * .08);
+        pathLight.intensity = (rig?.whitePulse ?? 0) * 34;
+        return;
+      }
+
+      // Blue, red and green use offset elliptical orbits and independent
+      // depth waves. Their highlights therefore cross different facets,
+      // bevels and the shared vertex instead of reading as a flat RGB wash.
+      const colorIndex = index - 1;
+      const dominance = dominanceWeights[colorIndex];
+      const dominanceRatio = dominance / SPECTRAL_DOMINANT_SHARE;
+      const energyScale = dominance * 3;
+      const phase = colorIndex * Math.PI * 2 / 3;
+      const directionSign = colorIndex === 1 ? -1 : 1;
+      const azimuth = radians + phase + orbit * directionSign;
+      const radius = (3.05 + Math.sin(orbit * 1.7 + phase) * .52) * THREE.MathUtils.lerp(1.06, .9, dominanceRatio);
+      const depth = -2.15 + Math.sin(orbit * 1.35 + phase * 1.4) * 1.32 + THREE.MathUtils.lerp(.65, -.95, dominanceRatio);
+      light.position.set(
+        Math.cos(azimuth) * radius,
+        Math.sin(azimuth) * radius * .82,
+        depth,
+      );
+      const colorWeight = MOTION_STRIP_COLOR_WEIGHT[colorIndex];
+      light.intensity = (rig?.spectralIntensity ?? 0) * 1100 * colorWeight * energyScale;
+
+      // Only the path-traced result uses the finite emitter dimensions. Narrow
+      // widths read as a line; wider values become a soft illuminated plane.
+      pathLight.position.copy(light.position);
+      pathLight.width = stripLength * MOTION_STRIP_LENGTH_SCALE[colorIndex] * THREE.MathUtils.lerp(.86, 1.3, dominanceRatio);
+      pathLight.height = stripWidth * MOTION_STRIP_WIDTH_SCALE[colorIndex] * THREE.MathUtils.lerp(.78, 1.4, dominanceRatio);
+      pathLight.lookAt(0, 0, 0);
+      pathLight.rotateZ(phase * .38 + orbit * (.16 + colorIndex * .035));
+      pathLight.intensity = (rig?.spectralIntensity ?? 0) * 76 * colorWeight * energyScale;
     });
-    this.motionRig.position.copy(direction).multiplyScalar((patch.spectralSweep ?? 0) * 1.2 - .6);
+    this.motionRig.position.set(0, 0, 0);
+    this.pathMotionRig.position.set(0, 0, 0);
   }
 
   private showPreview(message?: string): void {
@@ -818,6 +967,8 @@ export class MotionStudioApp {
     }
     this.renderingHigh = false;
     this.pathTracer.pausePathTracing = true;
+    this.setMotionLightRenderMode("preview");
+    this.lighting.setPathTracingShapeMode(false);
     this.pathRenderer.domElement.classList.remove("visible");
     this.previewRenderer.domElement.classList.add("visible");
     this.previewComposer.render();
@@ -841,7 +992,10 @@ export class MotionStudioApp {
     this.pathRenderer.setPixelRatio(1);
     this.pathRenderer.setSize(preview.width, preview.height, false);
     this.pathComposer.setSize(preview.width, preview.height);
-    this.composition.apply(this.camera, this.settings.format);
+    const cameraPositionBeforeComposition = this.camera.position.clone();
+    this.composition.apply(this.camera, this.settings.format, this.settings.setup.cameraPan);
+    this.controls.target.add(this.camera.position.clone().sub(cameraPositionBeforeComposition));
+    this.controls.update();
     this.pathCamera.copy(this.camera);
     this.pathTracer.updateCamera();
     this.require<HTMLElement>("[data-safe-guide]").classList.toggle("visible", this.settings.format.safeGuide);
@@ -1044,7 +1198,7 @@ export class MotionStudioApp {
     this.root.querySelectorAll<HTMLButtonElement>("[data-soft-spectral-preset]").forEach((button) => button.classList.toggle("active", button.dataset.softSpectralPreset === state.preset));
   }
 
-  private resetCamera(): void { this.camera.position.set(0, 0, -12); this.camera.lookAt(0, .02, 0); this.camera.zoom = 1; this.camera.updateProjectionMatrix(); this.controls.target.set(0, .02, 0); this.controls.update(); this.showPreview(); }
+  private resetCamera(): void { this.camera.position.set(0, 0, -12); this.camera.lookAt(0, .02, 0); this.camera.zoom = 1; this.camera.updateProjectionMatrix(); this.controls.target.set(0, .02, 0); this.controls.update(); this.resize(); }
 
   async exportPng(download = true): Promise<string> {
     return this.renderRasterFrame(download, 1, false, "raster");
@@ -1105,6 +1259,8 @@ export class MotionStudioApp {
     this.pathTracer.filterGlossyFactor = quality === "high" ? .25 : 0;
     this.pathTracer.bounces = bounces; this.pathTracer.transmissiveBounces = bounces + 4;
     this.pathDenoise.enabled = false;
+    this.setMotionLightRenderMode("path");
+    this.lighting.setPathTracingShapeMode(true);
     this.pathTracer.setScene(this.scene, this.pathCamera); this.pathTracer.reset(); this.pathTracer.pausePathTracing = false;
     this.require<HTMLElement>("[data-output='samples']").textContent = `${quality === "fast" ? "빠른" : "고품질"} 렌더링 0 / ${targetSamples} spp · ${output.width} × ${output.height}px`;
     return new Promise<string>((resolve, reject) => {
@@ -1125,10 +1281,86 @@ export class MotionStudioApp {
   private cancelPathRender(message: string): void {
     const job = this.renderJob;
     this.renderJob = null; this.renderingHigh = false; this.pathTracer.pausePathTracing = true;
+    this.setMotionLightRenderMode("preview");
+    this.lighting.setPathTracingShapeMode(false);
     job?.resolve?.("");
     this.pathRenderer.domElement.classList.remove("visible"); this.previewRenderer.domElement.classList.add("visible");
     this.require<HTMLElement>("[data-output='samples']").textContent = message;
     this.updateRenderUi();
+  }
+
+  private cancelActiveRender(): void {
+    if (this.videoExportJob) this.videoExportJob.cancelled = true;
+    if (this.renderJob) this.cancelPathRender("영상 렌더링 취소 중…");
+    else this.updateRenderUi();
+  }
+
+  private async exportPathTracedVideo(): Promise<void> {
+    if (this.videoExportJob || this.renderJob) throw new Error("이미 렌더링이 진행 중입니다.");
+    if (!("VideoEncoder" in window)) throw new Error("이 브라우저는 영상 인코딩을 지원하지 않습니다. 최신 Chrome 또는 Edge에서 실행해 주세요.");
+
+    const fps = Math.max(1, Math.round(this.settings.motion.fps));
+    const duration = Math.max(1 / fps, this.settings.motion.duration);
+    const totalFrames = Math.max(1, Math.round(duration * fps));
+    const outputSize = this.scaledOutput(1);
+    const encodedWidth = outputSize.width + outputSize.width % 2;
+    const encodedHeight = outputSize.height + outputSize.height % 2;
+    const encodingCanvas = document.createElement("canvas");
+    encodingCanvas.width = encodedWidth;
+    encodingCanvas.height = encodedHeight;
+    const context = encodingCanvas.getContext("2d", { alpha: false });
+    if (!context) throw new Error("영상 프레임 캔버스를 만들 수 없습니다.");
+
+    const target = new BufferTarget();
+    const output = new Output({ format: new Mp4OutputFormat({ fastStart: "in-memory" }), target });
+    const source = new CanvasSource(encodingCanvas, {
+      codec: "avc",
+      quality: new Quality("very-high"),
+      keyFrameInterval: 2,
+      latencyMode: "quality",
+      hardwareAcceleration: "prefer-hardware",
+    });
+    output.addVideoTrack(source, { frameRate: fps });
+
+    const originalTime = this.motionClock.time;
+    this.pause();
+    this.videoExportJob = { cancelled: false, completedFrames: 0, totalFrames };
+    this.updateRenderUi();
+    try {
+      await output.start();
+      for (let frame = 0; frame < totalFrames; frame += 1) {
+        if (this.videoExportJob.cancelled) throw new DOMException("사용자가 영상 렌더링을 취소했습니다.", "AbortError");
+        this.seek(frame / fps);
+        const frameData = await this.renderCurrentFrame(false);
+        if (!frameData || this.videoExportJob.cancelled) throw new DOMException("사용자가 영상 렌더링을 취소했습니다.", "AbortError");
+        context.fillStyle = this.settings.format.background;
+        context.fillRect(0, 0, encodedWidth, encodedHeight);
+        context.drawImage(this.pathRenderer.domElement, 0, 0, outputSize.width, outputSize.height);
+        await source.add(frame / fps, 1 / fps);
+        this.videoExportJob.completedFrames = frame + 1;
+        this.updateRenderUi();
+      }
+      await output.finalize();
+      if (!target.buffer) throw new Error("MP4 파일 생성에 실패했습니다.");
+      const url = URL.createObjectURL(new Blob([target.buffer], { type: "video/mp4" }));
+      this.download(url, `pleos-axis-${this.settings.look.preset}-${this.settings.motion.preset}-${duration.toFixed(1)}s-${fps}fps-${encodedWidth}x${encodedHeight}-${this.settings.advanced.targetSamples}spp.mp4`);
+      window.setTimeout(() => URL.revokeObjectURL(url), 30_000);
+      this.showPreview(`MP4 준비 완료 · ${totalFrames}프레임 · ${this.settings.advanced.targetSamples} spp`);
+    } catch (error) {
+      if (output.state !== "finalized" && output.state !== "canceled") await output.cancel().catch(() => undefined);
+      if (!(error instanceof DOMException && error.name === "AbortError")) throw error;
+      this.showPreview("영상 렌더링을 취소했습니다.");
+    } finally {
+      this.videoExportJob = null;
+      this.seek(originalTime);
+      this.setMotionLightRenderMode("preview");
+      this.lighting.setPathTracingShapeMode(false);
+      this.pathRenderer.domElement.classList.remove("visible");
+      this.previewRenderer.domElement.classList.add("visible");
+      this.renderingHigh = false;
+      this.updateRenderUi();
+      this.showPreview();
+    }
   }
 
   private async finishHighRender(): Promise<void> {
@@ -1188,6 +1420,7 @@ export class MotionStudioApp {
   private readonly onVisibility = (): void => { if (document.hidden) this.pause(); };
 
   private readonly render = (timestamp: number): void => {
+    if (this.disposed) return;
     if (this.motionClock.tick(timestamp, this.settings.motion.speed, this.settings.motion.duration, this.settings.motion.fps, this.settings.motion.loop)) this.applyMotionAt(this.motionClock.time);
     this.controls.update();
     if (this.renderingHigh && this.renderJob) {
@@ -1196,7 +1429,7 @@ export class MotionStudioApp {
       if (samples % 4 === 0) { this.require<HTMLElement>("[data-output='samples']").textContent = `${this.renderJob.quality === "fast" ? "빠른" : "고품질"} 렌더링 ${samples} / ${this.renderJob.targetSamples} spp`; this.updateRenderUi(); }
       if (samples >= this.renderJob.targetSamples) void this.finishHighRender();
     } else if (!this.motionClock.playing) this.previewComposer.render();
-    this.raf = requestAnimationFrame(this.render);
+    if (!this.disposed) this.raf = requestAnimationFrame(this.render);
   };
 
   inspect(): object {
@@ -1219,7 +1452,7 @@ export class MotionStudioApp {
       artboard: { ...this.settings.format },
       artboardPresets: FormatPresetRegistry.list(),
       renderRegion: { ...this.settings.advanced.renderRegion },
-      export: { ppi: this.settings.export.ppi, rasterPng: true, pathTracedStill: true, fixedTimestepSequence: true, transparency: true },
+      export: { ppi: this.settings.export.ppi, rasterPng: true, pathTracedStill: true, pathTracedMp4: true, fixedTimestepSequence: true, transparency: true },
       pathTracing: { active: this.renderingHigh, samples: this.pathTracer.samples, quality: this.renderJob?.quality ?? null, output: this.renderJob ? [this.renderJob.width, this.renderJob.height] : null },
       assembly: this.assembly.inspect(),
       look: { ...this.settings.look, physical: { ...this.settings.look.physical }, spectralFlow: { ...this.settings.look.spectralFlow } },
@@ -1229,7 +1462,7 @@ export class MotionStudioApp {
       storageVersion: 2,
     };
   }
-  getMotionState(): object { return { preset: this.settings.motion.preset, enabled: this.settings.motion.enabled, playing: this.motionClock.playing, time: this.motionClock.time, frame: this.motionClock.frame, duration: this.settings.motion.duration, fps: this.settings.motion.fps, seed: this.settings.motion.seed, patch: this.lastPatch }; }
+  getMotionState(): object { return { preset: this.settings.motion.preset, enabled: this.settings.motion.enabled, playing: this.motionClock.playing, time: this.motionClock.time, frame: this.motionClock.frame, duration: this.settings.motion.duration, fps: this.settings.motion.fps, seed: this.settings.motion.seed, preview: "realtime-optical", patch: this.lastPatch }; }
   private persist(): void {
     const panelStatus = this.root.querySelector<HTMLElement>("[data-output='save']");
     const topbarStatus = this.root.querySelector<HTMLElement>("[data-output='topbar-save']");
@@ -1238,10 +1471,11 @@ export class MotionStudioApp {
     window.clearTimeout(this.saveTimer);
     this.saveTimer = window.setTimeout(() => {
       localStorage.setItem(STORAGE_V2, JSON.stringify(this.settings));
+      this.modeHeader.onStateChange?.();
       if (panelStatus) panelStatus.textContent = "저장됨";
       if (topbarStatus) topbarStatus.textContent = "Saved";
     }, 180);
   }
-  dispose(): void { cancelAnimationFrame(this.raf); clearTimeout(this.saveTimer); this.resizeObserver.disconnect(); window.removeEventListener("keydown", this.onKeydown); document.removeEventListener("visibilitychange", this.onVisibility); this.stage.removeEventListener("wheel", this.onCanvasWheel); this.stage.removeEventListener("gesturestart", this.onGestureStart as EventListener); this.stage.removeEventListener("gesturechange", this.onGestureChange as EventListener); this.stage.removeEventListener("gestureend", this.onGestureEnd as EventListener); this.controls.dispose(); this.pathTracer.dispose(); this.previewComposer.dispose(); this.pathComposer.dispose(); this.lighting.dispose(); this.environment.dispose(); this.assembly.dispose(); this.previewRenderer.dispose(); this.pathRenderer.dispose(); }
+  dispose(): void { this.disposed = true; cancelAnimationFrame(this.raf); this.raf = 0; clearTimeout(this.saveTimer); this.resizeObserver.disconnect(); window.removeEventListener("keydown", this.onKeydown); document.removeEventListener("visibilitychange", this.onVisibility); this.stage.removeEventListener("wheel", this.onCanvasWheel); this.stage.removeEventListener("gesturestart", this.onGestureStart as EventListener); this.stage.removeEventListener("gesturechange", this.onGestureChange as EventListener); this.stage.removeEventListener("gestureend", this.onGestureEnd as EventListener); this.controls.dispose(); this.previewComposer.dispose(); this.pathMotionLights.forEach((light) => light.dispose()); this.lighting.dispose(); this.environment.dispose(); this.assembly.dispose(); this.previewRenderer.dispose(); const pathTracer = this.pathTracer; const pathComposer = this.pathComposer; const pathRenderer = this.pathRenderer; window.setTimeout(() => { pathTracer.dispose(); pathComposer.dispose(); pathRenderer.dispose(); }, 350); }
   private require<T extends Element>(selector: string): T { const element = this.root.querySelector<T>(selector); if (!element) throw new Error(`Missing Motion Studio element: ${selector}`); return element; }
 }

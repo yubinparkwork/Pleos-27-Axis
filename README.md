@@ -1,5 +1,7 @@
 # PLEOS 27 Axis — Multi-Mode Creative Studio
 
+Production Modes include `Glass 3D` (Three.js optical solids and supported path-traced stills), `Light Field` (raw WebGL2 continuous spectral field), `Glass Prism` (raw WebGL2 thickness-aware RGB refraction), `Kinetic Glass` (Three.js physical glass with Rapier rigid-body interaction), `Axis Trails` (cursor-following 30° signal lines), and `Formation Loop` (three PLEOS forms rebuilt as a nonuniform HDR light network with Svelte controls, GSAP motion, WebGL shaders, instanced ghost fragments, and BVH interaction). Each preserves the canonical three-part Axis identity and shares the Shell-owned artboard, Variation, motion transport, and export entry point.
+
 하나의 PLEOS Axis Identity를 공유하면서 레퍼런스에 맞는 독립적인 제작 환경을 선택할 수 있는 Mode 기반 제작 도구입니다. 첫 production Mode인 `Glass 3D`는 Three.js와 `three-gpu-pathtracer`를 사용하며, 세 optical solid가 하나의 공유 꼭짓점에서 만나는 30° 구조, 결정론적 모션, virtual artboard와 고품질 렌더를 유지합니다.
 
 ## 실행
@@ -15,13 +17,36 @@ npm run dev
 npm run typecheck
 npm run verify
 npm run verify:motion
+npm run verify:light-field
+npm run verify:glass-prism
+npm run verify:kinetic-glass
+npm run verify:axis-habitat
+npm run verify:axis-habitat-runtime
 npm run build
 npm run qa
 ```
 
 ## Mode Studio
 
-상단의 `Mode`가 렌더링 환경을 결정합니다. 현재 등록된 production Mode는 `Glass 3D` 하나이며 Clear, Prism, Smoked, Spectral Flow, Soft Spectral은 이 Mode의 Style로 관리됩니다. 새 레퍼런스가 기존 Mode에 적합하지 않을 때만 별도의 renderer·Inspector·Export adapter를 가진 Mode를 추가합니다.
+The common top bar is owned by `StudioShell`: Mode, Variation, primary Export, Inspector collapse and motion transport remain stable while renderers switch. `Light Field` owns one WebGL2 canvas, its own Inspector and Iridescent Pulse / Violet Membrane / Spectral White presets; it does not instantiate Three.js or the path tracer. Its world-space membrane field keeps warped spectral bands continuous across rounded cube faces. Mode-specific state is persisted in separate namespaces while the artboard remains shared.
+
+Light Field verification and evidence:
+
+```bash
+npm run verify:light-field
+npm run capture:light-field
+npm run render:light-field -- --preset iridescent-pulse --width 1080 --height 1350
+```
+
+Glass Prism verification and evidence:
+
+```bash
+npm run verify:glass-prism
+npm run capture:glass-prism
+npm run render:glass-prism -- --preset rgb-prism --width 1080 --height 1350
+```
+
+상단의 `Mode`가 렌더링 환경을 결정합니다. 각 Mode는 별도 renderer·Inspector·Export adapter를 소유합니다. Glass Prism은 기존 3개 큐브와 공유 꼭지점을 유지하며 배경을 큐브 실루엣 안에서만 굴절합니다. Kinetic Glass는 같은 3큐브 구조를 Rapier 물리 바디로 만들고, 커서가 밀어낸 큐브를 승인된 30° 축의 원래 위치로 복귀시킵니다. Formation Loop는 정확히 같은 PLEOS 기저와 공유 원점을 유지하되, 총 375개의 셀은 투명한 부피 힌트와 분해 모션에만 사용합니다. 형태의 주역은 큐브 내부의 불규칙한 부분 경계선·직선·대각선·삼각 연결·외곽 확장선을 white-hot core, spectral glow, outer halo의 3겹으로 렌더한 HDR 빛 골격입니다. 선 드로잉·재질 형성·클러스터 분해·관계선·재결합을 반복하며, Motion Inspector에서 전체 길이·배속·조각 순서·이징과 14개 단계 타이밍, 12개 조각 다이내믹스를 조절합니다. Visual Inspector에서는 구조 밀도, 길이·삼각 선 확률, 규칙성, 깊이, 불규칙성, 필라멘트, 플레어, 선택 Bloom, 색수차, 비네트, 그레인을 나눠 조정합니다. HIGH의 multi-mip Bloom과 ULTRA의 추가 sharp/wide pass, SMAA, 정확한 PNG의 4× MSAA를 지원합니다. Svelte, Three.js, WebGL2, GSAP, `three-mesh-bvh`는 각각 Inspector, 렌더, 셰이더, 타임라인, 정적 솔리드 상호작용에 실제로 사용됩니다. 기본 프리셋은 Frosted Formation, Obsidian Signal, Blue Archive입니다. 세부 리서치와 근거 매핑은 [`docs/axis-habitat-research.md`](docs/axis-habitat-research.md)에 기록됩니다.
 
 우측 Inspector는 영구 탭 없이 `Style / Material / Lighting / Motion / Output`의 핵심값만 먼저 보여줍니다. 물리 재질, 개별 조명, Geometry, Camera, render region, PPI 같은 기술 옵션은 같은 패널의 contextual details에서 필요할 때만 엽니다. 자세한 구조는 [`docs/MODE_ARCHITECTURE.md`](docs/MODE_ARCHITECTURE.md)를 참고하세요.
 
@@ -68,9 +93,12 @@ Inspector를 접거나 창 크기를 변경해도 출력 pixel dimension과 artb
 - 고품질 렌더링: Advanced의 sample / render scale / bounce 사용
 - Raster PNG: 현재 time의 artboard를 정확한 pixel dimension으로 출력
 - High Quality PNG: 재생을 멈추고 현재 time을 path tracer에 한 번 동기화한 후 sample을 누적
+- Path-traced MP4: `출력 → 렌더 → 유형: 영상 · MP4`에서 현재 모션의 0초부터 끝까지 모든 프레임을 고정 시간으로 평가하고, 설정한 sample / render scale / bounce로 누적·디노이즈한 뒤 브라우저에서 H.264 MP4로 저장. 진행률과 취소를 지원하며 최신 Chrome/Edge의 WebCodecs를 사용
 - 부분 렌더링: Advanced에서 artboard pixel 기준 X / Y / W / H 설정, 가운데/전체 정렬, `px/mm/cm/in` 입력
 - 인쇄용 PNG: `Output PPI / 단위 변환 기준 PPI` 비율로 부분 영역 pixel을 확장하고 PNG pHYs metadata 기록. 인쇄 출력은 설정된 미리보기 Render Scale과 무관하게 100% 네이티브 해상도, 최소 512 spp, 12 bounces, firefly 억제와 edge-aware denoise로 저장
 - Motion sequence: Playwright 기반 fixed-timestep PNG sequence
+
+브라우저 MP4 내보내기는 실시간 화면 녹화가 아닙니다. 각 프레임의 패스트레이싱이 끝난 다음 인코딩하므로 영상 길이와 FPS는 정확하지만, 512 spp 같은 고품질 설정은 프레임 수에 비례해 오래 걸립니다. 렌더링 중에는 탭을 닫거나 백그라운드 절전 상태로 두지 마세요.
 
 부분 렌더링 입력에서는 `↑ / ↓`로 1px, `Shift + ↑ / ↓`로 10px씩 조절합니다. 예를 들어 단위 기준이 96ppi일 때 `50mm`는 189px로 변환됩니다.
 
@@ -100,6 +128,8 @@ ffmpeg -framerate 30 -i frame-%06d.png -c:v libx264 -pix_fmt yuv420p pleos-axis.
 ```ts
 window.__pleos27Axis.inspect();
 window.__pleos27Axis.switchMode("glass-3d");
+window.__pleos27Axis.switchMode("light-field");
+window.__pleos27Axis.applyVariation("light-field-violet-membrane");
 window.__pleos27Axis.remountMode(); // lifecycle QA
 window.__pleos27Axis.setLook("prism");
 window.__pleos27Axis.setMotionPreset("spectral-axis-sweep");
@@ -115,9 +145,12 @@ await window.__pleos27Axis.renderPreview("fast");
 await window.__pleos27Axis.exportPng(false);
 await window.__pleos27Axis.renderCurrentFrame(false);
 await window.__pleos27Axis.renderPrintFrame(false);
+await window.__pleos27Axis.exportFrame(0, 30); // deterministic active-Mode frame
 ```
 
 ## State migration
+
+The common Studio state is stored under `pleos-27-axis-studio-state-v2`. Shared artboard and Shell UI state are stored once; each production Mode receives an isolated serialized namespace. Light Field user variations are stored under `pleos-27-axis-light-field-variations-v2`.
 
 현재 설정은 `pleos-27-axis-settings-v2`에 저장됩니다. V2가 없을 때 기존 `pleos-27-axis-settings-v1`의 look, roughness, dispersion, gap, lighting, render scale, bounce, sample, 부분 렌더 영역, 단위 기준 PPI, 출력 PPI와 Inspector 접힘 상태를 가져옵니다. 재생 timestamp와 per-frame override는 저장하지 않습니다.
 

@@ -14,6 +14,7 @@ const lightingSource = await readFile(path.join(root, "src/crystal/LightingSyste
 
 assert.ok(packageJson.dependencies.three, "Three.js dependency is required");
 assert.ok(packageJson.dependencies["three-gpu-pathtracer"], "GPU path tracer dependency is required");
+assert.ok(packageJson.dependencies.mediabunny, "Browser-side MP4 muxing dependency is required");
 assert.match(mainSource, /new StudioShell\(root!, registry, "glass-3d"\)/, "Mode Studio shell must own the default entry");
 assert.match(mainSource, /register\(GLASS_3D_MODE\)/, "Glass 3D must be the registered production mode");
 assert.match(shellSource, /definition\.create\(context\)/, "Studio shell must create renderers through the active mode definition");
@@ -24,11 +25,19 @@ assert.match(appSource, /transmissiveBounces = this\.settings\.advanced\.bounces
 assert.match(appSource, /this\.pathTracer\.setScene\(this\.scene, this\.pathCamera\)/, "Current-frame path tracing must synchronize the scene");
 assert.match(appSource, /pleos-27-axis-settings-v2/, "Settings V2 must persist locally");
 assert.match(appSource, /this\.pathTracer\.renderSample\(\)/, "Manual high-quality render must accumulate samples");
+assert.match(appSource, /new CanvasSource\(encodingCanvas/, "Path-traced video must encode deterministic canvas frames");
+assert.match(appSource, /outputSize\.height \+ outputSize\.height % 2/, "H.264 output height must be padded to an even number");
+assert.match(appSource, /await source\.add\(frame \/ fps, 1 \/ fps\)/, "Video frames need fixed timestamps and durations");
+assert.match(appSource, /new Mp4OutputFormat/, "Path-traced video must produce an MP4 container");
+assert.match(appSource, /colorDominanceWeights/, "RGB motion lights must cycle through camera-facing color dominance");
+assert.match(appSource, /SPECTRAL_DOMINANT_SHARE = \.76/, "Dominant RGB light must target roughly 70 percent visual share");
 assert.match(appSource, /new UnrealBloomPass/, "Subtle bloom must be composited into preview and final output");
 assert.match(panelSource, /data-mode-panel="glass-3d"/, "Glass 3D needs one mode-specific inspector panel");
 assert.doesNotMatch(panelSource, /data-inspector-tab/, "The production mode inspector cannot expose permanent technical tabs");
 assert.match(panelSource, /data-context-advanced/, "Technical controls must live in contextual details sections");
 assert.match(panelSource, /data-scrub/, "Inspector numeric inputs must support horizontal scrubbing");
+assert.match(panelSource, /영상 · MP4/, "Export type must expose browser-side MP4 output");
+assert.match(panelSource, /"target-samples", "샘플", 16, 2048, 16/, "Path-traced sample control must support up to 2048 spp");
 assert.match(lightingSource, /PLEOS_BRAND_COLORS/, "Pleos brand palette is required");
 assert.match(lightingSource, /new ShapedAreaLight/, "Rect area lights must be supported");
 assert.match(lightingSource, /new PhysicalSpotLight/, "Physical spot lights must be supported");
@@ -95,6 +104,9 @@ try {
   );
   assert.ok(Math.abs(pairDistances[0] - pairDistances[1]) < 1e-6, "Upper diagonal gaps must remain mirror-symmetric");
   assert.ok(pairDistances[2] > pairDistances[0], "Bevel compensation must widen the visually compressed lower gap");
+  assert.equal(beveledSpacing.bevelGapCompensation.strategy, "projected-geometry-solver");
+  assert.ok(beveledSpacing.bevelGapCompensation.projectedInsetBias > 0, "Rounded geometry must report its projected lower-pair inset");
+  assert.ok(beveledSpacing.bevelGapCompensation.residual < 1e-5, "Projected gap solver must equalize the three visible seams");
   assembly.setGap(0);
   assert.deepEqual(assembly.inspect().cornerPositions, [[0, 0, 0], [0, 0, 0], [0, 0, 0]], "Gap 0 must preserve the exact shared corner at every bevel radius");
   assembly.dispose();

@@ -464,6 +464,51 @@ button, input { font: inherit; }
   .hint { display: none; }
 }
 
+/* Shared production Mode shell + Light Field --------------------------- */
+.studio-shell { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--workspace); }
+.studio-shell-topbar { z-index: 30 !important; }
+.studio-shell-status { max-width: 260px; overflow: hidden; color: var(--text-dim); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.studio-save-status { min-width: 76px; color: var(--text-dim); font-size: 9px; text-align: right; white-space: nowrap; }
+.studio-save-status[data-state="saved"] { color: var(--text-secondary); }
+.studio-save-status[data-state="error"] { color: #ffffff; }
+.motion-studio .topbar-actions .topbar-state-save[data-state="saved"] { border-color: var(--border-hover); color: var(--text); background: var(--control-hover); }
+.studio-mode-host { position: absolute; inset: 0; overflow: hidden; }
+.studio-mode-host > .motion-studio { position: absolute; inset: 0; width: 100%; height: 100%; }
+.studio-mode-host > .motion-studio > .topbar { display: none; }
+.studio-shell [data-shell-mode] { width: 118px; }
+.studio-shell [data-shell-variation] { width: min(220px, 25vw); }
+@media (max-width: 860px) { .studio-save-status { display: none; } }
+
+.light-field-app { --left-panel-space: 0px; --right-panel-space: 360px; background: var(--workspace); }
+.light-field-app .pasteboard { left: 0; }
+.light-field-app .light-field-stage { position: absolute; inset: 0; }
+.light-field-app .light-field-canvas { width: 100%; height: 100%; display: block; }
+.axis-trails-app .axis-trails-stage { position: absolute; inset: 0; overflow: hidden; }
+.axis-trails-app .axis-trails-canvas { width: 100%; height: 100%; display: block; cursor: crosshair; touch-action: none; }
+.axis-trails-hint { position: absolute; left: 22px; bottom: 18px; margin: 0; color: rgba(255,255,255,.32); font-size: 8px; letter-spacing: .14em; pointer-events: none; }
+.light-field-app .control-dock { top: 44px; bottom: 0; width: var(--right-panel-space); overflow-y: auto; }
+.light-field-app .inspector-views { padding: 0 14px 28px; }
+.light-field-app .studio-section { padding: 16px 0; }
+.light-field-app .studio-section > header { margin-bottom: 10px; }
+.light-field-app .studio-section h2 { font-size: 11px; letter-spacing: .035em; }
+.light-field-app .studio-section header p { margin-top: 4px; font-size: 10px; }
+.light-field-app .property-row { min-height: 31px; grid-template-columns: 82px minmax(70px,1fr) 62px; gap: 7px; }
+.light-field-app .property-row label { font-size: 10px; }
+.light-field-app .field-details { margin: 0; }
+.light-field-app .field-details > summary { min-height: 34px; display: flex; align-items: center; color: var(--text-secondary); cursor: pointer; font-size: 10px; }
+.light-field-app .field-details[open] > summary { color: var(--text); }
+.light-field-app .field-details > div { padding-bottom: 8px; }
+.light-field-app .motion-transport { left: 0; grid-template-columns: auto 110px 1fr auto; }
+.light-field-app .field-error { position: absolute; z-index: 40; left: 14px; bottom: 54px; max-width: 520px; padding: 9px 11px; border: 1px solid rgba(255,255,255,.22); border-radius: var(--radius-sm); color: #f0f0f0; background: rgba(15,16,18,.95); font-size: 10px; line-height: 1.45; }
+.light-field-app .field-error[hidden] { display: none; }
+.light-field-app .wide-button.primary { color: #111315; border-color: #f4f4f5; background: #e7e8ea; }
+.light-field-app .wide-button.primary:hover { background: #fff; }
+
+@media (max-width: 900px) {
+  .light-field-app { --right-panel-space: min(330px, 46vw); }
+  .studio-shell [data-shell-variation] { width: 150px; }
+}
+
 /* Professional inspector shell */
 .control-dock { padding: 0; overflow: hidden; background: #101114; box-shadow: -14px 0 48px rgba(0,0,0,.3); }
 .inspector-header { height: 54px; padding: 0 13px 0 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,.075); }
@@ -803,6 +848,8 @@ input[type="range"]:focus::-webkit-slider-thumb, input[type="range"]:active::-we
 .motion-studio .render-primary:hover { background: #ffffff; }
 .motion-studio .render-primary:disabled { opacity: .45; cursor: default; }
 .motion-studio .render-cancel { width: 100%; height: 28px; margin-top: 5px; border: 0; color: var(--panel-secondary); background: transparent; cursor: pointer; font-size: 10px; }
+.motion-studio .video-export-settings { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.08); }
+.motion-studio .export-help { margin: 7px 0 0; color: rgba(255,255,255,.5); font-size: 10px; line-height: 1.45; }
 .motion-studio .render-progress { margin-top: 10px; }
 .motion-studio .render-progress > div { display: flex; justify-content: space-between; color: var(--panel-muted); font-size: 10px; }
 .motion-studio .render-progress b { color: var(--panel-secondary); font-weight: 500; }
@@ -1082,3 +1129,36 @@ input[type="range"]:focus::-webkit-slider-thumb, input[type="range"]:active::-we
   .motion-studio [data-mode-select] { width: 100px; }
   .motion-studio .panel-nav { grid-template-columns: repeat(4,minmax(44px,1fr)); }
 }
+
+/* Final Mode-shell overrides live after the creative-tool design system. */
+.studio-shell.motion-studio { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--workspace); }
+.studio-shell.motion-studio > .studio-shell-topbar { z-index: 30; }
+.studio-shell.motion-studio > .studio-mode-host { position: absolute; inset: 0; overflow: hidden; }
+.studio-shell.motion-studio > .studio-mode-host > .motion-studio { position: absolute; inset: 0; width: 100%; height: 100%; }
+.studio-shell.motion-studio > .studio-mode-host > .motion-studio > .topbar { display: none; }
+.studio-shell.motion-studio > .studio-mode-host > .motion-studio > .motion-transport { display: none; }
+.studio-shell.motion-studio > .studio-shell-transport { z-index: 24; }
+.studio-shell.motion-studio.studio-inspector-collapsed { --right-panel-space: 46px; }
+.studio-shell.motion-studio.studio-inspector-collapsed .studio-mode-host > .motion-studio { --right-panel-space: 46px; }
+.studio-shell.motion-studio.studio-inspector-collapsed .studio-mode-host .control-dock { width: 46px; overflow: hidden; }
+.studio-shell.motion-studio.studio-inspector-collapsed .studio-mode-host .control-dock > * { visibility: hidden; }
+.motion-studio.light-field-app { --left-panel-space: 0px; --right-panel-space: 360px; }
+.motion-studio.light-field-app .pasteboard { left: 0; }
+.motion-studio.light-field-app .control-dock { top: 44px; bottom: 0; width: var(--right-panel-space); overflow-y: auto; }
+.motion-studio.light-field-app .inspector-views { height: auto; padding: 0 14px 28px; overflow: visible; }
+.motion-studio.light-field-app .studio-section { margin: 0; padding: 16px 0; border-width: 0 0 1px; border-radius: 0; background: transparent; }
+.motion-studio.light-field-app .property-row { min-height: 42px; grid-template-columns: minmax(0,1fr) 68px; grid-template-areas: "label value" "slider slider"; gap: 4px 8px; }
+.motion-studio.light-field-app .light-field-stage { position: absolute; inset: 0; }
+.motion-studio.light-field-app .light-field-canvas { width: 100%; height: 100%; display: block; }
+.motion-studio.light-field-app .field-details { margin: 0; padding: 0; border: 0; border-bottom: 1px solid var(--border); border-radius: 0; background: transparent; }
+.motion-studio.light-field-app .field-details > summary { min-height: 42px; display: flex; align-items: center; color: var(--text-secondary); cursor: pointer; font-size: 10px; }
+.motion-studio.light-field-app .field-details > div { padding: 0 0 12px; }
+.motion-studio.light-field-app .motion-transport { left: 0; grid-template-columns: auto 110px 1fr auto; }
+.motion-studio.light-field-app .field-error { position: absolute; z-index: 40; left: 14px; bottom: 54px; max-width: 520px; padding: 9px 11px; border: 1px solid rgba(255,255,255,.22); border-radius: var(--radius-sm); color: #f0f0f0; background: rgba(15,16,18,.95); font-size: 10px; line-height: 1.45; }
+.motion-studio.light-field-app .field-error[hidden] { display: none; }
+@media (max-width: 900px) { .motion-studio.light-field-app { --right-panel-space: min(330px,46vw); } }
+.glass-prism-panel .text-control { display: grid; gap: 7px; margin: 9px 0 12px; color: var(--text-muted,#8f9198); font-size: 11px; }
+.glass-prism-panel textarea { width: 100%; min-height: 54px; resize: vertical; box-sizing: border-box; border: 1px solid rgba(255,255,255,.11); border-radius: 4px; padding: 8px 9px; background: #17181d; color: #f2f2f3; font: inherit; line-height: 1.35; }
+.glass-prism-panel textarea:focus-visible { outline: 1px solid #f2f2f3; outline-offset: 1px; border-color: rgba(255,255,255,.42); }
+.glass-prism-canvas { cursor: grab; touch-action: none; }
+.glass-prism-canvas:active { cursor: grabbing; }

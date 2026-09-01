@@ -1,0 +1,44 @@
+.axis-habitat-app .axis-habitat-stage { position: absolute; inset: 0; overflow: hidden; background: #0b0c0f; }
+.axis-habitat-app .axis-habitat-canvas { width: 100%; height: 100%; display: block; cursor: crosshair; touch-action: none; }
+.axis-habitat-app .axis-habitat-canvas:focus-visible { outline: 2px solid #4664ff; outline-offset: -3px; }
+.axis-habitat-artboard { overflow: hidden; background: #000; }
+.axis-habitat-overlay { position: absolute; z-index: 3; top: 18px; right: 20px; left: 20px; display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; color: rgba(255,255,255,.72); font-size: 8px; letter-spacing: .12em; line-height: 1.45; pointer-events: none; text-shadow: 0 1px 12px rgba(0,0,0,.65); }
+.axis-habitat-overlay > div { display: grid; gap: 2px; }
+.axis-habitat-overlay strong { color: rgba(255,255,255,.9); font-size: 9px; font-weight: 650; }
+.axis-habitat-overlay span, .axis-habitat-overlay small { color: rgba(255,255,255,.48); font-size: 7px; font-weight: 500; }
+.axis-habitat-overlay small { text-align: right; font-variant-numeric: tabular-nums; }
+.axis-habitat-hint { position: absolute; z-index: 3; left: 20px; bottom: 17px; margin: 0; color: rgba(255,255,255,.38); font-size: 7px; letter-spacing: .13em; pointer-events: none; }
+.axis-habitat-panel .inspector-header { position: sticky; z-index: 2; top: 0; background: rgba(16,17,20,.96); backdrop-filter: blur(12px); }
+.axis-habitat-panel .inspector-header small { max-width: 174px; overflow: hidden; text-align: right; text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.axis-habitat-panel .formation-tabs { height: 36px; padding: 4px 8px; display: grid; grid-template-columns: repeat(3,1fr); gap: 3px; border-bottom: 1px solid rgba(255,255,255,.085); background: #0d0f11; }
+.axis-habitat-panel .formation-tabs button { min-width: 0; min-height: 28px; border: 0; border-radius: 4px; color: #747981; background: transparent; cursor: pointer; font-size: 10px; }
+.axis-habitat-panel .formation-tabs button:hover { color: #d7d9dd; background: rgba(255,255,255,.045); }
+.axis-habitat-panel .formation-tabs button.active { color: #f4f4f5; background: #202329; box-shadow: inset 0 -1px 0 #e7e8ea; }
+.axis-habitat-panel .formation-views { height: calc(100% - 86px); padding: 0 12px 28px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.14) transparent; }
+.axis-habitat-panel .wide-button:disabled { opacity: .45; cursor: wait; }
+.axis-habitat-panel .formation-status { padding-top: 14px; }
+.axis-habitat-panel .formation-readout { display: flex; min-height: 28px; align-items: center; justify-content: space-between; gap: 10px; margin: 8px 0 12px; border-top: 1px solid rgba(255,255,255,.08); border-bottom: 1px solid rgba(255,255,255,.08); color: rgba(255,255,255,.72); font-size: 9px; letter-spacing: .08em; }
+.axis-habitat-panel .formation-readout span { display: flex; align-items: center; gap: 7px; }
+.axis-habitat-panel .formation-readout i { width: 5px; height: 5px; border-radius: 50%; background: #4664ff; box-shadow: 0 0 10px rgba(70,100,255,.8); }
+.axis-habitat-panel .formation-readout b { color: rgba(255,255,255,.4); font-size: 8px; font-weight: 550; font-variant-numeric: tabular-nums; }
+.axis-habitat-panel .formation-stage-map { height: 24px; margin: -4px 0 10px; display: grid; grid-template-columns: repeat(5,1fr); gap: 2px; }
+.axis-habitat-panel .formation-stage-map span { display: grid; place-items: center; border-radius: 3px; color: rgba(255,255,255,.42); background: rgba(255,255,255,.035); font-size: 7px; letter-spacing: .06em; }
+.axis-habitat-panel .formation-motion-group { border-bottom: 1px solid rgba(255,255,255,.085); }
+.axis-habitat-panel .formation-motion-group > summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; }
+.axis-habitat-panel .formation-motion-group > summary > span { display: grid; gap: 2px; }
+.axis-habitat-panel .formation-motion-group > summary strong { color: #d7d9dd; font-size: 11px; font-weight: 600; }
+.axis-habitat-panel .formation-motion-group > summary small { color: #747981; font-size: 9px; }
+.axis-habitat-panel .formation-motion-group > div { padding-bottom: 12px; }
+.axis-habitat-panel .formation-property { grid-template-columns: minmax(76px, 1fr) minmax(72px, 1.25fr) 58px; }
+.axis-habitat-panel .formation-property input[type="number"] { min-width: 0; }
+.axis-habitat-panel .formation-error { margin: 8px 0 0; color: #ff9a9f; font-size: 10px; line-height: 1.4; }
+.axis-habitat-panel button:focus-visible,
+.axis-habitat-panel input:focus-visible,
+.axis-habitat-panel select:focus-visible,
+.axis-habitat-panel summary:focus-visible { outline: 2px solid #4664ff; outline-offset: 1px; }
+.axis-habitat-panel button:active { transform: translateY(1px); }
+@media (max-width: 760px) {
+  .axis-habitat-overlay { top: 12px; right: 13px; left: 13px; }
+  .axis-habitat-overlay span, .axis-habitat-overlay small { display: none; }
+  .axis-habitat-hint { display: none; }
+}
