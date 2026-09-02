@@ -148,6 +148,7 @@ function transformOpticalCube(definition: BasisDefinition, span: number, bevelRa
   geometry = mergeVertices(geometry, 1e-5);
 
   const position = geometry.getAttribute("position") as THREE.BufferAttribute;
+  const axisLocal = new Float32Array(position.count * 3);
   const nearest = new THREE.Vector3();
   let nearestDistance = Infinity;
   for (let index = 0; index < position.count; index += 1) {
@@ -184,7 +185,13 @@ function transformOpticalCube(definition: BasisDefinition, span: number, bevelRa
   const local = new THREE.Vector3();
   const world = new THREE.Vector3();
   for (let index = 0; index < position.count; index += 1) {
-    local.set(position.getX(index) - nearest.x, position.getY(index) - nearest.y, position.getZ(index) - nearest.z);
+    const originalX = position.getX(index);
+    const originalY = position.getY(index);
+    const originalZ = position.getZ(index);
+    axisLocal[index * 3] = originalX * 2 - 1;
+    axisLocal[index * 3 + 1] = originalY * 2 - 1;
+    axisLocal[index * 3 + 2] = originalZ * 2 - 1;
+    local.set(originalX - nearest.x, originalY - nearest.y, originalZ - nearest.z);
     world.set(0, 0, 0)
       .addScaledVector(basis[0], local.x)
       .addScaledVector(basis[1], local.y)
@@ -193,6 +200,7 @@ function transformOpticalCube(definition: BasisDefinition, span: number, bevelRa
   }
 
   position.needsUpdate = true;
+  geometry.setAttribute("axisLocal", new THREE.BufferAttribute(axisLocal, 3));
   geometry.computeVertexNormals();
   geometry.computeBoundingBox();
   geometry.computeBoundingSphere();

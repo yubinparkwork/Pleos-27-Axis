@@ -2,12 +2,20 @@ import { ModeRegistry } from "./ModeRegistry";
 import type { StudioModeContext, StudioModeInstance, StudioVariationSummary } from "./ModeTypes";
 import { createStudioState, type StudioState } from "./StudioState";
 
-const STORAGE_KEY = "pleos-27-axis-studio-state-v2";
+const STORAGE_KEY = "pleos-27-axis-studio-state-v3";
+const LEGACY_STORAGE_KEY = "pleos-27-axis-studio-state-v2";
 const MANUAL_STORAGE_KEY = "pleos-27-axis-manual-save-v1";
+const FILE_STATE_ENDPOINT = "/__pleos/studio-state";
 
 interface ManualStudioSave {
   version: 1;
   savedAt: string;
+  state: StudioState;
+}
+
+interface PersistedStudioState {
+  version: 1;
+  updatedAt: string;
   state: StudioState;
 }
 
@@ -23,23 +31,27 @@ function parseState(value: unknown, registry: ModeRegistry): StudioState | null 
   };
 }
 
-function loadState(initialModeId: string, registry: ModeRegistry): StudioState {
+function loadState(initialModeId: string, registry: ModeRegistry): { state: StudioState; updatedAt: string } {
   const fallback = createStudioState(initialModeId);
   try {
-    const automatic = parseState(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "null"), registry);
-    if (automatic) return automatic;
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "null") as Partial<PersistedStudioState> | null;
+    const current = parseState(stored?.state, registry);
+    if (current) return { state: current, updatedAt: typeof stored?.updatedAt === "string" ? stored.updatedAt : new Date(0).toISOString() };
+    const automatic = parseState(JSON.parse(localStorage.getItem(LEGACY_STORAGE_KEY) ?? "null"), registry);
+    if (automatic) return { state: automatic, updatedAt: new Date(0).toISOString() };
     const manual = JSON.parse(localStorage.getItem(MANUAL_STORAGE_KEY) ?? "null") as Partial<ManualStudioSave> | null;
-    return parseState(manual?.state, registry) ?? fallback;
+    return { state: parseState(manual?.state, registry) ?? fallback, updatedAt: typeof manual?.savedAt === "string" ? manual.savedAt : new Date(0).toISOString() };
   } catch {
     try {
       const manual = JSON.parse(localStorage.getItem(MANUAL_STORAGE_KEY) ?? "null") as Partial<ManualStudioSave> | null;
-      return parseState(manual?.state, registry) ?? fallback;
-    } catch { return fallback; }
+      return { state: parseState(manual?.state, registry) ?? fallback, updatedAt: typeof manual?.savedAt === "string" ? manual.savedAt : new Date(0).toISOString() };
+    } catch { return { state: fallback, updatedAt: new Date(0).toISOString() }; }
   }
 }
 
 export class StudioShell {
-  private readonly state: StudioState;
+  private state: StudioState;
+  private updatedAt: string;
   private active: StudioModeInstance | null = null;
   private modeHost: HTMLElement | null = null;
   private status: HTMLElement | null = null;
@@ -48,9 +60,13 @@ export class StudioShell {
   private persistTimer = 0;
   private saveFeedbackTimer = 0;
   private transportTimer = 0;
+  private readonly filePersistenceEnabled = location.port === "5173" && (location.hostname === "127.0.0.1" || location.hostname === "localhost");
+  private fileHydrationPending = this.filePersistenceEnabled;
 
   constructor(private readonly root: HTMLElement, private readonly registry: ModeRegistry, initialModeId = "glass-3d") {
-    this.state = loadState(initialModeId, registry);
+    const loaded = loadState(initialModeId, registry);
+    this.state = loaded.state;
+    this.updatedAt = loaded.updatedAt;
   }
 
   mount(): void {
@@ -64,6 +80,7 @@ export class StudioShell {
     this.activate(this.state.activeModeId);
     this.showSaveStatus("자동 저장됨");
     this.transportTimer = window.setInterval(() => this.refreshTransport(), 100);
+    if (this.filePersistenceEnabled) void this.hydrateFileState();
   }
 
   switchMode(id: string): void { if (this.active?.id !== id) this.activate(id); }
@@ -121,7 +138,7 @@ export class StudioShell {
       registeredModes: this.registry.list().map(({ id, label, description, capabilities }) => ({ id, label, description, capabilities })),
       lifecycle: { mounted: Boolean(this.active), canvasCount: this.modeHost?.querySelectorAll("canvas").length ?? 0 },
       sharedState: { artboard: this.state.shared.artboard ?? null },
-      persistence: { version: this.state.version, storageKey: STORAGE_KEY, modeNamespaces: Object.keys(this.state.modeStates) },
+      persistence: { version: this.state.version, storageKey: STORAGE_KEY, fileBacked: this.filePersistenceEnabled, updatedAt: this.updatedAt, modeNamespaces: Object.keys(this.state.modeStates) },
       mode: this.active?.inspect?.() ?? null,
     };
   }
@@ -136,11 +153,11 @@ export class StudioShell {
     this.root.replaceChildren();
   }
 
-  private activate(id: string, force = false): void {
+  private activate(id: string, force = false, capturePrevious = true): void {
     if (!force && this.active?.id === id) return;
     const definition = this.registry.get(id);
     if (this.active) {
-      this.captureActiveState();
+      if (capturePrevious) this.captureActiveState();
       this.active.unmount();
       this.active.dispose();
       this.active = null;
@@ -188,7 +205,7 @@ export class StudioShell {
     return `<section class="studio-shell motion-studio">
       <header class="topbar studio-shell-topbar">
         <div class="wordmark"><strong>PLEOS 27 AXIS</strong></div>
-        <div class="studio-context"><label><span>모드</span><select data-shell-mode aria-label="스튜디오 모드"></select></label><label><span>변형</span><select data-shell-variation aria-label="현재 모드 변형"></select></label></div>
+        <div class="studio-context"><label><span>모드</span><select data-shell-mode aria-label="스튜디오 모드"></select></label><label data-shell-variation-field><span>변형</span><select data-shell-variation aria-label="현재 모드 변형"></select></label></div>
         <div class="topbar-actions"><span class="studio-save-status" data-shell-save-status role="status" aria-live="polite"></span><button class="topbar-state-save" data-shell-save aria-label="현재 패널 설정 저장">설정 저장</button><button class="topbar-export" data-shell-export>내보내기</button><button class="inspector-icon" data-shell-inspector aria-label="Inspector 표시 또는 숨기기">◫</button><span class="studio-shell-status" data-studio-status role="status" aria-live="polite"></span></div>
       </header>
       <div class="studio-mode-host" data-studio-mode-host></div>
@@ -220,10 +237,12 @@ export class StudioShell {
     const mode = this.root.querySelector<HTMLSelectElement>("[data-shell-mode]");
     if (mode) mode.innerHTML = this.registry.list().map(({ id, label }) => `<option value="${id}" ${id === this.state.activeModeId ? "selected" : ""}>${label}</option>`).join("");
     const variation = this.root.querySelector<HTMLSelectElement>("[data-shell-variation]");
+    const variationField = this.root.querySelector<HTMLElement>("[data-shell-variation-field]");
     if (variation) {
       const items = this.listVariations();
       variation.innerHTML = `<option value="">현재 설정</option>${items.map((item) => `<option value="${item.id}">${item.label}</option>`).join("")}`;
       variation.disabled = items.length === 0;
+      if (variationField) variationField.hidden = items.length === 0;
     }
     const capabilities = this.registry.get(this.state.activeModeId).capabilities;
     const transport = this.root.querySelector<HTMLElement>("[data-shell-transport]");
@@ -243,13 +262,41 @@ export class StudioShell {
 
   private schedulePersist(): void {
     window.clearTimeout(this.persistTimer);
+    if (this.fileHydrationPending) return;
     this.showSaveStatus("저장 중…", "saving");
     this.persistTimer = window.setTimeout(() => {
       try { this.persistNow(); this.showSaveStatus("자동 저장됨"); }
       catch { this.showSaveStatus("저장 실패", "error"); }
     }, 160);
   }
-  private persistNow(): void { localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state)); }
+  private persistNow(): void {
+    this.updatedAt = new Date().toISOString();
+    const stored: PersistedStudioState = { version: 1, updatedAt: this.updatedAt, state: this.state };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
+    localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify(this.state));
+    if (this.filePersistenceEnabled && !this.fileHydrationPending) this.syncFileState(stored);
+  }
+  private async hydrateFileState(): Promise<void> {
+    try {
+      const response = await fetch(FILE_STATE_ENDPOINT, { cache: "no-store" });
+      if (response.status === 204 || !response.ok || !response.headers.get("content-type")?.includes("application/json")) return;
+      const stored = await response.json() as Partial<PersistedStudioState>;
+      const remote = parseState(stored.state, this.registry);
+      const remoteTime = typeof stored.updatedAt === "string" ? Date.parse(stored.updatedAt) : 0;
+      const localTime = Date.parse(this.updatedAt);
+      if (stored.version === 1 && remote && Number.isFinite(remoteTime) && remoteTime > (Number.isFinite(localTime) ? localTime : 0)) {
+        window.clearTimeout(this.persistTimer);
+        this.state = remote;
+        this.updatedAt = stored.updatedAt as string;
+        this.activate(remote.activeModeId, true, false);
+        this.showSaveStatus("마지막 설정 복원됨", "saved");
+      }
+    } catch { /* Static hosting and non-default dev ports use browser storage only. */ }
+    finally { this.fileHydrationPending = false; this.captureActiveState(); this.schedulePersist(); }
+  }
+  private syncFileState(stored: PersistedStudioState): void {
+    void fetch(FILE_STATE_ENDPOINT, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(stored), keepalive: true }).catch(() => undefined);
+  }
   private showSaveStatus(message: string, state = "idle"): void {
     if (this.saveStatus) { this.saveStatus.textContent = message; this.saveStatus.dataset.state = state; }
     if (this.saveButton) {

@@ -2,6 +2,7 @@ import "./style.css";
 import "./crystal/CrystalApp.css";
 import "./modes/axis-habitat/AxisHabitat.css";
 import "./modes/axis-megastructure/AxisMegastructure.css";
+import "./modes/dimention-r3f/DimentionR3F.css";
 import type { ArtboardState } from "./artboard/ArtboardState";
 import type { StudioExportQuality } from "./studio/ModeTypes";
 
@@ -22,10 +23,10 @@ async function mount(): Promise<void> {
     const { LegacyArchiveView } = await import("./studio/ui/LegacyArchiveView");
     new LegacyArchiveView(root!); return;
   }
-  const [{ StudioShell }, { ModeRegistry }, { GLASS_3D_MODE }, { LIGHT_FIELD_MODE }, { GLASS_PRISM_MODE }, { KINETIC_GLASS_MODE }, { AXIS_TRAILS_MODE }, { AXIS_HABITAT_MODE }, { AXIS_MEGASTRUCTURE_MODE }] = await Promise.all([
-    import("./studio/StudioShell"), import("./studio/ModeRegistry"), import("./modes/glass-3d/Glass3DMode"), import("./modes/light-field/LightFieldMode"), import("./modes/glass-prism/GlassPrismMode"), import("./modes/kinetic-glass/KineticGlassMode"), import("./modes/axis-trails/AxisTrailsMode"), import("./modes/axis-habitat/AxisHabitatMode"), import("./modes/axis-megastructure/AxisMegastructureMode"),
+  const [{ StudioShell }, { ModeRegistry }, { GLASS_3D_MODE }, { DIMENTION_R3F_MODE }, { LIGHT_FIELD_MODE }, { GLASS_PRISM_MODE }, { KINETIC_GLASS_MODE }, { AXIS_TRAILS_MODE }, { AXIS_HABITAT_MODE }, { AXIS_MEGASTRUCTURE_MODE }] = await Promise.all([
+    import("./studio/StudioShell"), import("./studio/ModeRegistry"), import("./modes/glass-3d/Glass3DMode"), import("./modes/dimention-r3f/DimentionR3FMode"), import("./modes/light-field/LightFieldMode"), import("./modes/glass-prism/GlassPrismMode"), import("./modes/kinetic-glass/KineticGlassMode"), import("./modes/axis-trails/AxisTrailsMode"), import("./modes/axis-habitat/AxisHabitatMode"), import("./modes/axis-megastructure/AxisMegastructureMode"),
   ]);
-  const registry = new ModeRegistry().register(GLASS_3D_MODE).register(LIGHT_FIELD_MODE).register(GLASS_PRISM_MODE).register(KINETIC_GLASS_MODE).register(AXIS_TRAILS_MODE).register(AXIS_HABITAT_MODE).register(AXIS_MEGASTRUCTURE_MODE);
+  const registry = new ModeRegistry().register(GLASS_3D_MODE).register(DIMENTION_R3F_MODE).register(LIGHT_FIELD_MODE).register(GLASS_PRISM_MODE).register(KINETIC_GLASS_MODE).register(AXIS_TRAILS_MODE).register(AXIS_HABITAT_MODE).register(AXIS_MEGASTRUCTURE_MODE);
   const shell = new StudioShell(root!, registry, "glass-3d");
   shell.mount();
   const command = (name: string, payload?: unknown) => shell.command(name, payload);

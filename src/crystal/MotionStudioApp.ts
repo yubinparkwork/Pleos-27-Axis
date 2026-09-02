@@ -32,6 +32,8 @@ import { StudioVariationStore, type StudioVariationSnapshot } from "./variations
 import { renderMotionParameters } from "./ui/MotionPanel";
 import { studioPanelTemplate } from "./ui/StudioPanel";
 import { transportTemplate } from "./ui/TransportBar";
+import { WebGPUPreviewBackend } from "./rendering/WebGPUPreviewBackend";
+import { WebGPUPathTracerBackend } from "./rendering/WebGPUPathTracerBackend";
 
 interface StudioSettingsV2 {
   version: 2;
@@ -58,6 +60,7 @@ interface RenderRegion {
 }
 
 interface PathRenderJob {
+  backend: "webgpu" | "webgl";
   quality: RenderQuality;
   targetSamples: number;
   download: boolean;
@@ -88,6 +91,10 @@ const STORAGE_V1 = "pleos-27-axis-settings-v1";
 const FAST_RENDER_SAMPLES = 16;
 const FAST_RENDER_SCALE = 0.5;
 const FAST_RENDER_BOUNCES = 4;
+// Keep the converged raster/WebGPU preview visible while the path tracer's
+// target is still empty. Revealing the progressive canvas after a few real
+// samples avoids a misleading black flash at render start.
+const PATH_PREVIEW_REVEAL_SAMPLES = 4;
 const MOTION_STRIP_LENGTH_SCALE = [1, .9, 1.08] as const;
 const MOTION_STRIP_WIDTH_SCALE = [1, 1.18, .88] as const;
 const MOTION_STRIP_COLOR_WEIGHT = [1.08, .96, .9] as const;
@@ -252,6 +259,8 @@ export class MotionStudioApp {
   private readonly pathTracer: WebGLPathTracer;
   private readonly previewComposer: EffectComposer;
   private readonly previewBloom: UnrealBloomPass;
+  private readonly webgpuPreview: WebGPUPreviewBackend;
+  private readonly webgpuPathTracer: WebGPUPathTracerBackend;
   private readonly pathComposer: EffectComposer;
   private readonly pathTexture: TexturePass;
   private readonly pathDenoiseMaterial: DenoiseMaterial;
@@ -273,9 +282,12 @@ export class MotionStudioApp {
   private saveTimer = 0;
   private renderingHigh = false;
   private renderJob: PathRenderJob | null = null;
+  private lastCompletedPathBackend: "webgpu" | "webgl" | null = null;
+  private lastCompletedPathSamples = 0;
   private videoExportJob: VideoExportJob | null = null;
   private lastPatch: MotionPatch = {};
   private gestureZoomStart = 1;
+  private resizeDeferredByRender = false;
 
   constructor(private readonly root: HTMLElement, private readonly modeHeader: MotionStudioModeHeader = { activeModeId: "glass-3d", modes: [{ id: "glass-3d", label: "Glass 3D" }], onModeChange: () => undefined }) {
     this.root.innerHTML = this.template();
@@ -302,7 +314,10 @@ export class MotionStudioApp {
     this.stage.append(this.previewRenderer.domElement, this.pathRenderer.domElement);
     this.camera.position.set(0, 0, -12);
     this.camera.lookAt(0, .02, 0);
-    this.controls = new OrbitControls(this.camera, this.previewRenderer.domElement);
+    // Bind controls to the stable stage rather than a specific canvas. The
+    // visible preview canvas can now switch between WebGPU and WebGL without
+    // changing zoom/orbit interaction semantics.
+    this.controls = new OrbitControls(this.camera, this.stage);
     this.controls.enableDamping = true;
     this.controls.enablePan = false;
     this.controls.enabled = !this.settings.setup.viewLocked;
@@ -337,6 +352,21 @@ export class MotionStudioApp {
     this.previewBloom = new UnrealBloomPass(new THREE.Vector2(1, 1), this.settings.lighting.globals.bloomIntensity, .65, .78);
     this.previewComposer.addPass(this.previewBloom);
     this.previewComposer.addPass(new OutputPass());
+    this.webgpuPreview = new WebGPUPreviewBackend(
+      this.scene,
+      this.camera,
+      this.settings.format.background,
+      this.settings.format.transparent ? 0 : 1,
+      this.settings.lighting.globals.exposure,
+      this.settings.lighting.globals.bloomIntensity,
+    );
+    this.stage.insertBefore(this.webgpuPreview.canvas, this.pathRenderer.domElement);
+    this.webgpuPathTracer = new WebGPUPathTracerBackend(
+      this.settings.format.background,
+      this.settings.format.transparent ? 0 : 1,
+      this.settings.lighting.globals.exposure,
+    );
+    this.stage.insertBefore(this.webgpuPathTracer.canvas, this.pathRenderer.domElement);
     this.pathComposer = new EffectComposer(this.pathRenderer);
     this.pathTexture = new TexturePass(this.pathTracer.target.texture);
     this.pathComposer.addPass(this.pathTexture);
@@ -358,7 +388,26 @@ export class MotionStudioApp {
     this.resizeObserver.observe(this.root);
     this.resize();
     this.applyMotionAt(0);
+    void this.initializeWebGPUPreview();
+    void this.initializeWebGPUPathTracer();
     this.raf = requestAnimationFrame(this.render);
+  }
+
+  private async initializeWebGPUPreview(): Promise<void> {
+    await this.webgpuPreview.init();
+    if (this.disposed) return;
+    this.resize();
+    const status = this.webgpuPreview.isNativeWebGPU ? "WebGPU 준비됨" : this.webgpuPreview.status === "webgl2-fallback" ? "WebGPU 미지원 · WebGL2 호환" : `WebGPU 초기화 실패${this.webgpuPreview.error ? ` · ${this.webgpuPreview.error}` : ""}`;
+    this.showPreview(status);
+  }
+
+  private async initializeWebGPUPathTracer(): Promise<void> {
+    await this.webgpuPathTracer.init();
+    if (this.disposed) return;
+    const status = this.webgpuPathTracer.isReady
+      ? "WebGPU 패스트레이서 준비됨"
+      : `WebGPU 패스트레이서 미지원 · WebGL 폴백${this.webgpuPathTracer.error ? ` · ${this.webgpuPathTracer.error}` : ""}`;
+    this.showPreview(status);
   }
 
   private template(): string {
@@ -683,13 +732,14 @@ export class MotionStudioApp {
     const progressBar = this.root.querySelector<HTMLElement>("[data-output='render-progress-bar']");
     const cancel = this.root.querySelector<HTMLButtonElement>("[data-action='cancel-render']");
     const renderPrimary = this.root.querySelector<HTMLButtonElement>("[data-action='render-export']");
-    const frameProgress = this.renderJob ? Math.min(1, this.pathTracer.samples / this.renderJob.targetSamples) : 0;
+    const samples = this.currentPathSamples();
+    const frameProgress = this.renderJob ? Math.min(1, samples / this.renderJob.targetSamples) : 0;
     const progress = this.videoExportJob
       ? Math.min(1, (this.videoExportJob.completedFrames + frameProgress) / this.videoExportJob.totalFrames)
       : frameProgress;
     if (progressText) progressText.textContent = this.videoExportJob
-      ? `영상 렌더링 ${Math.min(this.videoExportJob.completedFrames + 1, this.videoExportJob.totalFrames)} / ${this.videoExportJob.totalFrames} · ${Math.floor(this.pathTracer.samples)} / ${this.settings.advanced.targetSamples} spp`
-      : this.renderJob ? `${this.renderJob.quality === "fast" ? "Preview" : "High"} · ${Math.floor(this.pathTracer.samples)} / ${this.renderJob.targetSamples} spp` : "준비됨";
+      ? `영상 렌더링 ${Math.min(this.videoExportJob.completedFrames + 1, this.videoExportJob.totalFrames)} / ${this.videoExportJob.totalFrames} · ${Math.floor(samples)} / ${this.settings.advanced.targetSamples} spp`
+      : this.renderJob ? `${this.renderJob.quality === "fast" ? "Preview" : "High"} · ${Math.floor(samples)} / ${this.renderJob.targetSamples} spp` : "준비됨";
     if (progressPercent) progressPercent.textContent = `${Math.round(progress * 100)}%`;
     if (progressBar) progressBar.style.width = `${progress * 100}%`;
     if (cancel) cancel.hidden = !this.renderJob && !this.videoExportJob;
@@ -697,6 +747,14 @@ export class MotionStudioApp {
     for (const selector of ["[data-action='export-raster']", "[data-action='render-current-high']", "[data-action='export-print']", "[data-action='render-export']"]) {
       const button = this.root.querySelector<HTMLButtonElement>(selector); if (button) button.disabled = this.renderingHigh;
     }
+  }
+
+  private currentPathSamples(): number {
+    return this.renderJob?.backend === "webgpu" ? this.webgpuPathTracer.sampleCounts.avg : this.pathTracer.samples;
+  }
+
+  private pathOutputCanvas(backend: "webgpu" | "webgl" = this.renderJob?.backend ?? this.lastCompletedPathBackend ?? (this.webgpuPathTracer.isReady ? "webgpu" : "webgl")): HTMLCanvasElement {
+    return backend === "webgpu" ? this.webgpuPathTracer.canvas : this.pathRenderer.domElement;
   }
 
   private handleAction(action: string): void {
@@ -895,6 +953,7 @@ export class MotionStudioApp {
     this.applyMotionLights(patch, time);
     const spectralBloom = this.settings.look.preset === "spectral-flow" ? this.settings.look.spectralFlow.bloom : this.settings.look.preset === "soft-spectral" ? this.settings.look.softSpectral.bloom : 0;
     this.previewBloom.strength = this.settings.lighting.globals.bloomIntensity + spectralBloom + (patch.bloomOffset ?? 0);
+    this.webgpuPreview.setBloom(this.settings.lighting.globals.bloomIntensity + (patch.bloomOffset ?? 0));
     this.showPreview();
     this.updateTransport();
   }
@@ -965,18 +1024,47 @@ export class MotionStudioApp {
       this.renderJob.resolve?.("");
       this.renderJob = null;
     }
+    if (!this.videoExportJob && this.resizeDeferredByRender) {
+      this.resizeDeferredByRender = false;
+      this.resize();
+      if (message) this.require<HTMLElement>("[data-output='samples']").textContent = message;
+      return;
+    }
     this.renderingHigh = false;
     this.pathTracer.pausePathTracing = true;
+    this.webgpuPathTracer.pause();
     this.setMotionLightRenderMode("preview");
     this.lighting.setPathTracingShapeMode(false);
     this.pathRenderer.domElement.classList.remove("visible");
-    this.previewRenderer.domElement.classList.add("visible");
-    this.previewComposer.render();
+    this.webgpuPathTracer.canvas.classList.remove("visible");
+    this.renderPreviewFrame();
     if (message) this.require<HTMLElement>("[data-output='samples']").textContent = message;
     this.updateRenderUi();
   }
 
+  private canUseWebGPUPreview(): boolean {
+    // onBeforeCompile GLSL looks are intentionally kept on the established
+    // WebGL pipeline. Clear/prism/smoked are standard MeshPhysicalMaterial
+    // looks and render through the native WebGPU backend.
+    return this.webgpuPreview.isNativeWebGPU && this.settings.look.preset !== "spectral-flow" && this.settings.look.preset !== "soft-spectral";
+  }
+
+  private renderPreviewFrame(): void {
+    const useWebGPU = this.canUseWebGPUPreview();
+    this.webgpuPreview.canvas.classList.toggle("visible", useWebGPU);
+    this.previewRenderer.domElement.classList.toggle("visible", !useWebGPU);
+    if (!useWebGPU || !this.webgpuPreview.render()) this.previewComposer.render();
+  }
+
   private resize(): void {
+    // ResizeObserver can fire while the path tracer owns the shared scene.
+    // Deferring layout prevents a harmless panel/layout change from silently
+    // resolving the active job as a cancellation.
+    if (this.renderJob || this.videoExportJob) {
+      this.resizeDeferredByRender = true;
+      return;
+    }
+    this.resizeDeferredByRender = false;
     const layout = getComputedStyle(this.require<HTMLElement>(".motion-studio"));
     const leftPanelWidth = Number.parseFloat(layout.getPropertyValue("--left-panel-space")) || 0;
     const rightPanelWidth = Number.parseFloat(layout.getPropertyValue("--right-panel-space")) || 0;
@@ -989,6 +1077,7 @@ export class MotionStudioApp {
     this.previewRenderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
     this.previewRenderer.setSize(preview.width, preview.height, false);
     this.previewComposer.setSize(preview.width, preview.height);
+    this.webgpuPreview.setSize(preview.width, preview.height, Math.min(devicePixelRatio, 1.75));
     this.pathRenderer.setPixelRatio(1);
     this.pathRenderer.setSize(preview.width, preview.height, false);
     this.pathComposer.setSize(preview.width, preview.height);
@@ -1010,6 +1099,8 @@ export class MotionStudioApp {
   private updateBackground(): void {
     const alpha = this.settings.format.transparent ? 0 : 1;
     this.previewRenderer.setClearColor(this.settings.format.background, alpha);
+    this.webgpuPreview.setClearColor(this.settings.format.background, alpha);
+    this.webgpuPathTracer.setClearColor(this.settings.format.background, alpha);
     this.pathRenderer.setClearColor(this.settings.format.background, alpha);
     this.artboardShell.classList.toggle("transparent", this.settings.format.transparent);
   }
@@ -1244,47 +1335,70 @@ export class MotionStudioApp {
   private startPathRender(quality: RenderQuality, download: boolean, printScale: number, printOutput: boolean): Promise<string> {
     this.pause(); this.applyMotionAt(this.motionClock.time);
     const output = this.scaledOutput(printScale);
-    const maxTextureSize = this.pathRenderer.capabilities.maxTextureSize;
+    const backend: "webgpu" | "webgl" = this.webgpuPathTracer.isReady ? "webgpu" : "webgl";
+    const maxTextureSize = backend === "webgpu" ? this.webgpuPathTracer.maxTextureSize : this.pathRenderer.capabilities.maxTextureSize;
     if (output.width > maxTextureSize || output.height > maxTextureSize) return Promise.reject(new Error(`${output.width} × ${output.height}px가 GPU 한계 ${maxTextureSize}px를 초과합니다.`));
     const targetSamples = quality === "fast" ? FAST_RENDER_SAMPLES : this.settings.advanced.targetSamples;
     const bounces = quality === "fast" ? FAST_RENDER_BOUNCES : this.settings.advanced.bounces;
     this.renderingHigh = true;
-    this.previewRenderer.domElement.classList.remove("visible"); this.pathRenderer.domElement.classList.add("visible");
-    this.pathRenderer.setPixelRatio(1); this.pathRenderer.setSize(output.width, output.height, false); this.pathComposer.setSize(output.width, output.height);
+    // The freshly reset path-tracing target is black. Keep the active preview
+    // visible until the render loop has accumulated enough useful samples.
+    this.pathRenderer.domElement.classList.remove("visible");
+    this.webgpuPathTracer.canvas.classList.remove("visible");
     this.pathCamera.copy(this.camera);
     this.pathCamera.setViewOffset(output.fullWidth, output.fullHeight, output.x, output.y, output.width, output.height);
     this.pathCamera.updateProjectionMatrix();
     this.applyPathCanvasFrame();
-    this.pathTracer.renderScale = quality === "fast" ? FAST_RENDER_SCALE : this.settings.advanced.renderScale;
-    this.pathTracer.filterGlossyFactor = quality === "high" ? .25 : 0;
-    this.pathTracer.bounces = bounces; this.pathTracer.transmissiveBounces = bounces + 4;
-    this.pathDenoise.enabled = false;
     this.setMotionLightRenderMode("path");
     this.lighting.setPathTracingShapeMode(true);
-    this.pathTracer.setScene(this.scene, this.pathCamera); this.pathTracer.reset(); this.pathTracer.pausePathTracing = false;
-    this.require<HTMLElement>("[data-output='samples']").textContent = `${quality === "fast" ? "빠른" : "고품질"} 렌더링 0 / ${targetSamples} spp · ${output.width} × ${output.height}px`;
-    return new Promise<string>((resolve, reject) => {
-      this.renderJob = { quality, targetSamples, download, printScale, printOutput, width: output.width, height: output.height, resolve, reject };
-      this.updateRenderUi();
-    });
+    try {
+      if (backend === "webgpu") {
+        this.webgpuPathTracer.prepare(this.scene, this.pathCamera, output.width, output.height, {
+          bounces,
+          renderScale: quality === "fast" ? FAST_RENDER_SCALE : this.settings.advanced.renderScale,
+          targetSamples,
+          filterGlossyFactor: quality === "high" ? .25 : 0,
+        });
+      } else {
+        this.pathRenderer.setPixelRatio(1); this.pathRenderer.setSize(output.width, output.height, false); this.pathComposer.setSize(output.width, output.height);
+        this.pathTracer.renderScale = quality === "fast" ? FAST_RENDER_SCALE : this.settings.advanced.renderScale;
+        this.pathTracer.filterGlossyFactor = quality === "high" ? .25 : 0;
+        this.pathTracer.bounces = bounces; this.pathTracer.transmissiveBounces = bounces + 4;
+        this.pathDenoise.enabled = false;
+        this.pathTracer.setScene(this.scene, this.pathCamera); this.pathTracer.reset(); this.pathTracer.pausePathTracing = false;
+      }
+      this.require<HTMLElement>("[data-output='samples']").textContent = `${quality === "fast" ? "빠른" : "고품질"} 렌더링 0 / ${targetSamples} spp · ${backend === "webgpu" ? "WebGPU" : "WebGL 폴백"} · ${output.width} × ${output.height}px`;
+      return new Promise<string>((resolve, reject) => {
+        this.renderJob = { backend, quality, targetSamples, download, printScale, printOutput, width: output.width, height: output.height, resolve, reject };
+        this.updateRenderUi();
+      });
+    } catch (error) {
+      this.renderingHigh = false;
+      this.setMotionLightRenderMode("preview");
+      this.lighting.setPathTracingShapeMode(false);
+      return Promise.reject(error instanceof Error ? error : new Error(String(error)));
+    }
   }
 
   private applyPathCanvasFrame(): void {
     const region = this.activeRegion();
-    Object.assign(this.pathRenderer.domElement.style, {
-      left: `${region.x / this.settings.format.width * 100}%`, top: `${region.y / this.settings.format.height * 100}%`,
-      width: `${region.width / this.settings.format.width * 100}%`, height: `${region.height / this.settings.format.height * 100}%`,
-      right: "auto", bottom: "auto",
-    });
+    for (const canvas of [this.pathRenderer.domElement, this.webgpuPathTracer.canvas]) {
+      Object.assign(canvas.style, {
+        left: `${region.x / this.settings.format.width * 100}%`, top: `${region.y / this.settings.format.height * 100}%`,
+        width: `${region.width / this.settings.format.width * 100}%`, height: `${region.height / this.settings.format.height * 100}%`,
+        right: "auto", bottom: "auto",
+      });
+    }
   }
 
   private cancelPathRender(message: string): void {
     const job = this.renderJob;
     this.renderJob = null; this.renderingHigh = false; this.pathTracer.pausePathTracing = true;
+    this.webgpuPathTracer.pause();
     this.setMotionLightRenderMode("preview");
     this.lighting.setPathTracingShapeMode(false);
     job?.resolve?.("");
-    this.pathRenderer.domElement.classList.remove("visible"); this.previewRenderer.domElement.classList.add("visible");
+    this.pathRenderer.domElement.classList.remove("visible"); this.webgpuPathTracer.canvas.classList.remove("visible"); this.renderPreviewFrame();
     this.require<HTMLElement>("[data-output='samples']").textContent = message;
     this.updateRenderUi();
   }
@@ -1335,7 +1449,7 @@ export class MotionStudioApp {
         if (!frameData || this.videoExportJob.cancelled) throw new DOMException("사용자가 영상 렌더링을 취소했습니다.", "AbortError");
         context.fillStyle = this.settings.format.background;
         context.fillRect(0, 0, encodedWidth, encodedHeight);
-        context.drawImage(this.pathRenderer.domElement, 0, 0, outputSize.width, outputSize.height);
+        context.drawImage(this.pathOutputCanvas(), 0, 0, outputSize.width, outputSize.height);
         await source.add(frame / fps, 1 / fps);
         this.videoExportJob.completedFrames = frame + 1;
         this.updateRenderUi();
@@ -1356,7 +1470,7 @@ export class MotionStudioApp {
       this.setMotionLightRenderMode("preview");
       this.lighting.setPathTracingShapeMode(false);
       this.pathRenderer.domElement.classList.remove("visible");
-      this.previewRenderer.domElement.classList.add("visible");
+      this.webgpuPathTracer.canvas.classList.remove("visible");
       this.renderingHigh = false;
       this.updateRenderUi();
       this.showPreview();
@@ -1365,16 +1479,23 @@ export class MotionStudioApp {
 
   private async finishHighRender(): Promise<void> {
     const job = this.renderJob; if (!job) return;
-    this.renderJob = null; this.renderingHigh = false; this.pathTracer.pausePathTracing = true; this.pathTexture.map = this.pathTracer.target.texture;
-    // The edge-aware denoiser is applied only after accumulation so it does not
-    // slow every progressive sample. It removes residual Monte Carlo grain and
-    // isolated fireflies while retaining the hard glass seams.
-    this.pathDenoise.enabled = job.quality === "high";
-    this.pathComposer.render();
+    let samples = Math.floor(this.currentPathSamples());
+    this.renderJob = null; this.renderingHigh = false;
+    this.lastCompletedPathBackend = job.backend;
+    if (job.backend === "webgpu") {
+      this.webgpuPathTracer.pause();
+      samples = Math.floor((await this.webgpuPathTracer.refreshSampleCounts()).avg);
+    } else {
+      this.pathTracer.pausePathTracing = true; this.pathTexture.map = this.pathTracer.target.texture;
+      // The WebGL fallback retains the established edge-aware finishing pass.
+      this.pathDenoise.enabled = job.quality === "high";
+      this.pathComposer.render();
+    }
+    this.lastCompletedPathSamples = samples;
     try {
-      const dataUrl = this.pathRenderer.domElement.toDataURL("image/png");
+      const dataUrl = job.backend === "webgpu" ? await this.webgpuPathTracer.capturePng() : this.pathRenderer.domElement.toDataURL("image/png");
       if (job.download) this.download(await this.injectPpi(dataUrl, this.settings.export.ppi), `pleos-axis-${job.printOutput ? "print" : "hq"}-${this.settings.motion.preset}-frame-${String(this.motionClock.frame).padStart(6, "0")}-${job.width}x${job.height}-${this.settings.export.ppi}ppi.png`);
-      job.resolve?.(dataUrl); this.require<HTMLElement>("[data-output='samples']").textContent = `${job.quality === "fast" ? "빠른" : "고품질"} 렌더링 완료 · ${Math.floor(this.pathTracer.samples)} spp · ${job.width} × ${job.height}px`;
+      job.resolve?.(dataUrl); this.require<HTMLElement>("[data-output='samples']").textContent = `${job.quality === "fast" ? "빠른" : "고품질"} 렌더링 완료 · ${samples} spp · ${job.backend === "webgpu" ? "WebGPU" : "WebGL 폴백"} · ${job.width} × ${job.height}px`;
     } catch (error) {
       const reason = error instanceof Error ? error : new Error("PNG 인코딩 실패");
       job.reject?.(reason); this.showPreview(`렌더링 실패 · ${reason.message}`);
@@ -1402,7 +1523,10 @@ export class MotionStudioApp {
     const globals = this.lighting.state.globals;
     this.environment.setIntensity(globals.environmentIntensity); this.assembly.setOpticalLighting(globals.reflectionStrength, globals.refractionStrength);
     this.previewRenderer.toneMappingExposure = globals.exposure; this.pathRenderer.toneMappingExposure = globals.exposure;
+    this.webgpuPreview.setExposure(globals.exposure);
+    this.webgpuPathTracer.setExposure(globals.exposure);
     this.previewBloom.strength = globals.bloomIntensity + (this.settings.look.preset === "spectral-flow" ? this.settings.look.spectralFlow.bloom : this.settings.look.preset === "soft-spectral" ? this.settings.look.softSpectral.bloom : 0); this.pathBloom.strength = globals.bloomIntensity;
+    this.webgpuPreview.setBloom(globals.bloomIntensity);
     this.showPreview(); this.persist();
   };
 
@@ -1424,11 +1548,29 @@ export class MotionStudioApp {
     if (this.motionClock.tick(timestamp, this.settings.motion.speed, this.settings.motion.duration, this.settings.motion.fps, this.settings.motion.loop)) this.applyMotionAt(this.motionClock.time);
     this.controls.update();
     if (this.renderingHigh && this.renderJob) {
-      this.pathTracer.renderSample(); this.pathTexture.map = this.pathTracer.target.texture; this.pathComposer.render();
-      const samples = Math.floor(this.pathTracer.samples);
-      if (samples % 4 === 0) { this.require<HTMLElement>("[data-output='samples']").textContent = `${this.renderJob.quality === "fast" ? "빠른" : "고품질"} 렌더링 ${samples} / ${this.renderJob.targetSamples} spp`; this.updateRenderUi(); }
-      if (samples >= this.renderJob.targetSamples) void this.finishHighRender();
-    } else if (!this.motionClock.playing) this.previewComposer.render();
+      const job = this.renderJob;
+      try {
+        if (job.backend === "webgpu") {
+          this.webgpuPathTracer.renderSample(timestamp);
+        } else {
+          this.pathTracer.renderSample(); this.pathTexture.map = this.pathTracer.target.texture; this.pathComposer.render();
+        }
+        const samples = Math.floor(this.currentPathSamples());
+        if (samples >= Math.min(PATH_PREVIEW_REVEAL_SAMPLES, job.targetSamples)) {
+          this.pathOutputCanvas(job.backend).classList.add("visible");
+        }
+        if (samples > 0 && samples % 4 === 0) { this.require<HTMLElement>("[data-output='samples']").textContent = `${job.quality === "fast" ? "빠른" : "고품질"} 렌더링 ${samples} / ${job.targetSamples} spp · ${job.backend === "webgpu" ? "WebGPU" : "WebGL 폴백"}`; this.updateRenderUi(); }
+        if (samples >= job.targetSamples) void this.finishHighRender();
+      } catch (error) {
+        const reason = error instanceof Error ? error : new Error(String(error));
+        const failedJob = this.renderJob;
+        this.renderJob = null;
+        this.renderingHigh = false;
+        this.webgpuPathTracer.pause();
+        failedJob?.reject?.(reason);
+        this.showPreview(`렌더링 실패 · ${reason.message}`);
+      }
+    } else if (!this.motionClock.playing) this.renderPreviewFrame();
     if (!this.disposed) this.raf = requestAnimationFrame(this.render);
   };
 
@@ -1440,20 +1582,23 @@ export class MotionStudioApp {
         entryPoint: "src/main.ts",
         defaultRoute: "/",
         activeApplication: "Glass3DMode / MotionStudioApp",
-        renderer: "Three.js WebGLRenderer + three-gpu-pathtracer",
-        previewRenderer: "Three.js raster + EffectComposer + UnrealBloomPass",
+        renderer: "Three.js WebGPU preview + native WebGPU wavefront path tracer",
+        previewRenderer: this.webgpuPreview.isNativeWebGPU ? "Three.js WebGPU + TSL PostProcessing/Bloom" : "Three.js WebGL compatibility preview",
+        previewBackend: { requested: "webgpu", active: this.webgpuPreview.status, native: this.webgpuPreview.isNativeWebGPU, error: this.webgpuPreview.error },
+        finalRenderer: this.webgpuPathTracer.isReady ? "three-gpu-pathtracer WebGPU wavefront compute" : "three-gpu-pathtracer WebGL compatibility fallback",
+        pathTracerBackend: { requested: "webgpu", active: this.webgpuPathTracer.status, native: this.webgpuPathTracer.isReady, fallback: !this.webgpuPathTracer.isReady, error: this.webgpuPathTracer.error },
         projection: "orthographic",
         camera: { type: this.camera.type, position: this.camera.position.toArray(), target: this.controls.target.toArray(), zoom: this.camera.zoom },
         sceneStructure: "3 closed optical solids meeting at one shared vertex",
       },
-      renderer: "Three.js + three-gpu-pathtracer",
+      renderer: this.webgpuPathTracer.isReady ? "Three.js WebGPU + WebGPU wavefront path tracer" : "Three.js WebGL compatibility + WebGL path tracer",
       motion: this.getMotionState(),
       motionPresets: MotionPresetRegistry.list().map((preset) => ({ id: preset.id, label: preset.label, duration: preset.duration, constraint: preset.constraint })),
       artboard: { ...this.settings.format },
       artboardPresets: FormatPresetRegistry.list(),
       renderRegion: { ...this.settings.advanced.renderRegion },
       export: { ppi: this.settings.export.ppi, rasterPng: true, pathTracedStill: true, pathTracedMp4: true, fixedTimestepSequence: true, transparency: true },
-      pathTracing: { active: this.renderingHigh, samples: this.pathTracer.samples, quality: this.renderJob?.quality ?? null, output: this.renderJob ? [this.renderJob.width, this.renderJob.height] : null },
+      pathTracing: { active: this.renderingHigh, backend: this.renderJob?.backend ?? this.lastCompletedPathBackend ?? (this.webgpuPathTracer.isReady ? "webgpu" : "webgl"), samples: this.renderJob ? this.currentPathSamples() : this.lastCompletedPathSamples, samplesPerSecond: (this.renderJob?.backend ?? this.lastCompletedPathBackend) === "webgpu" ? this.webgpuPathTracer.sampleCounts.samplesPerSecond : null, quality: this.renderJob?.quality ?? null, output: this.renderJob ? [this.renderJob.width, this.renderJob.height] : null, dispersion: (this.renderJob?.backend ?? this.lastCompletedPathBackend ?? (this.webgpuPathTracer.isReady ? "webgpu" : "webgl")) === "webgpu" ? "not-supported-upstream" : "supported" },
       assembly: this.assembly.inspect(),
       look: { ...this.settings.look, physical: { ...this.settings.look.physical }, spectralFlow: { ...this.settings.look.spectralFlow } },
       variations: { selectedId: this.settings.ui.selectedVariationId, modeAware: true, items: this.listVariations() },
@@ -1476,6 +1621,6 @@ export class MotionStudioApp {
       if (topbarStatus) topbarStatus.textContent = "Saved";
     }, 180);
   }
-  dispose(): void { this.disposed = true; cancelAnimationFrame(this.raf); this.raf = 0; clearTimeout(this.saveTimer); this.resizeObserver.disconnect(); window.removeEventListener("keydown", this.onKeydown); document.removeEventListener("visibilitychange", this.onVisibility); this.stage.removeEventListener("wheel", this.onCanvasWheel); this.stage.removeEventListener("gesturestart", this.onGestureStart as EventListener); this.stage.removeEventListener("gesturechange", this.onGestureChange as EventListener); this.stage.removeEventListener("gestureend", this.onGestureEnd as EventListener); this.controls.dispose(); this.previewComposer.dispose(); this.pathMotionLights.forEach((light) => light.dispose()); this.lighting.dispose(); this.environment.dispose(); this.assembly.dispose(); this.previewRenderer.dispose(); const pathTracer = this.pathTracer; const pathComposer = this.pathComposer; const pathRenderer = this.pathRenderer; window.setTimeout(() => { pathTracer.dispose(); pathComposer.dispose(); pathRenderer.dispose(); }, 350); }
+  dispose(): void { this.disposed = true; cancelAnimationFrame(this.raf); this.raf = 0; clearTimeout(this.saveTimer); this.resizeObserver.disconnect(); window.removeEventListener("keydown", this.onKeydown); document.removeEventListener("visibilitychange", this.onVisibility); this.stage.removeEventListener("wheel", this.onCanvasWheel); this.stage.removeEventListener("gesturestart", this.onGestureStart as EventListener); this.stage.removeEventListener("gesturechange", this.onGestureChange as EventListener); this.stage.removeEventListener("gestureend", this.onGestureEnd as EventListener); this.controls.dispose(); this.previewComposer.dispose(); this.pathMotionLights.forEach((light) => light.dispose()); this.lighting.dispose(); this.environment.dispose(); this.assembly.dispose(); this.webgpuPreview.dispose(); this.webgpuPathTracer.dispose(); this.previewRenderer.dispose(); const pathTracer = this.pathTracer; const pathComposer = this.pathComposer; const pathRenderer = this.pathRenderer; window.setTimeout(() => { pathTracer.dispose(); pathComposer.dispose(); pathRenderer.dispose(); }, 350); }
   private require<T extends Element>(selector: string): T { const element = this.root.querySelector<T>(selector); if (!element) throw new Error(`Missing Motion Studio element: ${selector}`); return element; }
 }

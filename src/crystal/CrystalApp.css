@@ -114,8 +114,9 @@
 .motion-studio .motion-transport time, .motion-studio .motion-transport label, .motion-studio .motion-transport span { color: var(--ui-text-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
 .motion-studio .pathtrace-canvas, .motion-studio .preview-canvas { inset: 0; width: 100%; height: 100%; opacity: 0; }
 .motion-studio .crystal-stage, .motion-studio .preview-canvas { touch-action: none; overscroll-behavior: contain; }
-.motion-studio canvas.visible, .motion-studio .preview-canvas { opacity: 1; }
+.motion-studio canvas.visible { opacity: 1; }
 .motion-studio .pathtrace-canvas.visible { opacity: 1; z-index: 3; }
+.motion-studio .webgpu-preview-canvas { z-index: 1; }
 .motion-studio.controls-hidden .pasteboard { right: 0; }
 .motion-studio.controls-hidden .topbar, .motion-studio.controls-hidden .motion-transport { right: 0; }
 .motion-studio .inspector-toggle { z-index: 10; }
@@ -850,6 +851,9 @@ input[type="range"]:focus::-webkit-slider-thumb, input[type="range"]:active::-we
 .motion-studio .render-cancel { width: 100%; height: 28px; margin-top: 5px; border: 0; color: var(--panel-secondary); background: transparent; cursor: pointer; font-size: 10px; }
 .motion-studio .video-export-settings { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.08); }
 .motion-studio .export-help { margin: 7px 0 0; color: rgba(255,255,255,.5); font-size: 10px; line-height: 1.45; }
+.motion-studio .dimention-video-meter { --progress: 0%; height: 2px; margin: 12px 0 8px; overflow: hidden; background: rgba(255,255,255,.1); }
+.motion-studio .dimention-video-meter i { display: block; width: var(--progress); height: 100%; background: #f4f4f5; transition: width .12s linear; }
+.motion-studio .dimention-video-export button + button { margin-top: 6px; }
 .motion-studio .render-progress { margin-top: 10px; }
 .motion-studio .render-progress > div { display: flex; justify-content: space-between; color: var(--panel-muted); font-size: 10px; }
 .motion-studio .render-progress b { color: var(--panel-secondary); font-weight: 500; }
@@ -869,6 +873,21 @@ input[type="range"]:focus::-webkit-slider-thumb, input[type="range"]:active::-we
 .motion-studio .light-toolbar button { height: 26px; border-radius: 3px; font-size: 10px; }
 .motion-studio .light-toolbar span { font-size: 10px; }
 .motion-studio .lighting-panel .inspector-section > summary { min-height: 38px; }
+.motion-studio .dimention-lighting-rig { padding-bottom: 8px; }
+.motion-studio .lighting-rig-list { margin: 10px -4px 0; border-top: 1px solid var(--border); }
+.motion-studio .lighting-light-editor { border-bottom: 1px solid var(--border); }
+.motion-studio .lighting-light-editor > summary { min-height: 44px; padding: 0 4px; display: flex; align-items: center; cursor: pointer; list-style: none; }
+.motion-studio .lighting-light-editor > summary::-webkit-details-marker { display: none; }
+.motion-studio .lighting-light-editor > summary::after { content: "+"; margin-left: auto; color: var(--text-dim); font-size: 14px; font-weight: 400; }
+.motion-studio .lighting-light-editor[open] > summary::after { content: "−"; }
+.motion-studio .lighting-light-editor > summary span { min-width: 0; display: grid; gap: 2px; }
+.motion-studio .lighting-light-editor > summary b { color: var(--text-secondary); font-size: 10.5px; font-weight: 600; }
+.motion-studio .lighting-light-editor > summary small { color: var(--text-dim); font-size: 8.5px; }
+.motion-studio .lighting-light-body { padding: 2px 4px 12px; }
+.motion-studio .lighting-light-body .property-row { min-height: 44px; }
+.motion-studio .lighting-light-body .select-row,
+.motion-studio .lighting-light-body .toggle-row,
+.motion-studio .lighting-light-body .color-property { min-height: 32px; }
 .motion-studio .lighting-panel .inspector-section > summary strong { font-size: 10px; letter-spacing: 0; }
 .motion-studio .lighting-panel .inspector-section > summary small { display: none; }
 .motion-studio .lighting-presets { display: grid; grid-template-columns: repeat(2,1fr); gap: 3px; }
@@ -946,6 +965,7 @@ input[type="range"]:focus::-webkit-slider-thumb, input[type="range"]:active::-we
 .motion-studio .wordmark strong { color: var(--text); font-size: 12px; font-weight: 670; letter-spacing: .03em; white-space: nowrap; }
 .motion-studio .studio-context { min-width: 0; display: flex; align-items: center; gap: 8px; }
 .motion-studio .studio-context > label { min-width: 0; display: flex; align-items: center; gap: 6px; }
+.motion-studio .studio-context > label[hidden] { display: none; }
 .motion-studio .studio-context > label > span { color: var(--text-dim); font-size: 10px; }
 .motion-studio .studio-context select { height: var(--control-height); padding: 0 24px 0 8px; border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); background: var(--control); font-size: 11px; }
 .motion-studio [data-mode-select] { width: 112px; }

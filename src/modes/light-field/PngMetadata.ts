@@ -9,6 +9,21 @@ function crc32(bytes: Uint8Array): number {
 
 export function injectPngPpi(dataUrl: string, ppi: number): string {
   const source = Uint8Array.from(atob(dataUrl.slice(dataUrl.indexOf(",") + 1)), (character) => character.charCodeAt(0));
+  const output = injectPngPpiBytes(source, ppi);
+  let binary = "";
+  for (let offset = 0; offset < output.length; offset += 0x8000) binary += String.fromCharCode(...output.subarray(offset, offset + 0x8000));
+  return `data:image/png;base64,${btoa(binary)}`;
+}
+
+export async function injectPngPpiBlob(blob: Blob, ppi: number): Promise<Blob> {
+  const source = new Uint8Array(await blob.arrayBuffer());
+  const injected = injectPngPpiBytes(source, ppi);
+  const bytes = new Uint8Array(injected.byteLength);
+  bytes.set(injected);
+  return new Blob([bytes], { type: "image/png" });
+}
+
+function injectPngPpiBytes(source: Uint8Array, ppi: number): Uint8Array {
   const view = new DataView(source.buffer, source.byteOffset, source.byteLength);
   const ihdrLength = view.getUint32(8, false);
   const insertOffset = 20 + ihdrLength;
@@ -32,7 +47,5 @@ export function injectPngPpi(dataUrl: string, ppi: number): string {
   output.set(source.subarray(0, insertOffset));
   output.set(chunk, insertOffset);
   output.set(source.subarray(insertOffset), insertOffset + chunk.length);
-  let binary = "";
-  for (let offset = 0; offset < output.length; offset += 0x8000) binary += String.fromCharCode(...output.subarray(offset, offset + 0x8000));
-  return `data:image/png;base64,${btoa(binary)}`;
+  return output;
 }

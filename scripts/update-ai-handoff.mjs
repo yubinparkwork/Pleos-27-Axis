@@ -133,7 +133,7 @@ async function captureRuntime(options = {}) {
     await page.waitForFunction(() => window.__pleos27Axis?.inspect().ready === true, undefined, { timeout: 20_000 });
     let initialRuntime = await page.evaluate(() => window.__pleos27Axis.inspect());
     const activeLook = options.look ?? initialRuntime.assembly?.look ?? initialRuntime.preset ?? "iridescent-pulse";
-    const activeMotionPreset = options.motion ?? initialRuntime.motion?.preset ?? initialRuntime.motion?.kind ?? (requestedMode === "light-field" ? "field-loop" : "off");
+    const activeMotionPreset = options.motion ?? initialRuntime.motion?.preset ?? initialRuntime.motion?.kind ?? (requestedMode === "light-field" ? "field-loop" : requestedMode === "dimention-r3f" ? "pleos-light-orbit" : "off");
     const duration = Number(initialRuntime.motion?.duration ?? 9);
     const requestedHeroTime = Number(options.heroTime);
     const heroTime = Number.isFinite(requestedHeroTime) ? Math.max(0, Math.min(duration, requestedHeroTime)) : activeMotionPreset === "off" ? 0 : duration * 0.5;
@@ -143,6 +143,7 @@ async function captureRuntime(options = {}) {
       if (mode === "light-field") api.setLightFieldPreset(look);
       else if (mode === "glass-prism") api.setGlassPrismPreset(look);
       else if (mode === "kinetic-glass") api.setKineticGlassPreset(look);
+      else if (mode === "dimention-r3f") api.modeApi("dimention-r3f").command("setPreset", look);
       else {
         api.setRenderRegion({ enabled: false }); api.setLook(look);
         if (preset !== "off") api.setMotionPreset(preset);
@@ -218,6 +219,7 @@ function makeHandoff({ runtimeState, task, filesChanged, visualChanges, knownIss
   const isLightField = runtime.studioMode?.activeMode === "light-field";
   const isGlassPrism = runtime.studioMode?.activeMode === "glass-prism";
   const isKineticGlass = runtime.studioMode?.activeMode === "kinetic-glass";
+  const isDimentionR3F = runtime.studioMode?.activeMode === "dimention-r3f";
   const looks = (assembly.supportedLooks ?? []).map((look) => lookDescription(look, assembly.renderStrategies));
   const validation = runtimeState.validation;
   const validationLines = [
@@ -258,12 +260,21 @@ function makeHandoff({ runtimeState, task, filesChanged, visualChanges, knownIss
 - Render strategy: realtime Three.js raster, PMREM studio environment and restrained bloom
 - Presets: Clear Attraction, PLEOS Prism, Dark Mass
 - Motion support: Yes, live pointer interaction with stable return to the approved 30° rest positions`;
-  const lookSections = [glassLookSections, lightFieldSection, glassPrismSection, kineticGlassSection].filter(Boolean).join("\n\n");
+  const dimentionR3FSection = `### Dimention R3F
+
+- Role: fast, noise-free optical-glass version of the canonical Glass 3D composition
+- Implementation: React Three Fiber MeshTransmissionMaterial, Environment Lightformers, moving Pleos RGB RectAreaLights, N8AO, MSAA and restrained Bloom
+- Main files: \`src/modes/dimention-r3f/DimentionR3FMode.ts\`, \`DimentionR3FScene.tsx\`, \`DimentionR3FRenderer.tsx\`
+- Geometry: cloned from \`CrystalAssembly\`, including its shared-corner and bevel-aware screen-gap compensation
+- Render strategy: realtime Three.js WebGL raster; no Monte Carlo accumulation and no path tracing
+- Presets: PLEOS Prism, Clear Studio, Dark Glass
+- Motion support: Yes, deterministic RGB/white light orbit with timeline playback and seek`;
+  const lookSections = [glassLookSections, dimentionR3FSection, lightFieldSection, glassPrismSection, kineticGlassSection].filter(Boolean).join("\n\n");
   const formats = (runtime.artboardPresets ?? []).map((format) => `${format.label} (${format.width} × ${format.height})`);
   const formatSummary = formats.length ? formats.join("; ") : runtimeState.previews.map((preview) => `${preview.id} (${preview.width} × ${preview.height})`).join("; ");
   const motionPresets = (runtime.motionPresets ?? []).map((preset) => `${preset.id} — ${preset.duration}s, ${preset.constraint}`);
-  const motionRuntime = isLightField ? "LightFieldMode absolute-time field clock" : isGlassPrism ? "GlassPrismMode absolute-time optical motion clock" : isKineticGlass ? "Rapier fixed-step rigid-body clock with spring attraction" : "`MotionEngine` + `MotionClock`";
-  const motionPresetSummary = motionPresets.length ? motionPresets.join("; ") : isLightField ? "field-loop — 9s seamless loop" : isGlassPrism ? "rotate; shared-pulse; explode-rejoin" : isKineticGlass ? "pointer repulsion + spring attraction" : "None reported";
+  const motionRuntime = isLightField ? "LightFieldMode absolute-time field clock" : isGlassPrism ? "GlassPrismMode absolute-time optical motion clock" : isKineticGlass ? "Rapier fixed-step rigid-body clock with spring attraction" : isDimentionR3F ? "R3F absolute-time Pleos light-orbit clock" : "`MotionEngine` + `MotionClock`";
+  const motionPresetSummary = motionPresets.length ? motionPresets.join("; ") : isLightField ? "field-loop — 9s seamless loop" : isGlassPrism ? "rotate; shared-pulse; explode-rejoin" : isKineticGlass ? "pointer repulsion + spring attraction" : isDimentionR3F ? "Pleos RGB/white light orbit — 9s loop" : "None reported";
 
   return `# PLEOS 27 Axis — AI Handoff
 
@@ -281,11 +292,11 @@ Production geometry and expression layers should remain separable so new Looks d
 
 - Entry point: \`${app.entryPoint ?? "src/main.ts"}\`
 - Default route: \`${app.defaultRoute ?? "/"}\`
-- Active application: ${isLightField ? "LightFieldMode" : isGlassPrism ? "GlassPrismMode" : isKineticGlass ? "KineticGlassMode" : app.activeApplication ?? "MotionStudioApp"}
+- Active application: ${isLightField ? "LightFieldMode" : isGlassPrism ? "GlassPrismMode" : isKineticGlass ? "KineticGlassMode" : isDimentionR3F ? "DimentionR3FMode" : app.activeApplication ?? "MotionStudioApp"}
 - Renderer: ${app.renderer ?? runtime.renderer}
-- Preview: ${isLightField ? "custom WebGL2 continuous field" : isGlassPrism ? "custom Raw WebGL2 thickness-aware refraction" : isKineticGlass ? "Three.js physical-glass raster with Rapier interaction" : app.previewRenderer ?? "Three.js raster preview"}
+- Preview: ${isLightField ? "custom WebGL2 continuous field" : isGlassPrism ? "custom Raw WebGL2 thickness-aware refraction" : isKineticGlass ? "Three.js physical-glass raster with Rapier interaction" : isDimentionR3F ? "R3F realtime transmission glass with Lightformers and N8AO" : app.previewRenderer ?? "Three.js raster preview"}
 - Projection: ${isLightField || isGlassPrism || isKineticGlass ? runtime.projection : `${app.projection ?? "orthographic"} (${app.camera?.type ?? "unknown"})`}
-- Main structure: ${isLightField ? "three canonical Axis lobes sharing one origin in normalized artboard space" : isGlassPrism ? "three ray-intersected optical cubes meeting at one shared corner" : isKineticGlass ? "three physical glass cubes attracted to canonical 90° / 210° / 330° rest positions" : app.sceneStructure ?? "3 optical solids at a shared vertex"}
+- Main structure: ${isLightField ? "three canonical Axis lobes sharing one origin in normalized artboard space" : isGlassPrism ? "three ray-intersected optical cubes meeting at one shared corner" : isKineticGlass ? "three physical glass cubes attracted to canonical 90° / 210° / 330° rest positions" : isDimentionR3F ? "three CrystalAssembly-derived optical solids with the canonical bevel-aware visual gap" : app.sceneStructure ?? "3 optical solids at a shared vertex"}
 - Studio mode: ${runtime.studioMode?.modeLabel ?? "Glass 3D"} (renderer lifecycle owned by the active Mode)
 - Legacy routes: \`?renderer=raw\` and \`?renderer=legacy\` — Legacy / reference only
 
@@ -294,7 +305,7 @@ Production geometry and expression layers should remain separable so new Looks d
 - Axis family: 30deg
 - Shared origin valid: ${isLightField ? "Yes, sourced from src/axis" : isKineticGlass ? runtime.sharedOrigin === true ? "Yes" : "No" : runtime.sharedVertexValid === true ? "Yes" : "No"}
 - Shared-origin contract: ${assembly.sharedCorner ? `[${assembly.sharedCorner.join(", ")}]` : "runtime-controlled"}
-- Projected directions: ${isLightField ? "derived from axis-30-basic at runtime" : (assembly.projectedAxisAngles ?? []).map((angle) => `${angle}°`).join(", ")}
+- Projected directions: ${isLightField ? "derived from axis-30-basic at runtime" : (assembly.projectedAxisAngles ?? []).map((angle) => `${angle}°`).join(", ") || "30° family, geometry-derived at runtime"}
 - Geometry relationship: ${isLightField ? "three continuous field lobes share one origin; renderer-local angles are not hardcoded" : "three closed optical solids meet at one shared vertex."}
 - Do not change the approved shared origin, 30° projection, default camera, or three-solid silhouette without an explicit brand-structure request.
 - Materials, shaders, lighting, motion, and artboard treatment are expression layers and may evolve while the Axis contract remains fixed.
@@ -344,6 +355,9 @@ ${lookSections}
 | \`src/studio/ModeTypes.ts\` | Mode instance, capability and export-adapter contracts |
 | \`src/modes/glass-3d/Glass3DMode.ts\` | First production Mode; owns the current Three.js optical environment |
 | \`src/modes/glass-3d/Glass3DExportAdapter.ts\` | Maps common output intent to Glass 3D render strategies |
+| \`src/modes/dimention-r3f/DimentionR3FMode.ts\` | Independent realtime R3F mode lifecycle, state and export |
+| \`src/modes/dimention-r3f/DimentionR3FScene.tsx\` | Transmission glass, Lightformer studio, RGB light motion, N8AO and Bloom |
+| \`src/modes/dimention-r3f/DimentionR3FState.ts\` | Presets and isolated serializable realtime mode state |
 | \`src/modes/light-field/LightFieldMode.ts\` | Independent Light Field lifecycle, state, motion and variations |
 | \`src/modes/light-field/LightFieldRenderer.ts\` | Raw WebGL2 fullscreen renderer and exact-size raster output |
 | \`src/modes/light-field/PngMetadata.ts\` | Print PPI metadata injection for Light Field PNG output |
@@ -453,6 +467,7 @@ const capturedMode = capturedRuntime?.studioMode?.activeMode ?? null;
 const capturedIsLightField = capturedMode === "light-field";
 const capturedIsGlassPrism = capturedMode === "glass-prism";
 const capturedIsKineticGlass = capturedMode === "kinetic-glass";
+const capturedIsDimentionR3F = capturedMode === "dimention-r3f";
 const runtimeState = {
   project: "PLEOS 27 Axis",
   generatedAt,
@@ -468,20 +483,20 @@ const runtimeState = {
   app: capturedRuntime?.app ?? (capturedRuntime ? {
     entryPoint: "src/main.ts",
     defaultRoute: "/",
-    activeApplication: capturedIsLightField ? "LightFieldMode" : capturedIsGlassPrism ? "GlassPrismMode" : capturedIsKineticGlass ? "KineticGlassMode" : "Glass3DMode",
+    activeApplication: capturedIsLightField ? "LightFieldMode" : capturedIsGlassPrism ? "GlassPrismMode" : capturedIsKineticGlass ? "KineticGlassMode" : capturedIsDimentionR3F ? "DimentionR3FMode" : "Glass3DMode",
     renderer: capturedRuntime.renderer,
     projection: capturedRuntime.projection,
   } : null),
   runtime: capturedRuntime,
   axis: capturedRuntime ? {
     family: "30deg",
-    sharedOrigin: capturedIsLightField ? capturedRuntime.axis?.sharedOrigin === true : capturedIsKineticGlass ? capturedRuntime.sharedOrigin === true : capturedRuntime.sharedVertexValid === true,
+    sharedOrigin: capturedIsLightField ? capturedRuntime.axis?.sharedOrigin === true : capturedIsKineticGlass ? capturedRuntime.sharedOrigin === true : capturedIsDimentionR3F ? capturedRuntime.axis?.sharedOrigin === true : capturedRuntime.sharedVertexValid === true,
     projectionAngles: capturedRuntime.assembly?.projectedAxisAngles ?? capturedRuntime.axis?.projectedAngles ?? [],
     source: capturedRuntime.axis?.source ?? "src/axis",
   } : null,
   artboard: capture.initialRuntime?.artboard ?? null,
-  looks: capturedRuntime?.assembly?.supportedLooks ?? (capturedIsLightField ? ["iridescent-pulse", "violet-membrane", "spectral-white"] : capturedIsKineticGlass ? ["clear-attraction", "pleos-prism", "dark-mass"] : []),
-  motionPresets: capturedRuntime?.motionPresets ?? (capturedIsLightField ? ["field-loop"] : capturedIsKineticGlass ? ["pointer-attraction"] : []),
+  looks: capturedRuntime?.assembly?.supportedLooks ?? (capturedIsLightField ? ["iridescent-pulse", "violet-membrane", "spectral-white"] : capturedIsKineticGlass ? ["clear-attraction", "pleos-prism", "dark-mass"] : capturedIsDimentionR3F ? ["pleos-prism", "clear-studio", "dark-glass"] : []),
+  motionPresets: capturedRuntime?.motionPresets ?? (capturedIsLightField ? ["field-loop"] : capturedIsKineticGlass ? ["pointer-attraction"] : capturedIsDimentionR3F ? ["pleos-light-orbit"] : []),
   activeExpression: capturedRuntime?.assembly?.look ?? capturedRuntime?.preset ?? null,
   motion: capturedRuntime?.motion ?? null,
   previews: capture.previews,

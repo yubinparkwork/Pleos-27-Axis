@@ -15,8 +15,8 @@ Production geometry and expression layers should remain separable so new Looks d
 - Entry point: `src/main.ts`
 - Default route: `/`
 - Active application: Glass3DMode / MotionStudioApp
-- Renderer: Three.js WebGLRenderer + three-gpu-pathtracer
-- Preview: Three.js raster + EffectComposer + UnrealBloomPass
+- Renderer: Three.js WebGPU preview + native WebGPU wavefront path tracer
+- Preview: Three.js WebGL compatibility preview
 - Projection: orthographic (OrthographicCamera)
 - Main structure: 3 closed optical solids meeting at one shared vertex
 - Studio mode: Glass 3D (renderer lifecycle owned by the active Mode)
@@ -73,6 +73,16 @@ Production geometry and expression layers should remain separable so new Looks d
 - Main file: `src/crystal/CrystalAssembly.ts`
 - Render strategy: path-traced-still+raster-preview
 - Motion support: Yes, via the shared Motion system
+
+### Dimention R3F
+
+- Role: fast, noise-free optical-glass version of the canonical Glass 3D composition
+- Implementation: React Three Fiber MeshTransmissionMaterial, Environment Lightformers, moving Pleos RGB RectAreaLights, N8AO, MSAA and restrained Bloom
+- Main files: `src/modes/dimention-r3f/DimentionR3FMode.ts`, `DimentionR3FScene.tsx`, `DimentionR3FRenderer.tsx`
+- Geometry: cloned from `CrystalAssembly`, including its shared-corner and bevel-aware screen-gap compensation
+- Render strategy: realtime Three.js WebGL raster; no Monte Carlo accumulation and no path tracing
+- Presets: PLEOS Prism, Clear Studio, Dark Glass
+- Motion support: Yes, deterministic RGB/white light orbit with timeline playback and seek
 
 ### Light Field
 
@@ -142,6 +152,9 @@ Production geometry and expression layers should remain separable so new Looks d
 | `src/studio/ModeTypes.ts` | Mode instance, capability and export-adapter contracts |
 | `src/modes/glass-3d/Glass3DMode.ts` | First production Mode; owns the current Three.js optical environment |
 | `src/modes/glass-3d/Glass3DExportAdapter.ts` | Maps common output intent to Glass 3D render strategies |
+| `src/modes/dimention-r3f/DimentionR3FMode.ts` | Independent realtime R3F mode lifecycle, state and export |
+| `src/modes/dimention-r3f/DimentionR3FScene.tsx` | Transmission glass, Lightformer studio, RGB light motion, N8AO and Bloom |
+| `src/modes/dimention-r3f/DimentionR3FState.ts` | Presets and isolated serializable realtime mode state |
 | `src/modes/light-field/LightFieldMode.ts` | Independent Light Field lifecycle, state, motion and variations |
 | `src/modes/light-field/LightFieldRenderer.ts` | Raw WebGL2 fullscreen renderer and exact-size raster output |
 | `src/modes/light-field/PngMetadata.ts` | Print PPI metadata injection for Light Field PNG output |
@@ -168,195 +181,18 @@ Production geometry and expression layers should remain separable so new Looks d
 
 ## Latest Task
 
-- User request: Add cyclic Blue Red Green camera-facing light dominance to the spectral axis motion
-- What changed: Regenerated runtime inspection, latest previews, validation state, and the current-state handoff.
-- Why: Keep ChatGPT and Codex synchronized without manually copying project context.
-- Main implementation decisions: Use the production inspect/export API and deterministic hero time; do not capture editor UI.
+- User request: Dimention R3F 모드에 광원별 모양·위치·크기·움직임을 슬라이더와 숫자 입력으로 조절하는 상세 조명 패널 추가
+- What changed: 상세 조명 리그 상태, 실제 R3F 광원 연결, 접이식 한글 조명 편집 UI, 저장 마이그레이션, 자동 검증을 추가했다.
+- Why: 사용자가 브랜드 조명의 형태와 공간 배치, 크기, 모션을 렌더 결과를 보며 직접 정밀 조정할 수 있게 하기 위해서다.
+- Main implementation decisions: 기존 전체 밝기/RGB/화이트/속도는 마스터로 유지하고 화이트 키, RGB 3색, 화이트 면광원, 후면 광원을 독립 리그로 확장했다. 기존 저장값은 sanitize fallback으로 안전하게 마이그레이션한다.
 
 ## Files Changed
 
-- `README.md` — Git status M
-- `artifacts/latest/preview-4x5.png` — Git status M
-- `artifacts/latest/preview-9x16.png` — Git status M
-- `artifacts/latest/preview-main.png` — Git status M
-- `artifacts/latest/runtime-state.json` — Git status M
-- `docs/AI_HANDOFF.md` — Git status M
-- `docs/MODE_ARCHITECTURE.md` — Git status M
-- `package-lock.json` — Git status M
-- `package.json` — Git status M
-- `scripts/render-motion-sequence.mjs` — Git status M
-- `scripts/update-ai-handoff.mjs` — Git status M
-- `scripts/verify-design-polish.mjs` — Git status M
-- `scripts/verify-mode-lifecycle.mjs` — Git status M
-- `scripts/verify-pathtracer.mjs` — Git status M
-- `scripts/verify-retained-rendering.mjs` — Git status M
-- `src/artboard/CompositionAdapter.ts` — Git status M
-- `src/crystal/CrystalApp.css` — Git status M
-- `src/crystal/CrystalAssembly.ts` — Git status M
-- `src/crystal/LightingSystem.ts` — Git status M
-- `src/crystal/MotionStudioApp.ts` — Git status M
-- `src/crystal/ui/MotionPanel.ts` — Git status M
-- `src/crystal/ui/StudioPanel.ts` — Git status M
-- `src/crystal/variations/StudioVariation.ts` — Git status M
-- `src/main.ts` — Git status M
-- `src/modes/glass-3d/Glass3DMode.ts` — Git status M
-- `src/motion/modules/SpectralAxisSweepMotion.ts` — Git status M
-- `src/motion/presets/spectralAxisSweep.ts` — Git status M
-- `src/motion/types.ts` — Git status M
-- `src/studio/ModeTypes.ts` — Git status M
-- `src/studio/StudioShell.ts` — Git status M
-- `src/studio/StudioState.ts` — Git status M
-- `vite.config.ts` — Git status M
-- `archive/legacy-three/package-lock.json` — Git status ??
-- `artifacts/axis-habitat/axis-habitat-blue-observatory.png` — Git status ??
-- `artifacts/axis-habitat/luminous-drawing-preview-v2.png` — Git status ??
-- `artifacts/axis-habitat/luminous-drawing-preview-v3.png` — Git status ??
-- `artifacts/axis-habitat/luminous-drawing-preview-v4.png` — Git status ??
-- `artifacts/axis-habitat/luminous-drawing-preview.png` — Git status ??
-- `artifacts/axis-habitat/luminous-final-drawing.png` — Git status ??
-- `artifacts/axis-habitat/luminous-final-material.png` — Git status ??
-- `artifacts/axis-habitat/luminous-final-suspended.png` — Git status ??
-- `artifacts/axis-habitat/luminous-isolate.png` — Git status ??
-- `artifacts/axis-habitat/luminous-material-preview.png` — Git status ??
-- `artifacts/axis-habitat/luminous-raw-preview.png` — Git status ??
-- `artifacts/axis-habitat/luminous-suspended-preview.png` — Git status ??
-- `artifacts/axis-habitat/luminous-tuned-preview.png` — Git status ??
-- `artifacts/axis-habitat/luminous-visual-panel.png` — Git status ??
-- `artifacts/axis-habitat/pleos-formation-material-hold.png` — Git status ??
-- `artifacts/axis-habitat/pleos-formation-motion-panel.png` — Git status ??
-- `artifacts/axis-habitat/pleos-formation-suspended.png` — Git status ??
-- `artifacts/axis-habitat/pleos-formation-wire.png` — Git status ??
-- `artifacts/axis-trails/axis-trails-pleos-blue.png` — Git status ??
-- `artifacts/glass-prism/formats/portrait-4x5.png` — Git status ??
-- `artifacts/glass-prism/formats/square.png` — Git status ??
-- `artifacts/glass-prism/formats/vertical-9x16.png` — Git status ??
-- `artifacts/glass-prism/motion/frame-000.png` — Git status ??
-- `artifacts/glass-prism/motion/frame-025.png` — Git status ??
-- `artifacts/glass-prism/motion/frame-050.png` — Git status ??
-- `artifacts/glass-prism/motion/frame-075.png` — Git status ??
-- `artifacts/glass-prism/motion/frame-100.png` — Git status ??
-- `artifacts/glass-prism/presets/clear-glass.png` — Git status ??
-- `artifacts/glass-prism/presets/dark-crystal.png` — Git status ??
-- `artifacts/glass-prism/presets/frosted-prism.png` — Git status ??
-- `artifacts/glass-prism/presets/rgb-prism.png` — Git status ??
-- `artifacts/glass-prism/ui/glass-prism-default.png` — Git status ??
-- `artifacts/light-field/formats/portrait-4x5.png` — Git status ??
-- `artifacts/light-field/formats/square.png` — Git status ??
-- `artifacts/light-field/formats/vertical-9x16.png` — Git status ??
-- `artifacts/light-field/lifecycle/glass-before.png` — Git status ??
-- `artifacts/light-field/lifecycle/glass-restored.png` — Git status ??
-- `artifacts/light-field/lifecycle/light-field.png` — Git status ??
-- `artifacts/light-field/motion/frame-000.png` — Git status ??
-- `artifacts/light-field/motion/frame-025.png` — Git status ??
-- `artifacts/light-field/motion/frame-050.png` — Git status ??
-- `artifacts/light-field/motion/frame-075.png` — Git status ??
-- `artifacts/light-field/motion/frame-100.png` — Git status ??
-- `artifacts/light-field/presets/blue-core.png` — Git status ??
-- `artifacts/light-field/presets/dark-spectral.png` — Git status ??
-- `artifacts/light-field/presets/iridescent-pulse.png` — Git status ??
-- `artifacts/light-field/presets/spectral-white.png` — Git status ??
-- `artifacts/light-field/presets/violet-membrane.png` — Git status ??
-- `artifacts/light-field/presets/warm-fold.png` — Git status ??
-- `artifacts/light-field/ui/field-details.png` — Git status ??
-- `artifacts/light-field/ui/inspector-collapsed.png` — Git status ??
-- `artifacts/light-field/ui/light-field-default.png` — Git status ??
-- `artifacts/light-field/ui/output.png` — Git status ??
-- `artifacts/light-field/ui/variation-menu.png` — Git status ??
-- `artifacts/renders/pleos-27-axis-brand-light-4k-square-midpoint.png` — Git status ??
-- `artifacts/renders/pleos-27-axis-brand-light-4k-square.mp4` — Git status ??
-- `artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000000.png` — Git status ??
-- `artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000001.png` — Git status ??
-- `artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000002.png` — Git status ??
-- `artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000003.png` — Git status ??
-- `artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000004.png` — Git status ??
-- `artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000005.png` — Git status ??
-- `artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000006.png` — Git status ??
-- `artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000030.png` — Git status ??
-- `artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000060.png` — Git status ??
-- `artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000090.png` — Git status ??
-- `artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000120.png` — Git status ??
-- `artifacts/renders/pleos-axis-0-6s-512spp-594x841/frame-000150.png` — Git status ??
-- `docs/axis-habitat-research.md` — Git status ??
-- `scripts/capture-glass-prism.mjs` — Git status ??
-- `scripts/capture-light-field.mjs` — Git status ??
-- `scripts/render-glass-prism-sequence.mjs` — Git status ??
-- `scripts/render-light-field-sequence.mjs` — Git status ??
-- `scripts/verify-axis-habitat-runtime.mjs` — Git status ??
-- `scripts/verify-axis-habitat.mjs` — Git status ??
-- `scripts/verify-axis-megastructure.mjs` — Git status ??
-- `scripts/verify-axis-trails.mjs` — Git status ??
-- `scripts/verify-glass-prism.mjs` — Git status ??
-- `scripts/verify-kinetic-glass.mjs` — Git status ??
-- `scripts/verify-light-field.mjs` — Git status ??
-- `src/modes/axis-habitat/AxisFormationPanel.svelte` — Git status ??
-- `src/modes/axis-habitat/AxisHabitat.css` — Git status ??
-- `src/modes/axis-habitat/AxisHabitatExportAdapter.ts` — Git status ??
-- `src/modes/axis-habitat/AxisHabitatMode.ts` — Git status ??
-- `src/modes/axis-habitat/AxisHabitatPanel.ts` — Git status ??
-- `src/modes/axis-habitat/AxisHabitatRenderer.ts` — Git status ??
-- `src/modes/axis-habitat/AxisHabitatState.ts` — Git status ??
-- `src/modes/axis-megastructure/AxisMegastructure.css` — Git status ??
-- `src/modes/axis-megastructure/AxisMegastructureExportAdapter.ts` — Git status ??
-- `src/modes/axis-megastructure/AxisMegastructureMode.ts` — Git status ??
-- `src/modes/axis-megastructure/AxisMegastructurePanel.ts` — Git status ??
-- `src/modes/axis-megastructure/AxisMegastructureRenderer.ts` — Git status ??
-- `src/modes/axis-megastructure/AxisMegastructureState.ts` — Git status ??
-- `src/modes/axis-trails/AxisTrailsExportAdapter.ts` — Git status ??
-- `src/modes/axis-trails/AxisTrailsMode.ts` — Git status ??
-- `src/modes/axis-trails/AxisTrailsPanel.ts` — Git status ??
-- `src/modes/axis-trails/AxisTrailsRenderer.ts` — Git status ??
-- `src/modes/axis-trails/AxisTrailsState.ts` — Git status ??
-- `src/modes/glass-prism/GlassPrismExportAdapter.ts` — Git status ??
-- `src/modes/glass-prism/GlassPrismMode.ts` — Git status ??
-- `src/modes/glass-prism/GlassPrismPanel.ts` — Git status ??
-- `src/modes/glass-prism/GlassPrismRenderer.ts` — Git status ??
-- `src/modes/glass-prism/GlassPrismState.ts` — Git status ??
-- `src/modes/glass-prism/shaders/prism.frag.glsl` — Git status ??
-- `src/modes/kinetic-glass/KineticGlassExportAdapter.ts` — Git status ??
-- `src/modes/kinetic-glass/KineticGlassMode.ts` — Git status ??
-- `src/modes/kinetic-glass/KineticGlassPanel.ts` — Git status ??
-- `src/modes/kinetic-glass/KineticGlassRenderer.ts` — Git status ??
-- `src/modes/kinetic-glass/KineticGlassState.ts` — Git status ??
-- `src/modes/light-field/LightFieldExportAdapter.ts` — Git status ??
-- `src/modes/light-field/LightFieldMode.ts` — Git status ??
-- `src/modes/light-field/LightFieldPanel.ts` — Git status ??
-- `src/modes/light-field/LightFieldRenderer.ts` — Git status ??
-- `src/modes/light-field/LightFieldState.ts` — Git status ??
-- `src/modes/light-field/PngMetadata.ts` — Git status ??
-- `src/modes/light-field/shaders/blur.frag.glsl` — Git status ??
-- `src/modes/light-field/shaders/composite.frag.glsl` — Git status ??
-- `src/modes/light-field/shaders/field.frag.glsl` — Git status ??
-- `src/modes/light-field/shaders/fullscreen.vert.glsl` — Git status ??
-- `svelte.config.js` — Git status ??
-- `tmp/export-qa.html` — Git status ??
-- `tmp/pdfs/g25-contact.png` — Git status ??
-- `tmp/pdfs/g25/p21.png` — Git status ??
-- `tmp/pdfs/g25/p22.png` — Git status ??
-- `tmp/pdfs/g25/p23.png` — Git status ??
-- `tmp/pdfs/g25/p24.png` — Git status ??
-- `tmp/pdfs/g25/p26.png` — Git status ??
-- `tmp/pdfs/g25/p28.png` — Git status ??
-- `tmp/pdfs/g25/p3.png` — Git status ??
-- `tmp/pdfs/g25/p31.png` — Git status ??
-- `tmp/pdfs/g25/p32.png` — Git status ??
-- `tmp/pdfs/g25/p33.png` — Git status ??
-- `tmp/pdfs/g25/p37.png` — Git status ??
-- `tmp/pdfs/g25/p8.png` — Git status ??
-- `tmp/pdfs/k27-contact.png` — Git status ??
-- `tmp/pdfs/k27/p10.png` — Git status ??
-- `tmp/pdfs/k27/p11.png` — Git status ??
-- `tmp/pdfs/k27/p12.png` — Git status ??
-- `tmp/pdfs/k27/p13.png` — Git status ??
-- `tmp/pdfs/k27/p3.png` — Git status ??
-- `tmp/pdfs/k27/p7.png` — Git status ??
-- `tmp/pdfs/k27/p8.png` — Git status ??
-- `tmp/pdfs/k27/p9.png` — Git status ??
-- `tmp/spectral-qa.html` — Git status ??
-- `tmp/verify-video.log` — Git status ??
+- `src/modes/dimention-r3f/DimentionR3FState.ts;src/modes/dimention-r3f/DimentionR3FScene.tsx;src/modes/dimention-r3f/DimentionR3FPanel.ts;src/crystal/CrystalApp.css;scripts/verify-dimention-r3f.mjs` — Changed in the latest task
 
 ## Visual Changes
 
-- The moving RGB rig now hands roughly 76 percent light share to Blue, Red, and Green in sequence; dominant emitters move forward and broaden while support colors remain on edges and bevels
+- 화이트 키를 스포트/사각 면광원으로 전환 가능;RGB 반사광을 원형/타원/링으로 전환하고 개별 위치·크기·궤도를 조절 가능;고정형 화이트/후면 광원의 형태·회전·크기 조절 가능
 
 ## Latest Previews
 
@@ -377,12 +213,11 @@ Validation values are generated from commands executed during this handoff. `NOT
 
 ## Known Issues
 
-None known
+- None known
 
 ## Next Recommended Work
 
-- Review the three latest previews after meaningful visual work.
-- Run handoff:full at the end of completed implementation work.
+- 광원 프리셋 저장/불러오기;선택 광원 뷰포트 기즈모;광원 그룹 복제/삭제
 
 ## ChatGPT Re-scan Notes
 

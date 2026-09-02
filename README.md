@@ -1,8 +1,8 @@
 # PLEOS 27 Axis — Multi-Mode Creative Studio
 
-Production Modes include `Glass 3D` (Three.js optical solids and supported path-traced stills), `Light Field` (raw WebGL2 continuous spectral field), `Glass Prism` (raw WebGL2 thickness-aware RGB refraction), `Kinetic Glass` (Three.js physical glass with Rapier rigid-body interaction), `Axis Trails` (cursor-following 30° signal lines), and `Formation Loop` (three PLEOS forms rebuilt as a nonuniform HDR light network with Svelte controls, GSAP motion, WebGL shaders, instanced ghost fragments, and BVH interaction). Each preserves the canonical three-part Axis identity and shares the Shell-owned artboard, Variation, motion transport, and export entry point.
+Production Modes include `Glass 3D` (Three.js optical solids with native WebGPU wavefront path tracing), `Dimention R3F` (noise-free realtime R3F transmission glass with Lightformer studio reflections and N8AO), `Light Field` (raw WebGL2 continuous spectral field), `Glass Prism` (raw WebGL2 thickness-aware RGB refraction), `Kinetic Glass` (Three.js physical glass with Rapier rigid-body interaction), `Axis Trails` (cursor-following 30° signal lines), and `Formation Loop` (three PLEOS forms rebuilt as a nonuniform HDR light network with Svelte controls, GSAP motion, WebGL shaders, instanced ghost fragments, and BVH interaction). Each preserves the canonical three-part Axis identity and shares the Shell-owned artboard, Variation, motion transport, and export entry point.
 
-하나의 PLEOS Axis Identity를 공유하면서 레퍼런스에 맞는 독립적인 제작 환경을 선택할 수 있는 Mode 기반 제작 도구입니다. 첫 production Mode인 `Glass 3D`는 Three.js와 `three-gpu-pathtracer`를 사용하며, 세 optical solid가 하나의 공유 꼭짓점에서 만나는 30° 구조, 결정론적 모션, virtual artboard와 고품질 렌더를 유지합니다.
+하나의 PLEOS Axis Identity를 공유하면서 레퍼런스에 맞는 독립적인 제작 환경을 선택할 수 있는 Mode 기반 제작 도구입니다. 첫 production Mode인 `Glass 3D`는 Three.js WebGPU 실시간 렌더러와 `three-gpu-pathtracer` WebGPU wavefront compute 고품질 렌더러를 사용하며, 세 optical solid가 하나의 공유 꼭짓점에서 만나는 30° 구조, 결정론적 모션, virtual artboard와 고품질 렌더를 유지합니다. WebGPU를 사용할 수 없는 브라우저에서는 기존 WebGL2 패스 트레이서로 폴백합니다.
 
 ## 실행
 
@@ -17,6 +17,8 @@ npm run dev
 npm run typecheck
 npm run verify
 npm run verify:motion
+npm run verify:webgpu-glass
+npm run verify:dimention-r3f
 npm run verify:light-field
 npm run verify:glass-prism
 npm run verify:kinetic-glass
@@ -29,6 +31,10 @@ npm run qa
 ## Mode Studio
 
 The common top bar is owned by `StudioShell`: Mode, Variation, primary Export, Inspector collapse and motion transport remain stable while renderers switch. `Light Field` owns one WebGL2 canvas, its own Inspector and Iridescent Pulse / Violet Membrane / Spectral White presets; it does not instantiate Three.js or the path tracer. Its world-space membrane field keeps warped spectral bands continuous across rounded cube faces. Mode-specific state is persisted in separate namespaces while the artboard remains shared.
+
+`Dimention R3F`는 기존 `Glass 3D`를 변경하지 않는 별도 실시간 모드입니다. `CrystalAssembly`의 3큐브, 공유 꼭짓점, 30° 투영, 베벨·갭 보정을 그대로 복제하고, 누적 패스 트레이싱 대신 R3F `MeshTransmissionMaterial`, Environment Lightformer, 움직이는 Pleos Red/Green/Blue 면광원, N8AO, MSAA, 제한적인 Bloom을 사용합니다. 프리셋은 PLEOS Prism / Clear Studio / Dark Glass이며 현재 판형의 PNG와 투명 PNG를 즉시 출력합니다.
+
+이 모드의 왼쪽 `카메라` 패널은 아이소메트릭 방향을 고정한 채 미리보기 확대, 수평·수직 평행 이동, Axis 기준점과 그래픽 크기를 조절합니다. 카메라 이동은 오브젝트나 조명을 변형하지 않으며 실시간 미리보기와 PNG 출력에 동일하게 적용됩니다. 패널은 헤더의 화살표로 46px 레일 상태까지 접을 수 있습니다.
 
 Light Field verification and evidence:
 
@@ -88,7 +94,7 @@ Inspector를 접거나 창 크기를 변경해도 출력 pixel dimension과 artb
 
 ## Render와 Export
 
-- 재생과 scrub: raster preview만 사용
+- 재생과 scrub: Clear / Prism / Smoked는 WebGPU + TSL bloom을 사용. WebGPU 미지원 브라우저와 GLSL 기반 Spectral Look은 기존 WebGL preview로 자동 복귀
 - 빠른 렌더링: 16spp · 50% render scale · 4 bounce
 - 고품질 렌더링: Advanced의 sample / render scale / bounce 사용
 - Raster PNG: 현재 time의 artboard를 정확한 pixel dimension으로 출력
@@ -99,6 +105,8 @@ Inspector를 접거나 창 크기를 변경해도 출력 pixel dimension과 artb
 - Motion sequence: Playwright 기반 fixed-timestep PNG sequence
 
 브라우저 MP4 내보내기는 실시간 화면 녹화가 아닙니다. 각 프레임의 패스트레이싱이 끝난 다음 인코딩하므로 영상 길이와 FPS는 정확하지만, 512 spp 같은 고품질 설정은 프레임 수에 비례해 오래 걸립니다. 렌더링 중에는 탭을 닫거나 백그라운드 절전 상태로 두지 마세요.
+
+> WebGPU 범위: 실시간 Glass 3D, TSL post-processing, 고품질 PNG/MP4 샘플 누적이 모두 native WebGPU입니다. 고품질 경로는 `three-gpu-pathtracer` 공식 `webgpu-pathtracer` 브랜치의 wavefront compute 백엔드를 특정 commit으로 고정해 사용합니다. 런타임에서 native WebGPU adapter가 없으면 기존 WebGL2 패스 트레이서로 자동 폴백합니다. 현재 upstream WebGPU 경로의 명시적 한계로 RGB dispersion은 폴백 경로에서만 지원됩니다.
 
 부분 렌더링 입력에서는 `↑ / ↓`로 1px, `Shift + ↑ / ↓`로 10px씩 조절합니다. 예를 들어 단위 기준이 96ppi일 때 `50mm`는 189px로 변환됩니다.
 
@@ -128,6 +136,7 @@ ffmpeg -framerate 30 -i frame-%06d.png -c:v libx264 -pix_fmt yuv420p pleos-axis.
 ```ts
 window.__pleos27Axis.inspect();
 window.__pleos27Axis.switchMode("glass-3d");
+window.__pleos27Axis.switchMode("dimention-r3f");
 window.__pleos27Axis.switchMode("light-field");
 window.__pleos27Axis.applyVariation("light-field-violet-membrane");
 window.__pleos27Axis.remountMode(); // lifecycle QA
@@ -178,7 +187,7 @@ scripts        검증과 fixed-timestep sequence 출력
 
 Motion은 기존 MOTION 탭과 6초 fixed-time 루프를 사용합니다. Motion이 꺼져 있을 때는 `Flow Position`으로 정적 상태를 직접 확인할 수 있습니다. Motion이 켜지면 0초와 6초의 spectral envelope가 동일하게 0으로 수렴합니다.
 
-SPECTRAL FLOW의 빠른/고품질/인쇄/시퀀스 출력은 path tracing 누적 대신 같은 custom shader를 artboard 또는 부분 렌더 영역의 정확한 pixel dimension으로 다시 그립니다. 따라서 viewport와 device pixel ratio에 독립적이고 Monte Carlo 노이즈가 없습니다. CLEAR / PRISM / SMOKED의 고품질 출력은 기존 path tracer를 유지합니다.
+SPECTRAL FLOW의 빠른/고품질/인쇄/시퀀스 출력은 path tracing 누적 대신 같은 custom shader를 artboard 또는 부분 렌더 영역의 정확한 pixel dimension으로 다시 그립니다. 따라서 viewport와 device pixel ratio에 독립적이고 Monte Carlo 노이즈가 없습니다. CLEAR / PRISM / SMOKED의 고품질 출력은 WebGPU wavefront path tracer를 사용하고, WebGPU 미지원 환경에서만 WebGL2 폴백을 사용합니다.
 
 ```bash
 npm run render:motion -- \

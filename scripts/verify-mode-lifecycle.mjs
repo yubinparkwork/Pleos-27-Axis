@@ -21,6 +21,7 @@ page.on("console", (message) => { if (message.type() === "error") errors.push(me
 await page.addInitScript(() => {
   if (!sessionStorage.getItem("pleos-lifecycle-initialized")) {
     localStorage.removeItem("pleos-27-axis-studio-state-v2");
+    localStorage.removeItem("pleos-27-axis-studio-state-v3");
     localStorage.removeItem("pleos-27-axis-manual-save-v1");
     sessionStorage.setItem("pleos-lifecycle-initialized", "1");
   }
@@ -79,7 +80,7 @@ try {
   const glassPanels = await page.locator("[data-mode-panel='glass-3d']").count();
   const finalRaf = await page.evaluate(() => window.__pleosRafDiagnostics.pending.size);
   const checks = {
-    registeredModes: ["glass-3d", "light-field", "glass-prism", "kinetic-glass", "axis-trails", "axis-habitat", "axis-megastructure"].every((id) => modes.some((item) => item.id === id)),
+    registeredModes: ["glass-3d", "dimention-r3f", "light-field", "glass-prism", "kinetic-glass", "axis-trails", "axis-habitat", "axis-megastructure"].every((id) => modes.some((item) => item.id === id)),
     lightIndependent: light.studioMode?.capabilities?.pathTracing === false && light.renderer === "custom WebGL2 fullscreen field",
     lightSingleCanvas: light.studioMode?.lifecycle?.canvasCount === 1 && lightCanvas === 1,
     prismIndependent: prism.studioMode?.capabilities?.pathTracing === false && prism.renderer === "custom Raw WebGL2 ray-box prism",
@@ -89,7 +90,9 @@ try {
     manualSave: manualSave?.version === 1 && manualSave?.state?.activeModeId === "light-field" && manualSave?.state?.shared?.artboard?.width === 1240 && /저장됨/.test(manualSaveStatus ?? ""),
     glassRestored: glassAfter.studioMode?.activeMode === "glass-3d" && glassAfter.assembly?.look === glassBefore.assembly?.look,
     artboardShared: light.artboard?.width === 1333 && light.artboard?.height === 777,
-    canvasCount: glassCanvas === 2 && glassAfter.studioMode?.lifecycle?.canvasCount === 2,
+    // WebGL preview + WebGPU preview + WebGL fallback path target + native
+    // WebGPU path target. Only one canvas is visible at a time.
+    canvasCount: glassCanvas === 4 && glassAfter.studioMode?.lifecycle?.canvasCount === 4,
     panelCount: glassPanels === 1,
     rafNotLeaking: glassRaf > 0 && lightRaf > 0 && prismRaf > 0 && finalRaf <= glassRaf + 1,
     console: errors.length === 0,

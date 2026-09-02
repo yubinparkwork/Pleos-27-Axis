@@ -9,6 +9,7 @@ const mainSource = await readFile(path.join(root, "src/main.ts"), "utf8");
 const shellSource = await readFile(path.join(root, "src/studio/StudioShell.ts"), "utf8");
 const glassModeSource = await readFile(path.join(root, "src/modes/glass-3d/Glass3DMode.ts"), "utf8");
 const appSource = await readFile(path.join(root, "src/crystal/MotionStudioApp.ts"), "utf8");
+const webgpuPathSource = await readFile(path.join(root, "src/crystal/rendering/WebGPUPathTracerBackend.ts"), "utf8");
 const panelSource = await readFile(path.join(root, "src/crystal/ui/StudioPanel.ts"), "utf8");
 const lightingSource = await readFile(path.join(root, "src/crystal/LightingSystem.ts"), "utf8");
 
@@ -19,12 +20,14 @@ assert.match(mainSource, /new StudioShell\(root!, registry, "glass-3d"\)/, "Mode
 assert.match(mainSource, /register\(GLASS_3D_MODE\)/, "Glass 3D must be the registered production mode");
 assert.match(shellSource, /definition\.create\(context\)/, "Studio shell must create renderers through the active mode definition");
 assert.match(glassModeSource, /new MotionStudioApp\(this\.context\.root/, "Glass 3D mode must own the path-traced Motion Studio app");
-assert.match(appSource, /new WebGLPathTracer\(this\.pathRenderer\)/, "WebGLPathTracer must own the active renderer");
+assert.match(webgpuPathSource, /new WebGPUPathTracer\(this\.renderer\)/, "WebGPUPathTracer must own the preferred final renderer");
+assert.match(appSource, /new WebGLPathTracer\(this\.pathRenderer\)/, "WebGLPathTracer must remain available as a compatibility fallback");
 assert.match(appSource, /new THREE\.OrthographicCamera\(/, "Default camera must be orthographic");
 assert.match(appSource, /transmissiveBounces = this\.settings\.advanced\.bounces \+ 4/, "High-quality transmission bounce budget is missing");
 assert.match(appSource, /this\.pathTracer\.setScene\(this\.scene, this\.pathCamera\)/, "Current-frame path tracing must synchronize the scene");
 assert.match(appSource, /pleos-27-axis-settings-v2/, "Settings V2 must persist locally");
-assert.match(appSource, /this\.pathTracer\.renderSample\(\)/, "Manual high-quality render must accumulate samples");
+assert.match(appSource, /this\.webgpuPathTracer\.renderSample\(timestamp\)/, "Manual high-quality render must accumulate native WebGPU samples");
+assert.match(appSource, /this\.pathTracer\.renderSample\(\)/, "Compatibility rendering must continue to accumulate WebGL samples");
 assert.match(appSource, /new CanvasSource\(encodingCanvas/, "Path-traced video must encode deterministic canvas frames");
 assert.match(appSource, /outputSize\.height \+ outputSize\.height % 2/, "H.264 output height must be padded to an even number");
 assert.match(appSource, /await source\.add\(frame \/ fps, 1 \/ fps\)/, "Video frames need fixed timestamps and durations");
@@ -39,8 +42,9 @@ assert.match(panelSource, /data-scrub/, "Inspector numeric inputs must support h
 assert.match(panelSource, /영상 · MP4/, "Export type must expose browser-side MP4 output");
 assert.match(panelSource, /"target-samples", "샘플", 16, 2048, 16/, "Path-traced sample control must support up to 2048 spp");
 assert.match(lightingSource, /PLEOS_BRAND_COLORS/, "Pleos brand palette is required");
-assert.match(lightingSource, /new ShapedAreaLight/, "Rect area lights must be supported");
-assert.match(lightingSource, /new PhysicalSpotLight/, "Physical spot lights must be supported");
+assert.match(lightingSource, /new THREE\.RectAreaLight/, "Renderer-neutral Rect Area Lights must be supported");
+assert.match(lightingSource, /new THREE\.SpotLight/, "Renderer-neutral Spot Lights must be supported");
+assert.match(lightingSource, /new ShapedAreaLight/, "Path-traced finite strip surrogates must be supported");
 assert.match(lightingSource, /new THREE\.DirectionalLight/, "Directional lights must be supported");
 assert.match(lightingSource, /new THREE\.PointLight/, "Point lights must be supported");
 
@@ -113,7 +117,7 @@ try {
 
   console.log(JSON.stringify({
     status: "pass",
-    renderer: "three-gpu-pathtracer",
+    renderer: "three-gpu-pathtracer WebGPU with WebGL fallback",
     solids: meshes.length,
     linePrimitives: lines.length,
     sharedCorner: inspection.sharedCorner,

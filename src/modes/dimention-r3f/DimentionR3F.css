@@ -1,0 +1,16 @@
+.motion-studio.light-field-app.dimention-r3f-app { --left-panel-space: 304px; }
+.motion-studio.light-field-app.dimention-r3f-app .pasteboard { left: var(--left-panel-space); }
+.motion-studio.light-field-app.dimention-r3f-app .motion-transport { left: var(--left-panel-space); }
+.dimention-r3f-app .dimention-r3f-stage { position: absolute; inset: 0; overflow: hidden; }
+.dimention-r3f-app .dimention-r3f-canvas { width: 100% !important; height: 100% !important; display: block; touch-action: none; }
+.dimention-r3f-app .studio-section > summary { min-height: 42px; display: flex; align-items: center; color: var(--text-secondary); cursor: pointer; font-size: 10px; letter-spacing: .035em; }
+.dimention-r3f-app .studio-section > .section-details { padding: 0 0 10px; }
+.dimention-r3f-app .dimention-r3f-artboard { box-shadow: 0 22px 70px rgba(0,0,0,.52), 0 0 0 1px rgba(255,255,255,.09); }
+.dimention-r3f-app.dimention-camera-collapsed { --left-panel-space: 46px !important; }
+.dimention-r3f-app.dimention-camera-collapsed .dimention-camera-panel .panel-header,
+.dimention-r3f-app.dimention-camera-collapsed .dimention-camera-panel .panel-scroll { display: none; }
+.dimention-r3f-app.dimention-camera-collapsed .dimention-camera-panel .panel-rail-button { display: block; }
+@media (max-width: 900px) {
+  .motion-studio.light-field-app.dimention-r3f-app { --left-panel-space: 0px; }
+  .dimention-r3f-app .dimention-camera-panel { display: none; }
+}

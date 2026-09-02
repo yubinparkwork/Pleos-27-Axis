@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { PhysicalSpotLight, ShapedAreaLight } from "three-gpu-pathtracer";
+import { ShapedAreaLight } from "three-gpu-pathtracer";
 
 export type PleosLightType = "rect" | "point" | "spot" | "directional";
 export type LightingPresetName = "pleos-rgb" | "pleos-blue" | "pleos-prism" | "dark-studio" | "soft-glass" | "custom";
@@ -265,6 +265,9 @@ interface RuntimeLight {
   helper: THREE.Group;
 }
 
+type PathCompatibleRectAreaLight = THREE.RectAreaLight & { isCircular: boolean };
+type PathCompatibleSpotLight = THREE.SpotLight & { radius: number; iesMap: THREE.Texture | null };
+
 function colorWithSaturation(hex: string, multiplier: number): THREE.Color {
   const color = new THREE.Color(hex);
   const hsl = { h: 0, s: 0, l: 0 };
@@ -394,8 +397,18 @@ export class LightingSystem {
   private createRuntime(data: PleosLightData): void {
     let object: THREE.Light;
     let target: THREE.Object3D | undefined;
-    if (data.type === "rect") object = new ShapedAreaLight(data.color, data.intensity, data.width, data.height);
-    else if (data.type === "spot") { const spot = new PhysicalSpotLight(data.color, data.intensity); object = spot; target = spot.target; }
+    if (data.type === "rect") {
+      const rect = new THREE.RectAreaLight(data.color, data.intensity, data.width, data.height) as PathCompatibleRectAreaLight;
+      rect.isCircular = false;
+      object = rect;
+    }
+    else if (data.type === "spot") {
+      const spot = new THREE.SpotLight(data.color, data.intensity) as PathCompatibleSpotLight;
+      spot.radius = 0;
+      spot.iesMap = null;
+      object = spot;
+      target = spot.target;
+    }
     else if (data.type === "directional") { const directional = new THREE.DirectionalLight(data.color, data.intensity); object = directional; target = directional.target; }
     else object = new THREE.PointLight(data.color, data.intensity, data.distance, data.decay);
     object.name = data.name; this.scene.add(object); if (target) this.scene.add(target);
@@ -414,7 +427,7 @@ export class LightingSystem {
     object.updateMatrixWorld(true);
     if (object instanceof THREE.RectAreaLight) { object.width = data.width; object.height = data.height; }
     if (object instanceof THREE.PointLight || object instanceof THREE.SpotLight) { object.distance = data.distance; object.decay = data.decay; }
-    if (object instanceof THREE.SpotLight) { object.angle = THREE.MathUtils.degToRad(data.angle); object.penumbra = data.penumbra; (object as PhysicalSpotLight).radius = data.shadowSoftness * 0.025; }
+    if (object instanceof THREE.SpotLight) { object.angle = THREE.MathUtils.degToRad(data.angle); object.penumbra = data.penumbra; (object as PathCompatibleSpotLight).radius = data.shadowSoftness * 0.025; }
     if ("castShadow" in object) object.castShadow = data.castShadow;
     if ((object instanceof THREE.PointLight || object instanceof THREE.SpotLight || object instanceof THREE.DirectionalLight) && object.shadow) {
       object.shadow.intensity = data.shadowIntensity;
@@ -459,7 +472,7 @@ export class LightingSystem {
     const runtime = this.runtime.get(id); if (!runtime) return;
     this.scene.remove(runtime.object); if (runtime.target) this.scene.remove(runtime.target); this.overlayScene.remove(runtime.helper);
     runtime.helper.traverse((object) => { if (object instanceof THREE.LineSegments) { object.geometry.dispose(); (object.material as THREE.Material).dispose(); } });
-    if (runtime.object instanceof ShapedAreaLight) runtime.object.dispose(); this.runtime.delete(id);
+    this.runtime.delete(id);
   }
 
   private clearPathSurrogates(): void {
