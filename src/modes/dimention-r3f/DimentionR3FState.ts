@@ -13,9 +13,9 @@ export interface DimentionDirectLightState {
 }
 
 export interface DimentionSpectralLightState {
-  enabled: boolean; shape: Exclude<DimentionEmitterShape, "rect">; color: string; intensity: number;
+  enabled: boolean; color: string; intensity: number;
   positionX: number; positionY: number; positionZ: number;
-  width: number; height: number; softness: number;
+  angle: number; penumbra: number; distance: number; decay: number;
   orbitRadius: number; orbitHeight: number; phase: number;
 }
 
@@ -23,7 +23,7 @@ export interface DimentionEnvironmentLightState {
   enabled: boolean; shape: DimentionEmitterShape; color: string; intensity: number;
   positionX: number; positionY: number; positionZ: number;
   rotationX: number; rotationY: number; rotationZ: number;
-  width: number; height: number;
+  width: number; height: number; motionAmount: number;
 }
 
 export interface DimentionLightingRigState {
@@ -46,12 +46,17 @@ export interface DimentionR3FState {
   };
   lighting: {
     exposure: number; master: number; rgb: number; white: number;
-    speed: number; bloom: number; ao: number;
+    speed: number; rgbMotionSpeed: number; rgbCoverage: number; bloom: number; ao: number;
     rig: DimentionLightingRigState;
   };
-  mirror: { enabled: boolean; bounces: number; recursionScale: number; reflectivity: number; absorption: number; dispersion: number; edgeIntensity: number };
+  mirror: {
+    enabled: boolean; intensity: number; bounces: number; recursionScale: number;
+    reflectivity: number; absorption: number; dispersion: number; edgeIntensity: number;
+    fresnelBoost: number; backfaceEnergy: number; depthShift: number;
+    blur: number; lightThreshold: number;
+  };
   camera: { panX: number; panY: number; freeOrbit: boolean; orbitYaw: number; orbitPitch: number; orbitZoom: number; panelCollapsed: boolean };
-  motion: { enabled: boolean; playing: boolean; time: number; duration: number };
+  motion: { enabled: boolean; playing: boolean; time: number; duration: number; cubeRotationTurns: number };
   quality: { transmissionResolution: number; samples: number; multisampling: number; maxDpr: number };
   artboard: ArtboardState;
   export: {
@@ -61,6 +66,7 @@ export interface DimentionR3FState {
     videoWidth: number;
     videoHeight: number;
     videoBitrateMbps: number;
+    videoSupersampling: number;
   };
 }
 
@@ -70,22 +76,22 @@ const base = (): DimentionR3FState => ({
   geometry: { gap: .055, bevel: .035 },
   material: { roughness: .055, transmission: 1, thickness: 1.75, ior: 1.48, chromaticAberration: .075, anisotropicBlur: .08, attenuationDistance: 5.5, environment: 1.65 },
   lighting: {
-    exposure: 1.02, master: 1, rgb: 1.15, white: .8, speed: .58, bloom: .16, ao: .9,
+    exposure: 1.02, master: 1, rgb: 1.15, white: .8, speed: .58, rgbMotionSpeed: .42, rgbCoverage: .78, bloom: .16, ao: .9,
     rig: {
       key: { enabled: true, shape: "spot", color: "#ffffff", intensity: 42, positionX: -3.6, positionY: 5.4, positionZ: -4.2, targetX: 0, targetY: 0, targetZ: 0, width: 5.5, height: 3.2, angle: .66, penumbra: 1, distance: 18, decay: 1.35, motionAmount: .8 },
-      red: { enabled: true, shape: "circle", color: "#FA293C", intensity: .92, positionX: 0, positionY: 0, positionZ: 0, width: 2.4, height: 2.4, softness: .72, orbitRadius: 4.6, orbitHeight: 3.1, phase: 0 },
-      green: { enabled: true, shape: "circle", color: "#0ADC91", intensity: .84, positionX: 0, positionY: 0, positionZ: 0, width: 2.25, height: 2.25, softness: .72, orbitRadius: 5.2, orbitHeight: 3.1, phase: 120 },
-      blue: { enabled: true, shape: "circle", color: "#4664FF", intensity: 1, positionX: 0, positionY: 0, positionZ: 0, width: 2.6, height: 2.6, softness: .72, orbitRadius: 4.9, orbitHeight: 3.1, phase: 240 },
-      whiteArea: { enabled: true, shape: "ellipse", color: "#ffffff", intensity: 2.4, positionX: 0, positionY: 6, positionZ: -5, rotationX: 90, rotationY: 0, rotationZ: 0, width: 8, height: 3.2 },
-      rear: { enabled: true, shape: "ring", color: "#CDDCFF", intensity: 1.4, positionX: 0, positionY: 0, positionZ: 5, rotationX: 0, rotationY: 0, rotationZ: 0, width: 3.2, height: 3.2 },
+      red: { enabled: true, color: "#FA293C", intensity: .92, positionX: 0, positionY: 0, positionZ: 0, angle: .72, penumbra: .92, distance: 24, decay: 1.35, orbitRadius: 4.6, orbitHeight: 3.1, phase: 0 },
+      green: { enabled: true, color: "#0ADC91", intensity: .84, positionX: 0, positionY: 0, positionZ: 0, angle: .72, penumbra: .92, distance: 24, decay: 1.35, orbitRadius: 5.2, orbitHeight: 3.1, phase: 120 },
+      blue: { enabled: true, color: "#4664FF", intensity: 1, positionX: 0, positionY: 0, positionZ: 0, angle: .72, penumbra: .92, distance: 24, decay: 1.35, orbitRadius: 4.9, orbitHeight: 3.1, phase: 240 },
+      whiteArea: { enabled: true, shape: "ellipse", color: "#ffffff", intensity: 2.4, positionX: 0, positionY: 6, positionZ: -5, rotationX: 90, rotationY: 0, rotationZ: 0, width: 8, height: 3.2, motionAmount: .65 },
+      rear: { enabled: true, shape: "ring", color: "#CDDCFF", intensity: 1.4, positionX: 0, positionY: 0, positionZ: 5, rotationX: 0, rotationY: 0, rotationZ: 0, width: 3.2, height: 3.2, motionAmount: .45 },
     },
   },
-  mirror: { enabled: true, bounces: 7, recursionScale: .72, reflectivity: .84, absorption: .16, dispersion: .055, edgeIntensity: 1.25 },
+  mirror: { enabled: true, intensity: 1, bounces: 7, recursionScale: .72, reflectivity: .84, absorption: .16, dispersion: .055, edgeIntensity: 1.25, fresnelBoost: 1, backfaceEnergy: .52, depthShift: 1, blur: 1, lightThreshold: .09 },
   camera: { panX: 0, panY: 0, freeOrbit: false, orbitYaw: 0, orbitPitch: 0, orbitZoom: 1, panelCollapsed: false },
-  motion: { enabled: true, playing: true, time: 0, duration: 9 },
-  quality: { transmissionResolution: 512, samples: 6, multisampling: 8, maxDpr: 1.5 },
+  motion: { enabled: true, playing: true, time: 0, duration: 9, cubeRotationTurns: 1 },
+  quality: { transmissionResolution: 512, samples: 12, multisampling: 8, maxDpr: 1.5 },
   artboard: { ...DEFAULT_ARTBOARD, axisAnchor: { ...DEFAULT_ARTBOARD.axisAnchor }, scale: .82, background: "#050607" },
-  export: { ppi: 300, videoFps: 30, videoResolution: "4k", videoWidth: 3840, videoHeight: 2160, videoBitrateMbps: 80 },
+  export: { ppi: 300, videoFps: 30, videoResolution: "4k", videoWidth: 3840, videoHeight: 2160, videoBitrateMbps: 160, videoSupersampling: 2 },
 });
 
 export const DIMENTION_R3F_PRESETS: Readonly<Record<DimentionR3FPresetId, DimentionR3FState>> = {
@@ -112,22 +118,23 @@ export function sanitizeDimentionR3FState(value: unknown): DimentionR3FState {
   const preset: DimentionR3FPresetId = candidate?.preset === "clear-studio" || candidate?.preset === "dark-glass" ? candidate.preset : "pleos-prism";
   const fallback = createDimentionR3FState(preset);
   const number = (entry: unknown, defaultValue: number, min: number, max: number) => typeof entry === "number" && Number.isFinite(entry) ? Math.min(max, Math.max(min, entry)) : defaultValue;
+  const motionDuration = number(candidate?.motion?.duration, fallback.motion.duration, 1, 15);
+  const motionTime = number(candidate?.motion?.time, 0, 0, motionDuration);
   const color = (entry: unknown, defaultValue: string) => typeof entry === "string" && /^#[0-9a-f]{6}$/i.test(entry) ? entry : defaultValue;
   const rig = candidate?.lighting?.rig;
   const directShape = (entry: unknown, defaultValue: DimentionDirectLightShape): DimentionDirectLightShape => entry === "area" || entry === "spot" ? entry : defaultValue;
   const emitterShape = (entry: unknown, defaultValue: DimentionEmitterShape): DimentionEmitterShape => entry === "circle" || entry === "ellipse" || entry === "ring" || entry === "rect" ? entry : defaultValue;
-  const spectralShape = (entry: unknown, defaultValue: DimentionSpectralLightState["shape"]): DimentionSpectralLightState["shape"] => entry === "circle" || entry === "ellipse" || entry === "ring" ? entry : defaultValue;
   const spectral = (entry: Partial<DimentionSpectralLightState> | undefined, defaultValue: DimentionSpectralLightState): DimentionSpectralLightState => ({
     enabled: entry?.enabled !== false,
-    shape: spectralShape(entry?.shape, defaultValue.shape),
     color: color(entry?.color, defaultValue.color),
     intensity: number(entry?.intensity, defaultValue.intensity, 0, 8),
     positionX: number(entry?.positionX, defaultValue.positionX, -12, 12),
     positionY: number(entry?.positionY, defaultValue.positionY, -12, 12),
     positionZ: number(entry?.positionZ, defaultValue.positionZ, -12, 12),
-    width: number(entry?.width, defaultValue.width, .05, 12),
-    height: number(entry?.height, defaultValue.height, .05, 12),
-    softness: number(entry?.softness, defaultValue.softness, .05, 1.5),
+    angle: number(entry?.angle, defaultValue.angle, .05, 1.5),
+    penumbra: number(entry?.penumbra, defaultValue.penumbra, 0, 1),
+    distance: number(entry?.distance, defaultValue.distance, 0, 50),
+    decay: number(entry?.decay, defaultValue.decay, 0, 3),
     orbitRadius: number(entry?.orbitRadius, defaultValue.orbitRadius, 0, 12),
     orbitHeight: number(entry?.orbitHeight, defaultValue.orbitHeight, 0, 12),
     phase: number(entry?.phase, defaultValue.phase, -360, 360),
@@ -145,6 +152,7 @@ export function sanitizeDimentionR3FState(value: unknown): DimentionR3FState {
     rotationZ: number(entry?.rotationZ, defaultValue.rotationZ, -180, 180),
     width: number(entry?.width, defaultValue.width, .05, 20),
     height: number(entry?.height, defaultValue.height, .05, 20),
+    motionAmount: number(entry?.motionAmount, defaultValue.motionAmount, 0, 6),
   });
   return {
     version: 1, preset,
@@ -157,7 +165,7 @@ export function sanitizeDimentionR3FState(value: unknown): DimentionR3FState {
     },
     lighting: {
       exposure: number(candidate?.lighting?.exposure, fallback.lighting.exposure, .2, 3), master: number(candidate?.lighting?.master, fallback.lighting.master, 0, 3),
-      rgb: number(candidate?.lighting?.rgb, fallback.lighting.rgb, 0, 4), white: number(candidate?.lighting?.white, fallback.lighting.white, 0, 4), speed: number(candidate?.lighting?.speed, fallback.lighting.speed, 0, 3),
+      rgb: number(candidate?.lighting?.rgb, fallback.lighting.rgb, 0, 4), white: number(candidate?.lighting?.white, fallback.lighting.white, 0, 4), speed: number(candidate?.lighting?.speed, fallback.lighting.speed, 0, 3), rgbMotionSpeed: number(candidate?.lighting?.rgbMotionSpeed, fallback.lighting.rgbMotionSpeed, .1, 1.5), rgbCoverage: number(candidate?.lighting?.rgbCoverage, fallback.lighting.rgbCoverage, .2, 1.5),
       bloom: number(candidate?.lighting?.bloom, fallback.lighting.bloom, 0, 1), ao: number(candidate?.lighting?.ao, fallback.lighting.ao, 0, 4),
       rig: {
         key: {
@@ -180,12 +188,18 @@ export function sanitizeDimentionR3FState(value: unknown): DimentionR3FState {
     },
     mirror: {
       enabled: candidate?.mirror?.enabled !== false,
-      bounces: Math.round(number(candidate?.mirror?.bounces ?? (candidate?.mirror as unknown as { layers?: number })?.layers, fallback.mirror.bounces, 1, 12)),
+      intensity: number(candidate?.mirror?.intensity, fallback.mirror.intensity, 0, 3),
+      bounces: Math.round(number(candidate?.mirror?.bounces ?? (candidate?.mirror as unknown as { layers?: number })?.layers, fallback.mirror.bounces, 1, 24)),
       recursionScale: number(candidate?.mirror?.recursionScale ?? (candidate?.mirror as unknown as { scale?: number })?.scale, fallback.mirror.recursionScale, .5, .9),
       reflectivity: number(candidate?.mirror?.reflectivity ?? (candidate?.mirror as unknown as { fade?: number })?.fade, fallback.mirror.reflectivity, .2, .98),
       absorption: number(candidate?.mirror?.absorption, fallback.mirror.absorption, 0, 1.5),
       dispersion: number(candidate?.mirror?.dispersion, fallback.mirror.dispersion, 0, .2),
       edgeIntensity: number(candidate?.mirror?.edgeIntensity, fallback.mirror.edgeIntensity, .2, 3),
+      fresnelBoost: number(candidate?.mirror?.fresnelBoost, fallback.mirror.fresnelBoost, .1, 3),
+      backfaceEnergy: number(candidate?.mirror?.backfaceEnergy, fallback.mirror.backfaceEnergy, 0, 1),
+      depthShift: number(candidate?.mirror?.depthShift, fallback.mirror.depthShift, 0, 3),
+      blur: number(candidate?.mirror?.blur, fallback.mirror.blur, 0, 4),
+      lightThreshold: number(candidate?.mirror?.lightThreshold, fallback.mirror.lightThreshold, .005, .5),
     },
     camera: {
       panX: number(candidate?.camera?.panX, fallback.camera.panX, -3, 3),
@@ -196,7 +210,13 @@ export function sanitizeDimentionR3FState(value: unknown): DimentionR3FState {
       orbitZoom: number(candidate?.camera?.orbitZoom, fallback.camera.orbitZoom, .25, 4),
       panelCollapsed: candidate?.camera?.panelCollapsed === true,
     },
-    motion: { enabled: candidate?.motion?.enabled !== false, playing: candidate?.motion?.playing !== false, time: number(candidate?.motion?.time, 0, 0, 120), duration: number(candidate?.motion?.duration, fallback.motion.duration, 2, 30) },
+    motion: {
+      enabled: candidate?.motion?.enabled !== false,
+      playing: candidate?.motion?.playing !== false,
+      time: motionTime,
+      duration: motionDuration,
+      cubeRotationTurns: number(candidate?.motion?.cubeRotationTurns, fallback.motion.cubeRotationTurns, 0, 2),
+    },
     quality: {
       transmissionResolution: Math.round(number(candidate?.quality?.transmissionResolution, fallback.quality.transmissionResolution, 128, 1024)), samples: Math.round(number(candidate?.quality?.samples, fallback.quality.samples, 1, 12)),
       multisampling: Math.round(number(candidate?.quality?.multisampling, fallback.quality.multisampling, 0, 8)), maxDpr: number(candidate?.quality?.maxDpr, fallback.quality.maxDpr, 1, 2),
@@ -209,6 +229,7 @@ export function sanitizeDimentionR3FState(value: unknown): DimentionR3FState {
       videoWidth: Math.round(number(candidate?.export?.videoWidth, fallback.export.videoWidth, 16, 8192)),
       videoHeight: Math.round(number(candidate?.export?.videoHeight, fallback.export.videoHeight, 16, 8192)),
       videoBitrateMbps: Math.round(number(candidate?.export?.videoBitrateMbps, fallback.export.videoBitrateMbps, 20, 160)),
+      videoSupersampling: number(candidate?.export?.videoSupersampling, fallback.export.videoSupersampling, 1, 2),
     },
   };
 }

@@ -1,5 +1,11 @@
 # PLEOS 27 Axis — Repository Instructions
 
+## Named draft snapshot
+
+- “플레오스 디멘션 초안” / “초안 불러와줘” refers to the immutable local snapshot in `../pleos-snapshots/pleos-dimension-draft-20260910-155444/`.
+- Read that directory's `README.md` before restoring. It contains the working source (including uncommitted changes), assets, and `.pleos/studio-state.json`, not just the Git HEAD.
+- Never overwrite this draft during development. Restore into a separate directory first; preserve the current development work and settings before switching. Do not reset or replace the current working tree without explicit user direction.
+
 ## Start every implementation task
 
 Before editing, inspect the current working state without changing it:

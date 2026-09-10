@@ -1,22 +1,14 @@
 {
   "project": "PLEOS 27 Axis",
-  "generatedAt": "2026-09-02T01:26:10.688Z",
+  "generatedAt": "2026-09-02T09:50:51.069Z",
   "git": {
     "root": ".",
     "projectPath": ".",
     "branch": "main",
-    "sourceBaseCommit": "e6a095a0f90984d0c5e6f2ff4f749a35e4b2332f",
+    "sourceBaseCommit": "08b336ea9dabd29a0031623b4e4a20a425dbcb1d",
     "remote": "https://github.com/yubinparkwork/Pleos-27-Axis.git",
     "dirtyBeforeHandoff": true,
     "changedBeforeHandoff": [
-      {
-        "status": "M",
-        "file": ".gitignore"
-      },
-      {
-        "status": "M",
-        "file": "README.md"
-      },
       {
         "status": "M",
         "file": "artifacts/latest/preview-4x5.png"
@@ -39,131 +31,35 @@
       },
       {
         "status": "M",
-        "file": "package-lock.json"
-      },
-      {
-        "status": "M",
-        "file": "package.json"
-      },
-      {
-        "status": "M",
-        "file": "scripts/update-ai-handoff.mjs"
-      },
-      {
-        "status": "M",
-        "file": "scripts/verify-mode-lifecycle.mjs"
-      },
-      {
-        "status": "M",
-        "file": "scripts/verify-pathtracer.mjs"
-      },
-      {
-        "status": "M",
-        "file": "src/crystal/CrystalApp.css"
-      },
-      {
-        "status": "M",
-        "file": "src/crystal/CrystalAssembly.ts"
-      },
-      {
-        "status": "M",
-        "file": "src/crystal/LightingSystem.ts"
-      },
-      {
-        "status": "M",
-        "file": "src/crystal/MotionStudioApp.ts"
-      },
-      {
-        "status": "M",
-        "file": "src/main.ts"
-      },
-      {
-        "status": "M",
-        "file": "src/modes/light-field/PngMetadata.ts"
-      },
-      {
-        "status": "M",
-        "file": "src/studio/StudioShell.ts"
-      },
-      {
-        "status": "M",
-        "file": "tsconfig.json"
-      },
-      {
-        "status": "M",
-        "file": "vite.config.ts"
-      },
-      {
-        "status": "??",
-        "file": "artifacts/latest/dimention-r3f-preview.png"
-      },
-      {
-        "status": "??",
-        "file": "artifacts/latest/webgpu-pathtracer-output.png"
-      },
-      {
-        "status": "??",
-        "file": "artifacts/latest/webgpu-pathtracer-qa.png"
-      },
-      {
-        "status": "??",
         "file": "scripts/verify-dimention-r3f.mjs"
       },
       {
-        "status": "??",
-        "file": "scripts/verify-webgpu-glass.mjs"
-      },
-      {
-        "status": "??",
-        "file": "src/crystal/rendering/WebGPUPathTracerBackend.ts"
-      },
-      {
-        "status": "??",
-        "file": "src/crystal/rendering/WebGPUPreviewBackend.ts"
-      },
-      {
-        "status": "??",
-        "file": "src/modes/dimention-r3f/DimentionR3F.css"
-      },
-      {
-        "status": "??",
+        "status": "M",
         "file": "src/modes/dimention-r3f/DimentionR3FCameraPanel.ts"
       },
       {
-        "status": "??",
-        "file": "src/modes/dimention-r3f/DimentionR3FExportAdapter.ts"
-      },
-      {
-        "status": "??",
-        "file": "src/modes/dimention-r3f/DimentionR3FExportPipeline.ts"
-      },
-      {
-        "status": "??",
+        "status": "M",
         "file": "src/modes/dimention-r3f/DimentionR3FMode.ts"
       },
       {
-        "status": "??",
+        "status": "M",
         "file": "src/modes/dimention-r3f/DimentionR3FPanel.ts"
       },
       {
-        "status": "??",
+        "status": "M",
         "file": "src/modes/dimention-r3f/DimentionR3FRenderer.tsx"
       },
       {
-        "status": "??",
+        "status": "M",
         "file": "src/modes/dimention-r3f/DimentionR3FScene.tsx"
       },
       {
-        "status": "??",
+        "status": "M",
         "file": "src/modes/dimention-r3f/DimentionR3FState.ts"
       },
       {
-        "status": "??",
+        "status": "M",
         "file": "src/modes/dimention-r3f/InternalReflectionPass.tsx"
-      },
-      {
-        "status": "??",
-        "file": "src/types/three-gpu-pathtracer-webgpu.d.ts"
       },
       {
         "status": "??",
@@ -893,7 +789,7 @@
         "version": 2,
         "storageKey": "pleos-27-axis-studio-state-v3",
         "fileBacked": false,
-        "updatedAt": "2026-09-02T01:26:09.997Z",
+        "updatedAt": "2026-09-02T09:50:50.467Z",
         "modeNamespaces": [
           "glass-3d"
         ]
@@ -1482,37 +1378,12 @@
     }
   ],
   "validation": {
-    "typecheck": "pass",
-    "verify": "pass",
-    "build": "pass",
+    "typecheck": "not-run",
+    "verify": "not-run",
+    "build": "not-run",
     "browserConsole": "pass"
   },
-  "validationRuns": [
-    {
-      "name": "typecheck",
-      "command": "npm run typecheck",
-      "status": "pass",
-      "durationMs": 2815,
-      "exitCode": 0,
-      "outputTail": "> pleos-27-axis@1.0.0 typecheck\n> tsc -b --pretty false"
-    },
-    {
-      "name": "verify",
-      "command": "npm run verify",
-      "status": "pass",
-      "durationMs": 660469,
-      "exitCode": 0,
-      "outputTail": "    \"physical-unit-input\",\n    \"ppi-print-output\"\n  ],\n  \"raster\": [\n    160,\n    120\n  ],\n  \"fastPath\": [\n    160,\n    120\n  ]\n}"
-    },
-    {
-      "name": "build",
-      "command": "npm run build",
-      "status": "pass",
-      "durationMs": 8212,
-      "exitCode": 0,
-      "outputTail": "dist/assets/OutputPass-BDAB8kpn.js               250.34 kB │ gzip: 102.54 kB\ndist/assets/DimentionR3FMode-DptAMytl.js         724.97 kB │ gzip: 258.46 kB\ndist/assets/three.module-Dc7hrohh.js             735.86 kB │ gzip: 190.70 kB\ndist/assets/Glass3DMode-Bn-X3FqU.js            1,204.37 kB │ gzip: 334.02 kB\ndist/assets/KineticGlassMode-Dbk4_3OY.js       2,257.69 kB │ gzip: 838.39 kB\n✓ built in 5.12s\n\n\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit."
-    }
-  ],
+  "validationRuns": [],
   "browser": {
     "url": "http://127.0.0.1:41741/",
     "consoleErrors": []

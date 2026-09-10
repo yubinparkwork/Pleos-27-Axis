@@ -27,16 +27,23 @@ const fragmentShader = /* glsl */`
 
   uniform sampler2D uFeedbackTexture;
   uniform mat3 uWorldToCube;
+  uniform mat3 uWorldToObject;
   uniform vec2 uOutputResolution;
   uniform vec2 uFeedbackResolution;
   uniform vec2 uCenterUv;
   uniform float uFeedbackReady;
   uniform float uIor;
   uniform float uDispersion;
+  uniform float uIntensity;
   uniform float uRecursionScale;
   uniform float uReflectivity;
   uniform float uAbsorption;
   uniform float uEdgeIntensity;
+  uniform float uFresnelBoost;
+  uniform float uBackfaceEnergy;
+  uniform float uDepthShift;
+  uniform float uBlur;
+  uniform float uLightThreshold;
   uniform vec3 uBackgroundColor;
   uniform int uBounces;
 
@@ -45,13 +52,21 @@ const fragmentShader = /* glsl */`
   varying vec3 vWorldNormal;
 
   vec3 sampleFeedback(vec2 uv) {
-    vec2 texel = 1.0 / max(uFeedbackResolution, vec2(1.0));
+    vec2 texel = (1.0 + uBlur * 1.5) / max(uFeedbackResolution, vec2(1.0));
     vec3 value = texture2D(uFeedbackTexture, uv).rgb * 0.40;
     value += texture2D(uFeedbackTexture, uv + vec2(texel.x, 0.0)).rgb * 0.15;
     value += texture2D(uFeedbackTexture, uv - vec2(texel.x, 0.0)).rgb * 0.15;
     value += texture2D(uFeedbackTexture, uv + vec2(0.0, texel.y)).rgb * 0.15;
     value += texture2D(uFeedbackTexture, uv - vec2(0.0, texel.y)).rgb * 0.15;
     return value;
+  }
+
+  vec3 softPeakLimit(vec3 color, float knee, float ceiling) {
+    float peak = max(color.r, max(color.g, color.b));
+    if (peak <= knee) return color;
+    float span = max(0.0001, ceiling - knee);
+    float limitedPeak = knee + span * (1.0 - exp(-(peak - knee) / span));
+    return color * limitedPeak / max(peak, 0.0001);
   }
 
   vec3 safeDirection(vec3 direction) {
@@ -94,9 +109,19 @@ const fragmentShader = /* glsl */`
     return smoothstep(0.70, 0.985, edgeCoordinate);
   }
 
-  vec3 sampleRecursiveGlass(vec2 screenUv, float halfSize, float layer, float edge) {
+  vec3 sampleRecursiveGlass(vec2 screenUv, vec3 hitPosition, vec3 faceNormal, vec3 rayDirection, float halfSize, float layer, float edge) {
     vec2 radial = screenUv - uCenterUv;
-    vec2 recursiveUv = uCenterUv + radial / max(halfSize, 0.08);
+    // Each nested image follows the refracted/reflected path at the current
+    // cube boundary. This keeps the repeated image faceted and tied to the
+    // glass faces instead of producing a flat radial zoom gradient.
+    vec3 reflectedDirection = reflect(rayDirection, faceNormal);
+    vec2 facetFlow = vec2(
+      reflectedDirection.x + hitPosition.z * 0.31,
+      reflectedDirection.y - hitPosition.z * 0.23
+    );
+    facetFlow /= max(length(facetFlow), 0.0001);
+    float nestedShift = (1.0 - halfSize) * (0.026 + layer * 0.0025) * uDepthShift;
+    vec2 recursiveUv = uCenterUv + radial / max(halfSize, 0.08) + facetFlow * nestedShift;
     vec2 radialDirection = radial / max(length(radial), 0.0001);
     float channelOffset = uDispersion * (0.006 + layer * 0.0007) * (0.45 + edge);
     vec2 redUv = recursiveUv + radialDirection * channelOffset;
@@ -107,22 +132,29 @@ const fragmentShader = /* glsl */`
       sampleFeedback(clamp(recursiveUv, 0.0, 1.0)).g,
       sampleFeedback(clamp(blueUv, 0.0, 1.0)).b
     );
-    captured = mix(captured, captured / (vec3(1.0) + captured), 0.72);
-    return captured * inside * uFeedbackReady * 0.74;
+    // Preserve the original mirror response below the knee. Compression only
+    // engages when temporal feedback starts exceeding the stable HDR range.
+    captured = softPeakLimit(captured, 1.0, 1.6);
+    return captured * inside * uFeedbackReady * 0.93;
   }
 
   vec4 shadeBoundary(vec3 rayDirection, vec3 hitPosition, vec3 faceNormal, float halfSize, float layer, float energy, vec2 screenUv) {
     float cosine = clamp(dot(-rayDirection, faceNormal), 0.0, 1.0);
-    float fresnel = fresnelSchlick(cosine, uIor, 1.0);
+    float fresnel = clamp(fresnelSchlick(cosine, uIor, 1.0) * uFresnelBoost, 0.0, 1.0);
     float edge = cubeEdge(hitPosition, faceNormal, halfSize);
-    vec3 capturedGlass = sampleRecursiveGlass(screenUv, halfSize, layer, edge);
+    vec3 capturedGlass = sampleRecursiveGlass(screenUv, hitPosition, faceNormal, rayDirection, halfSize, layer, edge);
     vec3 reflectedLight = max(capturedGlass - uBackgroundColor * 0.82, vec3(0.0));
     float reflectedEnergy = max(reflectedLight.r, max(reflectedLight.g, reflectedLight.b));
-    float faceTransmission = 0.015 + fresnel * 0.11;
-    float contour = edge * uEdgeIntensity * (0.26 + fresnel * 0.60);
-    vec3 opticalGlass = reflectedLight * (0.48 + reflectedEnergy * 0.52);
-    vec3 color = opticalGlass * energy * (0.26 + fresnel * 0.58 + contour * 0.72);
-    float alpha = energy * reflectedEnergy * (faceTransmission * 0.10 + contour * 0.24);
+    // Propagate illuminated reflections, not the broad low-frequency color of
+    // an entire glass face. This is what makes the recursion read as light
+    // transport rather than a colored overlay.
+    reflectedLight *= smoothstep(uLightThreshold * 0.067, uLightThreshold, reflectedEnergy);
+    float depthFade = exp(-layer * 0.085);
+    float faceTransmission = 0.026 + fresnel * 0.14;
+    float contour = edge * uEdgeIntensity * (0.31 + fresnel * 0.66) * (1.0 + min(layer, 8.0) * 0.045);
+    vec3 opticalGlass = reflectedLight * (0.58 + reflectedEnergy * 0.48);
+    vec3 color = opticalGlass * energy * depthFade * (0.40 + fresnel * 0.66 + contour * 0.92);
+    float alpha = energy * depthFade * reflectedEnergy * (faceTransmission * 0.15 + contour * 0.32);
     return vec4(color, alpha);
   }
 
@@ -134,13 +166,13 @@ const fragmentShader = /* glsl */`
     vec3 refractedWorld = refract(incidentWorld, surfaceNormal, 1.0 / max(1.01, uIor));
     if (dot(refractedWorld, refractedWorld) < 0.00001) refractedWorld = reflect(incidentWorld, surfaceNormal);
 
-    vec3 rayDirection = normalize(uWorldToCube * refractedWorld);
+    vec3 rayDirection = normalize(uWorldToCube * uWorldToObject * refractedWorld);
     vec3 rayOrigin = clamp(vCubePosition + rayDirection * 0.004, vec3(-0.998), vec3(0.998));
     vec3 accumulatedColor = vec3(0.0);
     float accumulatedAlpha = 0.0;
     float energy = 1.0;
 
-    for (int layer = 0; layer < 12; layer += 1) {
+    for (int layer = 0; layer < 24; layer += 1) {
       if (layer >= uBounces) break;
       float halfSize = pow(uRecursionScale, float(layer + 1));
       float nearDistance;
@@ -151,7 +183,7 @@ const fragmentShader = /* glsl */`
         vec3 nearHit = rayOrigin + rayDirection * max(nearDistance, 0.0);
         vec3 farHit = rayOrigin + rayDirection * farDistance;
         vec4 frontBoundary = shadeBoundary(rayDirection, nearHit, nearNormal, halfSize, float(layer), energy, screenUv);
-        vec4 backBoundary = shadeBoundary(rayDirection, farHit, -farNormal, halfSize, float(layer) + 0.5, energy * 0.52, screenUv);
+        vec4 backBoundary = shadeBoundary(rayDirection, farHit, -farNormal, halfSize, float(layer) + 0.5, energy * uBackfaceEnergy, screenUv);
         accumulatedColor += frontBoundary.rgb + backBoundary.rgb;
         accumulatedAlpha += frontBoundary.a + backBoundary.a;
         float pathLength = max(0.0, farDistance - max(nearDistance, 0.0));
@@ -161,9 +193,12 @@ const fragmentShader = /* glsl */`
       }
     }
 
-    float entranceFresnel = fresnelSchlick(abs(dot(-incidentWorld, surfaceNormal)), 1.0, uIor);
-    accumulatedAlpha = clamp(accumulatedAlpha + entranceFresnel * 0.004, 0.0, 0.42);
-    gl_FragColor = vec4(accumulatedColor, accumulatedAlpha);
+    float entranceFresnel = clamp(fresnelSchlick(abs(dot(-incidentWorld, surfaceNormal)), 1.0, uIor) * uFresnelBoost, 0.0, 1.0);
+    accumulatedAlpha = clamp(accumulatedAlpha + entranceFresnel * 0.005, 0.0, 0.50);
+    // The original look is untouched until the reflection overlay reaches the
+    // soft knee. Only runaway feedback is rolled into a finite HDR ceiling.
+    vec3 stableColor = softPeakLimit(accumulatedColor * uIntensity, 1.30, 2.35);
+    gl_FragColor = vec4(stableColor, clamp(accumulatedAlpha * uIntensity, 0.0, 0.72));
   }
 `;
 
@@ -198,22 +233,33 @@ function deriveWorldToCube(geometry: THREE.BufferGeometry): THREE.Matrix3 {
 }
 
 function ReflectionMesh({ geometry, center, state, index, register }: ReflectionMeshProps): React.JSX.Element {
+  const mesh = useRef<THREE.Mesh>(null);
+  const worldCenter = useRef(new THREE.Vector3());
+  const worldToObject = useRef(new THREE.Matrix3());
+  const { camera } = useThree();
   const material = useMemo(() => new THREE.ShaderMaterial({
     vertexShader,
     fragmentShader,
     uniforms: {
       uFeedbackTexture: { value: null },
       uWorldToCube: { value: deriveWorldToCube(geometry) },
+      uWorldToObject: { value: new THREE.Matrix3() },
       uOutputResolution: { value: new THREE.Vector2(1, 1) },
       uFeedbackResolution: { value: new THREE.Vector2(1, 1) },
       uCenterUv: { value: new THREE.Vector2(.5, .5) },
       uFeedbackReady: { value: 0 },
       uIor: { value: state.material.ior },
       uDispersion: { value: state.mirror.dispersion },
+      uIntensity: { value: state.mirror.intensity },
       uRecursionScale: { value: state.mirror.recursionScale },
       uReflectivity: { value: state.mirror.reflectivity },
       uAbsorption: { value: state.mirror.absorption },
       uEdgeIntensity: { value: state.mirror.edgeIntensity },
+      uFresnelBoost: { value: state.mirror.fresnelBoost },
+      uBackfaceEnergy: { value: state.mirror.backfaceEnergy },
+      uDepthShift: { value: state.mirror.depthShift },
+      uBlur: { value: state.mirror.blur },
+      uLightThreshold: { value: state.mirror.lightThreshold },
       uBackgroundColor: { value: new THREE.Color(state.artboard.transparent ? "#000000" : state.artboard.background).convertSRGBToLinear() },
       uBounces: { value: state.mirror.bounces },
     },
@@ -229,18 +275,33 @@ function ReflectionMesh({ geometry, center, state, index, register }: Reflection
   }), [geometry]);
 
   useEffect(() => { register(index, material); return () => { register(index, null); material.dispose(); }; }, [index, material, register]);
+  useFrame(() => {
+    const current = mesh.current;
+    if (!current) return;
+    current.updateWorldMatrix(true, false);
+    worldToObject.current.setFromMatrix4(current.matrixWorld).invert();
+    material.uniforms.uWorldToObject.value.copy(worldToObject.current);
+    current.getWorldPosition(worldCenter.current).project(camera);
+    material.uniforms.uCenterUv.value.set(worldCenter.current.x * .5 + .5, worldCenter.current.y * .5 + .5);
+  }, -20);
   useEffect(() => {
     material.uniforms.uIor.value = state.material.ior;
     material.uniforms.uDispersion.value = state.mirror.dispersion;
+    material.uniforms.uIntensity.value = state.mirror.intensity;
     material.uniforms.uRecursionScale.value = state.mirror.recursionScale;
     material.uniforms.uReflectivity.value = state.mirror.reflectivity;
     material.uniforms.uAbsorption.value = state.mirror.absorption;
     material.uniforms.uEdgeIntensity.value = state.mirror.edgeIntensity;
+    material.uniforms.uFresnelBoost.value = state.mirror.fresnelBoost;
+    material.uniforms.uBackfaceEnergy.value = state.mirror.backfaceEnergy;
+    material.uniforms.uDepthShift.value = state.mirror.depthShift;
+    material.uniforms.uBlur.value = state.mirror.blur;
+    material.uniforms.uLightThreshold.value = state.mirror.lightThreshold;
     material.uniforms.uBackgroundColor.value.set(state.artboard.transparent ? "#000000" : state.artboard.background).convertSRGBToLinear();
     material.uniforms.uBounces.value = state.mirror.bounces;
-  }, [material, state.artboard.background, state.artboard.transparent, state.material.ior, state.mirror.absorption, state.mirror.bounces, state.mirror.dispersion, state.mirror.edgeIntensity, state.mirror.recursionScale, state.mirror.reflectivity]);
+  }, [material, state.artboard.background, state.artboard.transparent, state.material.ior, state.mirror.absorption, state.mirror.backfaceEnergy, state.mirror.blur, state.mirror.bounces, state.mirror.depthShift, state.mirror.dispersion, state.mirror.edgeIntensity, state.mirror.fresnelBoost, state.mirror.intensity, state.mirror.lightThreshold, state.mirror.recursionScale, state.mirror.reflectivity]);
 
-  return <mesh name={`RecursiveGlassReflection-${index}`} geometry={geometry} position={center} scale={1.001} material={material} renderOrder={3} />;
+  return <mesh ref={mesh} name={`RecursiveGlassReflection-${index}`} geometry={geometry} position={center} scale={1.001} material={material} renderOrder={3} />;
 }
 
 interface InternalReflectionSystemProps {
@@ -257,14 +318,14 @@ export function InternalReflectionSystem({ geometries, state, captureQuality }: 
   const writeTarget = useRef<THREE.WebGLRenderTarget | null>(null);
   const previousCameraPosition = useRef(new THREE.Vector3(Number.POSITIVE_INFINITY, 0, 0));
   const previousCameraQuaternion = useRef(new THREE.Quaternion());
-  const projectedCenter = useRef(new THREE.Vector3());
+  const previousProjection = useRef(new THREE.Matrix4());
   const savedViewport = useRef(new THREE.Vector4());
   const savedScissor = useRef(new THREE.Vector4());
   const mainResolution = useRef(new THREE.Vector2());
   const { gl, scene, camera, size } = useThree();
   const captureSize = useMemo(() => {
-    const qualityLimit = captureQuality === "video" ? 3072 : captureQuality === "still" ? 2048 : 1024;
-    const desiredLimit = captureQuality === "preview" ? state.quality.transmissionResolution * 2 : Math.max(size.width, size.height);
+    const qualityLimit = captureQuality === "video" ? 6144 : captureQuality === "still" ? 2048 : 1024;
+    const desiredLimit = captureQuality === "preview" ? state.quality.transmissionResolution * 2 : Math.max(size.width, size.height) * gl.getPixelRatio();
     const limit = Math.max(256, Math.min(qualityLimit, gl.capabilities.maxTextureSize, Math.round(desiredLimit)));
     const aspect = size.width / Math.max(1, size.height);
     return aspect >= 1
@@ -274,10 +335,10 @@ export function InternalReflectionSystem({ geometries, state, captureQuality }: 
   const targetOptions = useMemo(() => ({
     depthBuffer: true,
     stencilBuffer: false,
-    samples: captureQuality === "preview" ? 0 : 4,
+    samples: captureQuality === "preview" ? 0 : Math.min(8, gl.capabilities.maxSamples),
     type: THREE.HalfFloatType,
     format: THREE.RGBAFormat,
-  }), [captureQuality]);
+  }), [captureQuality, gl.capabilities.maxSamples]);
   const targetA = useFBO(captureSize.width, captureSize.height, targetOptions);
   const targetB = useFBO(captureSize.width, captureSize.height, targetOptions);
 
@@ -289,13 +350,8 @@ export function InternalReflectionSystem({ geometries, state, captureQuality }: 
   }, [camera, geometries, state.artboard.background, state.artboard.transparent, state.geometry.bevel, state.geometry.gap, state.material.attenuationDistance, state.material.ior, state.material.roughness, state.material.thickness, state.material.transmission, state.mirror.bounces, state.mirror.recursionScale, targetA, targetB]);
 
   const configureMaterials = (texture: THREE.Texture | null, ready: number, width: number, height: number) => {
-    materials.current.forEach((material, index) => {
+    materials.current.forEach((material) => {
       if (!material) return;
-      const center = geometries[index]?.center;
-      if (center) {
-        projectedCenter.current.copy(center).project(camera);
-        material.uniforms.uCenterUv.value.set(projectedCenter.current.x * .5 + .5, projectedCenter.current.y * .5 + .5);
-      }
       material.uniforms.uFeedbackTexture.value = texture;
       material.uniforms.uFeedbackReady.value = ready;
       material.uniforms.uOutputResolution.value.set(width, height);
@@ -307,11 +363,13 @@ export function InternalReflectionSystem({ geometries, state, captureQuality }: 
     const reflectionGroup = group.current;
     if (!reflectionGroup || !readTarget.current || !writeTarget.current) return;
     const cameraChanged = camera.position.distanceToSquared(previousCameraPosition.current) > 1e-8
-      || 1 - Math.abs(camera.quaternion.dot(previousCameraQuaternion.current)) > 1e-8;
+      || 1 - Math.abs(camera.quaternion.dot(previousCameraQuaternion.current)) > 1e-8
+      || !camera.projectionMatrix.equals(previousProjection.current);
     if (cameraChanged) {
       initialized.current = false;
       previousCameraPosition.current.copy(camera.position);
       previousCameraQuaternion.current.copy(camera.quaternion);
+      previousProjection.current.copy(camera.projectionMatrix);
     }
 
     const previousRenderTarget = gl.getRenderTarget();

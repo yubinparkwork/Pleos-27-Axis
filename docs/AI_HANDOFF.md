@@ -181,18 +181,55 @@ Production geometry and expression layers should remain separable so new Looks d
 
 ## Latest Task
 
-- User request: Dimention R3F 모드에 광원별 모양·위치·크기·움직임을 슬라이더와 숫자 입력으로 조절하는 상세 조명 패널 추가
-- What changed: 상세 조명 리그 상태, 실제 R3F 광원 연결, 접이식 한글 조명 편집 UI, 저장 마이그레이션, 자동 검증을 추가했다.
-- Why: 사용자가 브랜드 조명의 형태와 공간 배치, 크기, 모션을 렌더 결과를 보며 직접 정밀 조정할 수 있게 하기 위해서다.
-- Main implementation decisions: 기존 전체 밝기/RGB/화이트/속도는 마스터로 유지하고 화이트 키, RGB 3색, 화이트 면광원, 후면 광원을 독립 리그로 확장했다. 기존 저장값은 sanitize fallback으로 안전하게 마이그레이션한다.
+- User request: Refresh the AI handoff from the active production runtime.
+- What changed: Regenerated runtime inspection, latest previews, validation state, and the current-state handoff.
+- Why: Keep ChatGPT and Codex synchronized without manually copying project context.
+- Main implementation decisions: Use the production inspect/export API and deterministic hero time; do not capture editor UI.
 
 ## Files Changed
 
-- `src/modes/dimention-r3f/DimentionR3FState.ts;src/modes/dimention-r3f/DimentionR3FScene.tsx;src/modes/dimention-r3f/DimentionR3FPanel.ts;src/crystal/CrystalApp.css;scripts/verify-dimention-r3f.mjs` — Changed in the latest task
+- `artifacts/latest/preview-4x5.png` — Git status M
+- `artifacts/latest/preview-9x16.png` — Git status M
+- `artifacts/latest/preview-main.png` — Git status M
+- `artifacts/latest/runtime-state.json` — Git status M
+- `docs/AI_HANDOFF.md` — Git status M
+- `scripts/verify-dimention-r3f.mjs` — Git status M
+- `src/modes/dimention-r3f/DimentionR3FCameraPanel.ts` — Git status M
+- `src/modes/dimention-r3f/DimentionR3FMode.ts` — Git status M
+- `src/modes/dimention-r3f/DimentionR3FPanel.ts` — Git status M
+- `src/modes/dimention-r3f/DimentionR3FRenderer.tsx` — Git status M
+- `src/modes/dimention-r3f/DimentionR3FScene.tsx` — Git status M
+- `src/modes/dimention-r3f/DimentionR3FState.ts` — Git status M
+- `src/modes/dimention-r3f/InternalReflectionPass.tsx` — Git status M
+- `tmp/export-qa.html` — Git status ??
+- `tmp/pdfs/g25-contact.png` — Git status ??
+- `tmp/pdfs/g25/p21.png` — Git status ??
+- `tmp/pdfs/g25/p22.png` — Git status ??
+- `tmp/pdfs/g25/p23.png` — Git status ??
+- `tmp/pdfs/g25/p24.png` — Git status ??
+- `tmp/pdfs/g25/p26.png` — Git status ??
+- `tmp/pdfs/g25/p28.png` — Git status ??
+- `tmp/pdfs/g25/p3.png` — Git status ??
+- `tmp/pdfs/g25/p31.png` — Git status ??
+- `tmp/pdfs/g25/p32.png` — Git status ??
+- `tmp/pdfs/g25/p33.png` — Git status ??
+- `tmp/pdfs/g25/p37.png` — Git status ??
+- `tmp/pdfs/g25/p8.png` — Git status ??
+- `tmp/pdfs/k27-contact.png` — Git status ??
+- `tmp/pdfs/k27/p10.png` — Git status ??
+- `tmp/pdfs/k27/p11.png` — Git status ??
+- `tmp/pdfs/k27/p12.png` — Git status ??
+- `tmp/pdfs/k27/p13.png` — Git status ??
+- `tmp/pdfs/k27/p3.png` — Git status ??
+- `tmp/pdfs/k27/p7.png` — Git status ??
+- `tmp/pdfs/k27/p8.png` — Git status ??
+- `tmp/pdfs/k27/p9.png` — Git status ??
+- `tmp/spectral-qa.html` — Git status ??
+- `tmp/verify-video.log` — Git status ??
 
 ## Visual Changes
 
-- 화이트 키를 스포트/사각 면광원으로 전환 가능;RGB 반사광을 원형/타원/링으로 전환하고 개별 위치·크기·궤도를 조절 가능;고정형 화이트/후면 광원의 형태·회전·크기 조절 가능
+No intentional visual changes
 
 ## Latest Previews
 
@@ -204,20 +241,21 @@ Production geometry and expression layers should remain separable so new Looks d
 
 ## Validation
 
-- npm run typecheck — PASS
-- npm run verify — PASS
-- npm run build — PASS
+- npm run typecheck — NOT-RUN
+- npm run verify — NOT-RUN
+- npm run build — NOT-RUN
 - Browser console — PASS
 
 Validation values are generated from commands executed during this handoff. `NOT-RUN` is never treated as PASS.
 
 ## Known Issues
 
-- None known
+None known
 
 ## Next Recommended Work
 
-- 광원 프리셋 저장/불러오기;선택 광원 뷰포트 기즈모;광원 그룹 복제/삭제
+- Review the three latest previews after meaningful visual work.
+- Run handoff:full at the end of completed implementation work.
 
 ## ChatGPT Re-scan Notes
 

@@ -1,6 +1,6 @@
 import { Environment, Lightformer, OrbitControls as DreiOrbitControls } from "@react-three/drei";
 import { Canvas, useFrame, useThree, type RootState } from "@react-three/fiber";
-import { Bloom, EffectComposer, N8AO } from "@react-three/postprocessing";
+import { Bloom, EffectComposer, N8AO, SMAA } from "@react-three/postprocessing";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
@@ -36,36 +36,53 @@ interface SceneProps {
 
 interface AxisGeometry { geometry: THREE.BufferGeometry; center: THREE.Vector3 }
 
-const discVertexShader = /* glsl */`
-  varying vec2 vUv;
-  void main() {
-    vUv = uv;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-  }
-`;
+const RGB_SPOT_BASE_POWER = 420;
+const RGB_SPOT_ENERGY_CEILING = 650;
+const RGB_DOMINANCE_TOTAL = 1.65;
+// Keep the three emitters separated at the neutral loop beat. Collapsing the
+// spread to zero placed every source on the same side of the glass near 14s,
+// so a camera-facing reflection could disappear from all three cubes at once.
+const RGB_NEUTRAL_PHASE_SPREAD = .35;
+const RGB_LIGHT_SEQUENCE = [
+  { weights: [1 / 3, 1 / 3, 1 / 3] as const, phaseSpread: RGB_NEUTRAL_PHASE_SPREAD },
+  { weights: [.70, .15, .15] as const, phaseSpread: 1 },
+  { weights: [.15, .70, .15] as const, phaseSpread: 1 },
+  { weights: [.15, .15, .70] as const, phaseSpread: 1 },
+  { weights: [1 / 3, 1 / 3, 1 / 3] as const, phaseSpread: RGB_NEUTRAL_PHASE_SPREAD },
+] as const;
 
-const discFragmentShader = /* glsl */`
-  precision highp float;
-  uniform vec3 uColor;
-  uniform float uIntensity;
-  uniform float uSoftness;
-  uniform float uShape;
-  varying vec2 vUv;
+function softLimitEnergy(value: number, ceiling: number): number {
+  if (!Number.isFinite(value) || value <= 0) return 0;
+  return ceiling * (1 - Math.exp(-value / ceiling));
+}
 
-  void main() {
-    vec2 point = (vUv - 0.5) * 2.0;
-    float radius = length(point);
-    float falloff = mix(1.15, 2.8, clamp(uSoftness, 0.05, 1.5) / 1.5);
-    float core = exp(-pow(radius * falloff, mix(1.45, 3.2, clamp(uSoftness, 0.05, 1.5) / 1.5)));
-    float halo = exp(-pow(radius * (falloff + 1.5), 1.6)) * 0.28;
-    float disc = (core + halo) * smoothstep(1.08, 0.72, radius);
-    float ringDistance = abs(radius - 0.62);
-    float ring = exp(-pow(ringDistance * mix(5.0, 13.0, clamp(uSoftness, 0.05, 1.5) / 1.5), 2.0)) * smoothstep(1.05, 0.88, radius);
-    float alpha = mix(disc, ring, step(1.5, uShape));
-    if (alpha < 0.002) discard;
-    gl_FragColor = vec4(uColor * uIntensity * alpha, alpha);
-  }
-`;
+function smoothSequenceStep(value: number): number {
+  const t = THREE.MathUtils.clamp(value, 0, 1);
+  return t * t * t * (t * (t * 6 - 15) + 10);
+}
+
+function easedLoopPhase(phase: number): number {
+  const turn = ((phase / (Math.PI * 2) % 1) + 1) % 1;
+  const doubled = turn * 2;
+  const half = Math.floor(doubled);
+  return (half + smoothSequenceStep(doubled - half)) * Math.PI;
+}
+
+function rgbLightSequence(normalizedTime: number): { weights: [number, number, number]; phaseSpread: number } {
+  const progress = ((normalizedTime % 1) + 1) % 1 * (RGB_LIGHT_SEQUENCE.length - 1);
+  const segment = Math.min(RGB_LIGHT_SEQUENCE.length - 2, Math.floor(progress));
+  const blend = smoothSequenceStep(progress - segment);
+  const from = RGB_LIGHT_SEQUENCE[segment];
+  const to = RGB_LIGHT_SEQUENCE[segment + 1];
+  return {
+    weights: [
+      THREE.MathUtils.lerp(from.weights[0], to.weights[0], blend),
+      THREE.MathUtils.lerp(from.weights[1], to.weights[1], blend),
+      THREE.MathUtils.lerp(from.weights[2], to.weights[2], blend),
+    ],
+    phaseSpread: THREE.MathUtils.lerp(from.phaseSpread, to.phaseSpread, blend),
+  };
+}
 
 function buildAxisGeometries(gap: number, bevel: number): AxisGeometry[] {
   const source = new CrystalAssembly();
@@ -157,6 +174,7 @@ function FreeOrbit({ state, onCameraOrbit }: Pick<SceneProps, "state" | "onCamer
 function MovingPleosLights({ state, onTime }: Pick<SceneProps, "state" | "onTime">): React.JSX.Element {
   const white = useRef<THREE.SpotLight>(null);
   const area = useRef<THREE.RectAreaLight>(null);
+  const ambient = useRef<THREE.AmbientLight>(null);
   const time = useRef(state.motion.time);
   const report = useRef(0);
   useEffect(() => { time.current = state.motion.time; }, [state.motion.time]);
@@ -175,86 +193,284 @@ function MovingPleosLights({ state, onTime }: Pick<SceneProps, "state" | "onTime
       area.current.lookAt(key.targetX, key.targetY, key.targetZ);
       area.current.intensity = key.enabled ? key.intensity * .4 * state.lighting.master * state.lighting.white : 0;
     }
+    if (ambient.current) ambient.current.intensity = .035 * state.lighting.master * (state.motion.enabled ? .94 + Math.sin(phase * .21) * .06 : 1);
     report.current += delta;
     if (report.current > .2) { report.current = 0; onTime(time.current); }
   });
   const key = state.lighting.rig.key;
   return <>
     {key.shape === "spot" ? <spotLight ref={white} color={key.color} angle={key.angle} penumbra={key.penumbra} distance={key.distance} decay={key.decay} /> : <rectAreaLight ref={area} color={key.color} width={key.width} height={key.height} />}
-    <ambientLight color="#dbe4ff" intensity={.035 * state.lighting.master} />
+    <ambientLight ref={ambient} color="#dbe4ff" intensity={.035 * state.lighting.master} />
   </>;
 }
 
-function GradientDisc({ color, intensity, softness, shape }: { color: string; intensity: number; softness: number; shape: DimentionSpectralLightState["shape"] }): React.JSX.Element {
-  const material = useMemo(() => new THREE.ShaderMaterial({
-    vertexShader: discVertexShader,
-    fragmentShader: discFragmentShader,
-    uniforms: { uColor: { value: new THREE.Color(color) }, uIntensity: { value: intensity }, uSoftness: { value: softness }, uShape: { value: shape === "ring" ? 2 : 0 } },
-    transparent: true,
-    depthWrite: false,
-    side: THREE.DoubleSide,
-    blending: THREE.AdditiveBlending,
-    toneMapped: false,
-  }), []);
-  useEffect(() => { material.uniforms.uColor.value.set(color); material.uniforms.uIntensity.value = intensity; material.uniforms.uSoftness.value = softness; material.uniforms.uShape.value = shape === "ring" ? 2 : 0; }, [color, intensity, material, shape, softness]);
-  useEffect(() => () => material.dispose(), [material]);
-  return <mesh>
-    <planeGeometry args={[2, 2]} />
-    <primitive object={material} attach="material" />
-  </mesh>;
-}
-
-function SpectralEmitter({ light, state, lightRef }: { light: DimentionSpectralLightState; state: DimentionR3FState; lightRef: React.RefObject<THREE.Group | null> }): React.JSX.Element | null {
-  if (!light.enabled) return null;
-  return <group ref={lightRef} scale={[light.width, light.height, 1]}><GradientDisc color={light.color} intensity={state.lighting.master * state.lighting.rgb * 1.55 * light.intensity} softness={light.softness} shape={light.shape} /></group>;
-}
-
-function MovingSpectralDiscs({ state }: { state: DimentionR3FState }): React.JSX.Element {
-  const red = useRef<THREE.Group>(null);
-  const green = useRef<THREE.Group>(null);
-  const blue = useRef<THREE.Group>(null);
+function MovingRgbSpotlights({ state }: { state: DimentionR3FState }): React.JSX.Element {
+  const red = useRef<THREE.SpotLight>(null);
+  const green = useRef<THREE.SpotLight>(null);
+  const blue = useRef<THREE.SpotLight>(null);
   const time = useRef(state.motion.time);
   useEffect(() => { time.current = state.motion.time; }, [state.motion.time]);
   useFrame((_, delta) => {
     if (state.motion.enabled && state.motion.playing) time.current = (time.current + delta) % state.motion.duration;
-    const phase = time.current / Math.max(.001, state.motion.duration) * Math.PI * 2 * state.lighting.speed;
+    const rgbMotionSpeed = Number.isFinite(state.lighting.rgbMotionSpeed) ? state.lighting.rgbMotionSpeed : .42;
+    // RGB movement is deliberately slower than the rest of the rig. The
+    // quintic phase warp gives each half orbit a soft departure and arrival
+    // instead of a mechanically constant angular velocity.
+    const phase = easedLoopPhase(time.current / Math.max(.001, state.motion.duration) * Math.PI * 2 * state.lighting.speed * rgbMotionSpeed);
+    const sequence = rgbLightSequence(time.current / Math.max(.001, state.motion.duration));
     const lights = [state.lighting.rig.red, state.lighting.rig.green, state.lighting.rig.blue];
-    const groups = [red.current, green.current, blue.current];
-    groups.forEach((group, index) => {
-      if (!group) return;
+    const spots = [red.current, green.current, blue.current];
+    const sharedEnergy = softLimitEnergy(
+      state.lighting.master * state.lighting.rgb * RGB_SPOT_BASE_POWER,
+      RGB_SPOT_ENERGY_CEILING,
+    );
+    spots.forEach((spot, index) => {
+      if (!spot) return;
       const light = lights[index];
-      const angle = phase + THREE.MathUtils.degToRad(light.phase);
-      group.position.set(light.positionX + Math.cos(angle) * light.orbitRadius, light.positionY + Math.sin(angle * .83) * light.orbitHeight, light.positionZ + Math.sin(angle) * light.orbitRadius);
-      group.lookAt(0, 0, 0);
+      // At the neutral beat the lights converge enough for their colors to
+      // merge, while the minimum spread keeps illumination on multiple faces.
+      // They fan back out for the red, green and blue hero beats.
+      const angle = phase + THREE.MathUtils.degToRad(light.phase) * sequence.phaseSpread;
+      spot.position.set(light.positionX + Math.cos(angle) * light.orbitRadius, light.positionY + Math.sin(angle * .83) * light.orbitHeight, light.positionZ + Math.sin(angle) * light.orbitRadius);
+      spot.target.position.set(0, 0, 0);
+      spot.target.updateMatrixWorld();
+      // Energy remains bounded throughout the sequence. Hero beats allocate
+      // 70% to the featured color and retain 15% of each supporting color.
+      const energyShare = sequence.weights[index] * RGB_DOMINANCE_TOTAL;
+      const requestedIntensity = sharedEnergy * light.intensity * energyShare;
+      spot.intensity = light.enabled && Number.isFinite(requestedIntensity) ? requestedIntensity : 0;
     });
   });
-  // These discs exist only as visible reflection sources in the environment.
-  // Direct illumination comes from the spotlights above, so keeping this value
-  // restrained prevents the glass body from reading as self-emissive.
+  const redLight: DimentionSpectralLightState = state.lighting.rig.red;
+  const greenLight: DimentionSpectralLightState = state.lighting.rig.green;
+  const blueLight: DimentionSpectralLightState = state.lighting.rig.blue;
+  const reflectorSize = Number.isFinite(state.lighting.rgbCoverage) ? state.lighting.rgbCoverage : .78;
+  const widenedAngle = (light: DimentionSpectralLightState) => Math.min(1.42, light.angle * (.72 + reflectorSize * .45));
   return <>
-    <SpectralEmitter light={state.lighting.rig.red} state={state} lightRef={red} />
-    <SpectralEmitter light={state.lighting.rig.green} state={state} lightRef={green} />
-    <SpectralEmitter light={state.lighting.rig.blue} state={state} lightRef={blue} />
+    <spotLight ref={red} color={redLight.color} angle={widenedAngle(redLight)} penumbra={Math.max(.9, redLight.penumbra)} distance={redLight.distance} decay={redLight.decay} />
+    <spotLight ref={green} color={greenLight.color} angle={widenedAngle(greenLight)} penumbra={Math.max(.9, greenLight.penumbra)} distance={greenLight.distance} decay={greenLight.decay} />
+    <spotLight ref={blue} color={blueLight.color} angle={widenedAngle(blueLight)} penumbra={Math.max(.9, blueLight.penumbra)} distance={blueLight.distance} decay={blueLight.decay} />
   </>;
 }
 
-function EnvironmentEmitter({ light, intensityScale }: { light: DimentionEnvironmentLightState; intensityScale: number }): React.JSX.Element | null {
+function MovingRgbReflectionSources({ state }: { state: DimentionR3FState }): React.JSX.Element {
+  const meshes = useRef<Array<THREE.Mesh | null>>([]);
+  const time = useRef(state.motion.time);
+  const color = useMemo(() => new THREE.Color(), []);
+  const materials = useMemo(() => [0, 1, 2, 3, 4, 5].map(() => new THREE.ShaderMaterial({
+    uniforms: { uColor: { value: new THREE.Color("#ffffff") } },
+    vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader: `precision highp float; varying vec2 vUv; uniform vec3 uColor; void main() { float radius = length(vUv - 0.5) * 2.0; float halo = pow(1.0 - smoothstep(0.0, 1.0, radius), 0.48); gl_FragColor = vec4(uColor * halo, halo); }`,
+    side: THREE.DoubleSide,
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    toneMapped: false,
+  })), []);
+  useEffect(() => () => { materials.forEach((material) => material.dispose()); }, [materials]);
+  useEffect(() => { time.current = state.motion.time; }, [state.motion.time]);
+  useFrame((_, delta) => {
+    if (state.motion.enabled && state.motion.playing) time.current = (time.current + delta) % state.motion.duration;
+    const speed = Number.isFinite(state.lighting.rgbMotionSpeed) ? state.lighting.rgbMotionSpeed : .42;
+    const coverage = Number.isFinite(state.lighting.rgbCoverage) ? state.lighting.rgbCoverage : .78;
+    const phase = easedLoopPhase(time.current / Math.max(.001, state.motion.duration) * Math.PI * 2 * state.lighting.speed * speed);
+    const sequence = rgbLightSequence(time.current / Math.max(.001, state.motion.duration));
+    const lights = [state.lighting.rig.red, state.lighting.rig.green, state.lighting.rig.blue];
+    meshes.current.forEach((mesh, index) => {
+      if (!mesh) return;
+      const colorIndex = index % 3;
+      const opposite = index >= 3;
+      const light = lights[colorIndex];
+      const angle = phase + THREE.MathUtils.degToRad(light.phase) * sequence.phaseSpread + (opposite ? Math.PI : 0);
+      const radius = light.orbitRadius * 1.18;
+      mesh.position.set(light.positionX + Math.cos(angle) * radius, light.positionY + Math.sin(angle * .83) * light.orbitHeight * 1.08, light.positionZ + Math.sin(angle) * radius);
+      mesh.lookAt(0, 0, 0);
+      const pairEnergy = opposite ? .28 : 1;
+      const energy = light.enabled ? state.lighting.master * state.lighting.rgb * (.18 + sequence.weights[colorIndex] * 1.72) * 2.8 * pairEnergy : 0;
+      materials[index].uniforms.uColor.value.copy(color.set(light.color)).multiplyScalar(Math.min(18.0, energy * 1.7));
+      // These cards exist only in the captured environment. They behave as
+      // moving studio sources, so color appears through angle-dependent glass
+      // reflection instead of a full-scene RGB field.
+      const size = 1.8 + coverage * 2.6;
+      const aspect = .24 + coverage * .16;
+      mesh.scale.set(size * (opposite ? .68 : 1), size * aspect * (opposite ? .68 : 1), 1);
+    });
+  });
+  return <>
+    {[0, 1, 2, 3, 4, 5].map((index) => <mesh key={`rgb-reflection-fill-${index}`} ref={(mesh) => { meshes.current[index] = mesh; }} material={materials[index]}>
+      <circleGeometry args={[1, 48]} />
+    </mesh>)}
+  </>;
+}
+
+const opticalTransportVertexShader = /* glsl */`
+  precision highp float;
+  attribute vec3 axisLocal;
+  varying vec3 vWorldPosition;
+  varying vec3 vWorldNormal;
+  varying vec3 vAxisLocal;
+  void main() {
+    vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+    vWorldPosition = worldPosition.xyz;
+    vWorldNormal = normalize(mat3(modelMatrix) * normal);
+    vAxisLocal = axisLocal;
+    gl_Position = projectionMatrix * viewMatrix * worldPosition;
+  }
+`;
+
+const opticalTransportFragmentShader = /* glsl */`
+  precision highp float;
+  uniform vec3 uLightPositions[3];
+  uniform vec3 uLightColors[3];
+  uniform vec3 uLightEnergy;
+  uniform float uIor;
+  uniform float uRoughness;
+  uniform float uThickness;
+  varying vec3 vWorldPosition;
+  varying vec3 vWorldNormal;
+  varying vec3 vAxisLocal;
+
+  float fresnelSchlick(float cosine, float ior) {
+    float f0 = (1.0 - ior) / (1.0 + ior);
+    f0 *= f0;
+    return f0 + (1.0 - f0) * pow(1.0 - clamp(cosine, 0.0, 1.0), 5.0);
+  }
+
+  void main() {
+    vec3 normal = normalize(vWorldNormal);
+    vec3 viewDirection = normalize(cameraPosition - vWorldPosition);
+    if (dot(normal, viewDirection) < 0.0) normal *= -1.0;
+    vec3 q = abs(vAxisLocal);
+    float secondAxis = max(min(q.x, q.y), max(min(q.x, q.z), min(q.y, q.z)));
+    float edge = smoothstep(0.54, 0.985, secondAxis);
+    float fresnel = fresnelSchlick(abs(dot(normal, viewDirection)), max(1.01, uIor));
+    float roughness = clamp(uRoughness * 2.0, 0.0, 1.0);
+    float specularPower = mix(46.0, 7.0, roughness);
+    float transmissionPower = mix(18.0, 4.5, roughness);
+    vec3 color = vec3(0.0);
+
+    for (int index = 0; index < 3; index += 1) {
+      vec3 toLight = uLightPositions[index] - vWorldPosition;
+      float distanceToLight = max(0.001, length(toLight));
+      vec3 lightDirection = toLight / distanceToLight;
+      vec3 reflectedDirection = reflect(-lightDirection, normal);
+      vec3 refractedDirection = refract(-lightDirection, normal, 1.0 / max(1.01, uIor));
+      float specular = pow(max(dot(reflectedDirection, viewDirection), 0.0), specularPower);
+      float transmitted = pow(max(dot(-refractedDirection, viewDirection), 0.0), transmissionPower);
+      vec3 fromLight = normalize(vWorldPosition - uLightPositions[index]);
+      vec3 beamDirection = normalize(-uLightPositions[index]);
+      float cone = smoothstep(0.70, 0.975, dot(fromLight, beamDirection));
+      float incidence = pow(abs(dot(normal, lightDirection)), 0.72);
+      float distanceFalloff = 1.0 / (1.0 + distanceToLight * distanceToLight * 0.018);
+      float opticalPath = exp(-distanceToLight * 0.018 / max(0.15, uThickness));
+      float surfaceTransmission = cone * incidence * opticalPath * (0.14 + edge * 0.42) * (0.62 + fresnel);
+      float response = specular * (1.25 + fresnel * 1.5)
+        + transmitted * opticalPath * (0.20 + edge * 0.92)
+        + surfaceTransmission
+        + edge * fresnel * specular * 1.35;
+      color += uLightColors[index] * uLightEnergy[index] * distanceFalloff * response;
+    }
+
+    color = color / (vec3(1.0) + color * 0.42);
+    float alpha = clamp(max(color.r, max(color.g, color.b)) * 0.34, 0.0, 0.58);
+    gl_FragColor = vec4(color, alpha);
+  }
+`;
+
+function RgbOpticalTransport({ geometries, state }: { geometries: AxisGeometry[]; state: DimentionR3FState }): React.JSX.Element {
+  const time = useRef(state.motion.time);
+  const positions = useMemo(() => [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()], []);
+  const colors = useMemo(() => [new THREE.Color(), new THREE.Color(), new THREE.Color()], []);
+  const material = useMemo(() => new THREE.ShaderMaterial({
+    vertexShader: opticalTransportVertexShader,
+    fragmentShader: opticalTransportFragmentShader,
+    uniforms: {
+      uLightPositions: { value: positions },
+      uLightColors: { value: colors },
+      uLightEnergy: { value: new THREE.Vector3() },
+      uIor: { value: state.material.ior },
+      uRoughness: { value: state.material.roughness },
+      uThickness: { value: state.material.thickness },
+    },
+    transparent: true,
+    depthWrite: false,
+    depthTest: true,
+    side: THREE.FrontSide,
+    blending: THREE.AdditiveBlending,
+    toneMapped: true,
+    polygonOffset: true,
+    polygonOffsetFactor: -1,
+    polygonOffsetUnits: -1,
+  }), [colors, positions]);
+  useEffect(() => () => material.dispose(), [material]);
+  useEffect(() => { time.current = state.motion.time; }, [state.motion.time]);
+  useFrame((_, delta) => {
+    if (state.motion.enabled && state.motion.playing) time.current = (time.current + delta) % state.motion.duration;
+    const speed = Number.isFinite(state.lighting.rgbMotionSpeed) ? state.lighting.rgbMotionSpeed : .42;
+    const phase = easedLoopPhase(time.current / Math.max(.001, state.motion.duration) * Math.PI * 2 * state.lighting.speed * speed);
+    const sequence = rgbLightSequence(time.current / Math.max(.001, state.motion.duration));
+    const lights = [state.lighting.rig.red, state.lighting.rig.green, state.lighting.rig.blue];
+    const sharedEnergy = softLimitEnergy(state.lighting.master * state.lighting.rgb * RGB_SPOT_BASE_POWER, RGB_SPOT_ENERGY_CEILING);
+    const energy = material.uniforms.uLightEnergy.value as THREE.Vector3;
+    lights.forEach((light, index) => {
+      const angle = phase + THREE.MathUtils.degToRad(light.phase) * sequence.phaseSpread;
+      positions[index].set(light.positionX + Math.cos(angle) * light.orbitRadius, light.positionY + Math.sin(angle * .83) * light.orbitHeight, light.positionZ + Math.sin(angle) * light.orbitRadius);
+      colors[index].set(light.color);
+      energy.setComponent(index, light.enabled ? sharedEnergy * light.intensity * sequence.weights[index] * RGB_DOMINANCE_TOTAL / 210 : 0);
+    });
+    material.uniforms.uIor.value = state.material.ior;
+    material.uniforms.uRoughness.value = state.material.roughness;
+    material.uniforms.uThickness.value = state.material.thickness;
+  });
+  return <group name="RgbOpticalTransport">
+    {geometries.map(({ geometry, center }, index) => <mesh key={`rgb-optical-transport-${index}`} geometry={geometry} position={center} scale={1.0015} material={material} renderOrder={2} />)}
+  </group>;
+}
+
+function EnvironmentEmitter({ light, intensityScale, state, phaseOffset }: { light: DimentionEnvironmentLightState; intensityScale: number; state: DimentionR3FState; phaseOffset: number }): React.JSX.Element | null {
+  const motionGroup = useRef<THREE.Group>(null);
+  const time = useRef(state.motion.time);
+  useEffect(() => { time.current = state.motion.time; }, [state.motion.time]);
+  useFrame((_, delta) => {
+    const group = motionGroup.current;
+    if (!group) return;
+    if (state.motion.enabled && state.motion.playing) time.current = (time.current + delta) % state.motion.duration;
+    if (!state.motion.enabled) { group.position.set(0, 0, 0); return; }
+    const phase = time.current / Math.max(.001, state.motion.duration) * Math.PI * 2 * state.lighting.speed + phaseOffset;
+    const amount = Number.isFinite(light.motionAmount) ? light.motionAmount : .5;
+    group.position.set(
+      Math.sin(phase * .31) * amount,
+      Math.cos(phase * .23 + .7) * amount * .62,
+      Math.sin(phase * .19 + 1.3) * amount * .38,
+    );
+  });
   if (!light.enabled) return null;
   const form = light.shape === "ring" ? "ring" : light.shape === "rect" ? "rect" : "circle";
-  return <Lightformer
-    form={form}
-    intensity={light.intensity * intensityScale}
-    color={light.color}
-    position={[light.positionX, light.positionY, light.positionZ]}
-    rotation={[THREE.MathUtils.degToRad(light.rotationX), THREE.MathUtils.degToRad(light.rotationY), THREE.MathUtils.degToRad(light.rotationZ)]}
-    scale={[light.width, light.height, 1]}
-  />;
+  return <group ref={motionGroup}><Lightformer
+      form={form}
+      intensity={light.intensity * intensityScale}
+      color={light.color}
+      position={[light.positionX, light.positionY, light.positionZ]}
+      rotation={[THREE.MathUtils.degToRad(light.rotationX), THREE.MathUtils.degToRad(light.rotationY), THREE.MathUtils.degToRad(light.rotationZ)]}
+      scale={[light.width, light.height, 1]}
+    /></group>;
 }
 
 function AxisGlass({ state, captureQuality }: { state: DimentionR3FState; captureQuality: DimentionCaptureQuality }): React.JSX.Element {
+  const assembly = useRef<THREE.Group>(null);
+  const time = useRef(state.motion.time);
   const geometries = useMemo(() => buildAxisGeometries(state.geometry.gap, state.geometry.bevel), [state.geometry.bevel, state.geometry.gap]);
+  useEffect(() => { time.current = state.motion.time; }, [state.motion.time]);
   useEffect(() => () => geometries.forEach(({ geometry }) => geometry.dispose()), [geometries]);
-  return <group>
+  useFrame((_, delta) => {
+    const group = assembly.current;
+    if (!group) return;
+    if (state.motion.enabled && state.motion.playing) time.current = (time.current + delta) % state.motion.duration;
+    const progress = state.motion.enabled ? time.current / Math.max(.001, state.motion.duration) : 0;
+    group.rotation.y = -progress * state.motion.cubeRotationTurns * Math.PI * 2;
+    group.updateMatrixWorld(true);
+  }, -30);
+  return <group ref={assembly} name="PleosAxisCubeRotation">
     {geometries.map(({ geometry, center }, index) => <mesh key={`outer-${index}`} geometry={geometry} position={center} castShadow receiveShadow>
       <meshPhysicalMaterial
         color="#f6f8f8"
@@ -274,6 +490,7 @@ function AxisGlass({ state, captureQuality }: { state: DimentionR3FState; captur
         side={THREE.DoubleSide}
       />
     </mesh>)}
+    <RgbOpticalTransport geometries={geometries} state={state} />
     {state.mirror.enabled && <InternalReflectionSystem geometries={geometries} state={state} captureQuality={captureQuality} />}
   </group>;
 }
@@ -286,16 +503,18 @@ function OpticalStudio({ state, captureQuality, onTime, onCameraOrbit }: Pick<Sc
     <FreeOrbit state={state} onCameraOrbit={onCameraOrbit} />
     <AxisGlass state={state} captureQuality={captureQuality} />
     <MovingPleosLights state={state} onTime={onTime} />
+    <MovingRgbSpotlights state={state} />
     <Environment resolution={256} frames={Infinity} background={false}>
       <group rotation={[0, 0, 0]}>
-        <EnvironmentEmitter light={state.lighting.rig.whiteArea} intensityScale={state.lighting.master * state.lighting.white} />
-        <MovingSpectralDiscs state={state} />
-        <EnvironmentEmitter light={state.lighting.rig.rear} intensityScale={state.lighting.master * state.lighting.white} />
+        <MovingRgbReflectionSources state={state} />
+        <EnvironmentEmitter light={state.lighting.rig.whiteArea} intensityScale={state.lighting.master * state.lighting.white} state={state} phaseOffset={0} />
+        <EnvironmentEmitter light={state.lighting.rig.rear} intensityScale={state.lighting.master * state.lighting.white} state={state} phaseOffset={Math.PI * .83} />
       </group>
     </Environment>
     <EffectComposer multisampling={state.quality.multisampling} enableNormalPass>
       <N8AO aoRadius={.72} distanceFalloff={1} intensity={state.lighting.ao} quality={captureQuality === "preview" ? "medium" : "high"} halfRes={captureQuality === "preview"} />
       <Bloom intensity={state.lighting.bloom} luminanceThreshold={1.05} luminanceSmoothing={.45} mipmapBlur />
+      <SMAA />
     </EffectComposer>
   </>;
 }

@@ -12,6 +12,7 @@ export class DimentionR3FRenderer {
   private lastSize = { width: 1, height: 1 };
   private appliedSize = { width: 0, height: 0 };
   private captureDpr: number | null = null;
+  private videoSupersampling = 1;
   private captureQuality: DimentionCaptureQuality = "preview";
 
   constructor(private readonly stage: HTMLElement, initialState: DimentionR3FState, private readonly onReady: () => void, private readonly onError: (message: string) => void, private readonly onTime: (time: number) => void, private readonly onCameraOrbit: (yaw: number, pitch: number, zoom: number) => void) {
@@ -32,7 +33,7 @@ export class DimentionR3FRenderer {
   maximumTextureSize(): number { return this.runtime?.gl.capabilities.maxTextureSize ?? 0; }
   inspect(): object {
     const gl = this.runtime?.gl;
-    return { ready: this.isReady(), renderer: "React Three Fiber realtime transmission + recursive FBO glass reflection + Lightformer + N8AO", pipeline: "Three.js WebGL raster", materialPipeline: "deterministic MeshPhysicalMaterial transmission + dispersion", recursionCapture: "ping-pong half-float FBO", lightingRig: "soft white spotlight + animated Gaussian spectral disc IBL", pathTracing: false, solids: 3, sharedOrigin: this.state.geometry.gap === 0, canvasCount: this.stage.querySelectorAll("canvas").length, motion: { enabled: this.state.motion.enabled, playing: this.state.motion.playing, time: this.currentTime, duration: this.state.motion.duration, fps: 60 }, gpu: gl ? { maximumTextureSize: gl.capabilities.maxTextureSize, logarithmicDepthBuffer: gl.capabilities.logarithmicDepthBuffer } : null };
+    return { ready: this.isReady(), renderer: "React Three Fiber realtime transmission + recursive FBO glass reflection + Lightformer + N8AO", pipeline: "Three.js WebGL raster", materialPipeline: "deterministic MeshPhysicalMaterial transmission + dispersion", recursionCapture: "ping-pong half-float FBO", opticalTransport: "moving spotlight cone + world normal + Fresnel + IOR refraction, captured into recursive FBO", antialiasing: { preview: `${this.state.quality.multisampling}x MSAA + final SMAA`, video: `${this.state.export.videoSupersampling}x supersampling + ${this.state.quality.multisampling}x MSAA + final SMAA + high-quality downsample` }, lightingRig: "white key + animated Pleos RGB spotlights + studio Lightformers", rgbEnergyMode: "bounded merge-red-green-blue loop", pathTracing: false, solids: 3, sharedOrigin: this.state.geometry.gap === 0, canvasCount: this.stage.querySelectorAll("canvas").length, motion: { enabled: this.state.motion.enabled, playing: this.state.motion.playing, time: this.currentTime, duration: this.state.motion.duration, fps: 60, cubeRotationTurns: this.state.motion.cubeRotationTurns, cubeRotationDegrees: -(this.currentTime / Math.max(.001, this.state.motion.duration)) * this.state.motion.cubeRotationTurns * 360, cubeRotationDirection: "clockwise-y" }, gpu: gl ? { maximumTextureSize: gl.capabilities.maxTextureSize, logarithmicDepthBuffer: gl.capabilities.logarithmicDepthBuffer } : null };
   }
   async exportPng(width: number, height: number): Promise<string> {
     return this.blobDataUrl(await this.exportPngBlob(width, height));
@@ -41,55 +42,82 @@ export class DimentionR3FRenderer {
     const runtime = this.runtime;
     if (!runtime) throw new Error("Dimention R3F 렌더러를 초기화하는 중입니다.");
     const maximum = runtime.gl.capabilities.maxTextureSize;
-    if (width > maximum || height > maximum) throw new Error(`요청 크기 ${width}×${height}px가 GPU 한계 ${maximum}px를 초과합니다.`);
     const previousDpr = runtime.gl.getPixelRatio();
+    const wasPlaying = this.state.motion.playing;
     const pixelBudget = 8_000_000;
     const superSample = Math.max(1, Math.min(2, maximum / width, maximum / height, Math.sqrt(pixelBudget / Math.max(1, width * height))));
     try {
+      // A still must use one deterministic motion frame. Otherwise a large
+      // tiled print export can advance while tiles are being rendered.
+      this.state.motion.playing = false;
       this.captureQuality = "still"; this.renderReact();
-      // Keep the logical artboard size stable and raise DPR for supersampling.
-      // Resizing the logical viewport itself leaves post-processing targets at
-      // the old size for a frame and can capture only the upper-left quadrant.
-      runtime.setSize(width, height); runtime.setDpr(superSample); runtime.invalidate();
-      await this.frames(3);
       const output = document.createElement("canvas"); output.width = width; output.height = height;
       const context = output.getContext("2d", { alpha: true });
       if (!context) throw new Error("고품질 PNG 캔버스를 만들 수 없습니다.");
       context.imageSmoothingEnabled = true; context.imageSmoothingQuality = "high";
       context.clearRect(0, 0, width, height);
-      context.drawImage(runtime.gl.domElement, 0, 0, runtime.gl.domElement.width, runtime.gl.domElement.height, 0, 0, width, height);
+
+      if (width * height <= pixelBudget && width * superSample <= maximum && height * superSample <= maximum) {
+        // Small and medium stills retain the existing supersampled path.
+        runtime.setSize(width, height); runtime.setDpr(superSample); runtime.invalidate();
+        await this.frames(3);
+        context.drawImage(runtime.gl.domElement, 0, 0, runtime.gl.domElement.width, runtime.gl.domElement.height, 0, 0, width, height);
+      } else {
+        // EffectComposer and the recursive reflection pass use screen-space
+        // history, so camera tiles do not join reliably. Render the complete
+        // artboard at a bounded internal resolution and perform one high-
+        // quality upscale instead. This preserves the composition and avoids
+        // allocating a 50 MP MSAA / half-float framebuffer stack.
+        const renderScale = Math.min(1, maximum / width, maximum / height, Math.sqrt(pixelBudget / Math.max(1, width * height)));
+        const renderWidth = Math.max(1, Math.round(width * renderScale));
+        const renderHeight = Math.max(1, Math.round(height * renderScale));
+        runtime.setDpr(1);
+        runtime.setSize(renderWidth, renderHeight);
+        runtime.invalidate();
+        await this.frames(4);
+        context.drawImage(runtime.gl.domElement, 0, 0, runtime.gl.domElement.width, runtime.gl.domElement.height, 0, 0, width, height);
+      }
       return await this.canvasPngBlob(output);
     } finally {
+      this.state.motion.playing = wasPlaying;
       this.captureQuality = "preview"; this.renderReact();
       runtime.setDpr(previousDpr); runtime.setSize(this.lastSize.width, this.lastSize.height); this.appliedSize = { ...this.lastSize }; runtime.invalidate();
       await this.frames(3);
     }
   }
-  beginVideoCapture(width: number, height: number): void {
+  beginVideoCapture(width: number, height: number, requestedSupersampling: number): number {
     const runtime = this.runtime;
     if (!runtime) throw new Error("Dimention R3F 렌더러를 초기화하는 중입니다.");
     const maximum = runtime.gl.capabilities.maxTextureSize;
     if (width > maximum || height > maximum) throw new Error(`요청 크기 ${width}×${height}px가 GPU 한계 ${maximum}px를 초과합니다.`);
     if (this.captureDpr !== null) throw new Error("이미 동영상 캡처가 진행 중입니다.");
     this.captureDpr = runtime.gl.getPixelRatio();
+    this.videoSupersampling = Math.max(1, Math.min(2, requestedSupersampling, maximum / width, maximum / height));
     this.captureQuality = "video";
-    this.renderReact();
-    runtime.setDpr(1);
+    runtime.setDpr(this.videoSupersampling);
     runtime.setSize(width, height);
+    // Apply the capture DPR and logical size before switching the React scene
+    // so resolution-dependent post-process and recursive targets are allocated
+    // at their final dimensions on the first captured frame.
+    this.renderReact();
     this.appliedSize = { width, height };
     runtime.invalidate();
+    return this.videoSupersampling;
   }
   async captureVideoFrame(context: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, shouldCancel?: () => boolean): Promise<void> {
     const runtime = this.runtime;
     if (!runtime || this.captureDpr === null) throw new Error("동영상 캡처 세션이 시작되지 않았습니다.");
-    await this.frames(2, shouldCancel);
-    context.drawImage(runtime.gl.domElement, x, y, width, height);
+    await this.frames(Math.max(3, Math.round(this.state.quality.samples)), shouldCancel);
+    context.imageSmoothingEnabled = true;
+    context.imageSmoothingQuality = "high";
+    context.drawImage(runtime.gl.domElement, 0, 0, runtime.gl.domElement.width, runtime.gl.domElement.height, x, y, width, height);
   }
   endVideoCapture(): void {
     const runtime = this.runtime;
     if (!runtime || this.captureDpr === null) return;
     runtime.setDpr(this.captureDpr);
     this.captureDpr = null;
+    this.videoSupersampling = 1;
     this.captureQuality = "preview";
     this.renderReact();
     runtime.setSize(this.lastSize.width, this.lastSize.height);
