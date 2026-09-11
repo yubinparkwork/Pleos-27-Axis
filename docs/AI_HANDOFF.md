@@ -112,29 +112,18 @@ Production geometry and expression layers should remain separable so new Looks d
 
 ## Latest Task
 
-- User request: Preserve current green optical look and add subtle RGB secondary illumination with cycling lead colour
-- What changed: Added optional spatial RGB emitters and smooth 80/10/10 lead handover
-- Why: Provide simultaneous supporting colours without changing cube material tint
-- Main implementation decisions: Preserve manual mode and stored settings; four existing emitter cards with separated RGB ribbons; quintic deterministic timeline; saved phase anchor
+- User request: Publish Pleos B sharing link
+- What changed: Fix Pages deployment on GPU-less runners
+- Why: Hardware-only optical QA blocked GitHub Pages
+- Main implementation decisions: Keep full GPU QA local; run geometry and build on Pages
 
 ## Files Changed
 
-- `src/optical-studio/OpticalLighting.ts` — RGB weights and palette
-- `src/optical-studio/OpticalState.ts` — Cycle state and sanitization
-- `src/optical-studio/OpticalRenderer.ts` — Preallocated lighting uniforms
-- `src/optical-studio/optical.frag.glsl` — Spatial incident colour ribbons
-- `src/optical-studio/OpticalStudio.ts` — Phase anchor and runtime inspection
-- `src/optical-studio/OpticalPanel.ts` — Korean cycle toggle and live ratios
-- `src/optical-studio/OpticalStudio.css` — Native checkbox layout
-- `scripts/verify-optical-light-cycle.mjs` — Regression tests and captures
-- `scripts/optical-handoff.mjs` — Active lighting documentation
-- `docs/OPTICAL_STUDIO.md` — Cycle controls and limitations
-- `package.json` — Verification command
+- `.github/workflows/deploy-pages.yml` — Pages verification steps
 
 ## Visual Changes
 
-- Optional green-red-blue illumination cycle with persistent secondary colours
-- Geometry camera dimension layers and manual rendering preserved
+- No intentional visual changes
 
 ## Latest Previews
 
@@ -160,7 +149,6 @@ Validation values are generated from commands executed during this handoff. `NOT
 
 ## Known Issues
 
-- 80/10/10 describes emitter weights, not exact screen coverage; default latest previews remain manual, cycle captures are in artifacts/optical-light-cycle
 - OpticalStudio currently exports PNG stills only; MP4/video and an automatic motion-sequence exporter are unsupported.
 - Optical transport is bounded and art-directed: surface curvature uses a shading-normal approximation, secondary paths stop after eight interfaces, and no volumetric caustic/offline path-tracer equivalence is claimed.
 
