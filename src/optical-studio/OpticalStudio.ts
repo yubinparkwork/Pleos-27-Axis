@@ -15,7 +15,9 @@ export function mountOpticalStudio(root: HTMLElement): () => void {
   const storageKey = sharedScene ? `${STORAGE_KEY}:pleos-b-20260911` : STORAGE_KEY;
   let saved: unknown;
   try { saved = JSON.parse(localStorage.getItem(storageKey) ?? "null"); } catch { /* Recover corrupted state without touching the old studio. */ }
-  let state = sanitizeOpticalState(saved ?? (sharedScene ? pleosB : null));
+  // First-time visitors start with the approved local Pleos B composition.
+  // Existing personal edits remain authoritative on subsequent visits.
+  let state = sanitizeOpticalState(saved ?? pleosB);
   let renderer: OpticalRenderer | undefined;
   let dirty = true, disposed = false, exporting = false, frame = 0, lastTime = performance.now(), lastUi = 0;
   let width = 1, height = 1, frameMs = 0;

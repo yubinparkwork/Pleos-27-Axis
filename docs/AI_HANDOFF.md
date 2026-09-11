@@ -29,7 +29,7 @@ Production geometry and expression layers should remain separable so new Looks d
 - Axis family: 30deg
 - Cube count: 3
 - Shared origin valid: No; inspect the current gap setting
-- Projected directions: 30°, 90°, 150°, 209.99999999999997°, 270°, 330°
+- Projected directions: 9.31640830154197°, 90°, 103.90944952658475°, 189.316408301542°, 270°, 283.90944952658475°
 - Geometry source: `src/optical-studio/AxisGeometry.ts`; the geometry module preserves the approved unrounded legacy silhouette and common vertex at zero gap.
 - Render geometry uses bevel-aware inward radial compensation: at zero gap all three rounded-cube pairs touch without volume overlap. Positive pair clearance is sqrt(3) times gap regardless of bevel. Orientation, canonical depth and assembly centroid are preserved. Pairwise tangency is not a common rounded triple vertex; inspect runtime renderedCenters and surfacesTouch.
 - Do not change the approved shared origin, 30° projection, default camera, or three-solid silhouette without an explicit brand-structure request.
@@ -68,7 +68,7 @@ Production geometry and expression layers should remain separable so new Looks d
 
 ## Artboard / Export
 
-- Captured artboard: 3840 × 3840 (main).
+- Captured artboard: 3072 × 3840 (4x5).
 - Raster export: exact-size PNG via `capture(width, height, samples)` with tiled high-resolution rendering.
 - The interface exposes native long-edge 3840px PNG with 4×4 (16) spatial samples averaged in linear light before tone mapping. Canvas2D assembles final pixels only, without display-RGB supersample averaging. Latest handoff previews below use their recorded pixel dimensions and four samples.
 - Both preview and export render off-artboard guard bands covering the scaled bloom footprint and spatial-AA reach, then crop. Outer image boundaries and internal tile seams use the same lighting support; output is not an enlarged preview screenshot.
@@ -112,25 +112,25 @@ Production geometry and expression layers should remain separable so new Looks d
 
 ## Latest Task
 
-- User request: Share the current Pleos B local settings
-- What changed: Add a versioned shared scene with exact local camera and lighting settings
-- Why: Published code was current but browser-local settings were absent
-- Main implementation decisions: Scene URL selects an immutable snapshot with isolated autosave; preserve local working settings
+- User request: Use current Pleos B settings on first visit
+- What changed: Default route loads the approved local snapshot; make lighting test phase explicit
+- Why: All new visitors should start at the same local composition
+- Main implementation decisions: Preserve saved edits and seed only first visits
 
 ## Files Changed
 
-- `src/optical-studio/OpticalStudio.ts` — Shared scene loading
-- `src/optical-studio/shared/pleos-b-20260911.json` — Local settings snapshot
+- `src/optical-studio/OpticalStudio.ts` — Initial state
+- `scripts/verify-optical-light-cycle.mjs` — Independent test phase
 
 ## Visual Changes
 
-- Shared scene opens the current 4x5 camera, dimensions and RGB cycle
+- First visit uses the saved 4x5 composition
 
 ## Latest Previews
 
 | Preview | Pixels | Look | Hero time |
 | --- | ---: | --- | ---: |
-| `artifacts/latest/preview-main.png` | 1080 × 1080 | optical-glass | 7.5s |
+| `artifacts/latest/preview-main.png` | 864 × 1080 | optical-glass | 7.5s |
 | `artifacts/latest/preview-4x5.png` | 1080 × 1350 | optical-glass | 7.5s |
 | `artifacts/latest/preview-9x16.png` | 1080 × 1920 | optical-glass | 7.5s |
 

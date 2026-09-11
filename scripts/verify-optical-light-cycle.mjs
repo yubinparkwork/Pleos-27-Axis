@@ -10,7 +10,8 @@ const url = process.env.PLEOS_OPTICAL_URL ?? 'http://127.0.0.1:51744/';
 await mkdir(output, { recursive: true });
 let server, browser;
 const report = { checks: {}, errors: [], captures: {} };
-const custom = { playing: false, time: 0, duration: 15, speed: .4, lightColor: '#0CFFA8',
+// Explicit phase keeps this test independent of the published starting scene.
+const custom = { playing: false, lightCycleOffset: 0, time: 0, duration: 15, speed: .4, lightColor: '#0CFFA8',
   gap: .005, bevel: .055, dimensionTop: 12, dimensionLeft: 10, dimensionRight: 12,
   dimensionSpacing: .14, dimensionSoftness: .55, dimensionFalloff: .55,
   ior: 2.5, dispersion: .008, roughness: .2, surfaceCurvature: 0, reflection: 1,
@@ -77,7 +78,7 @@ try {
   await toggle.focus(); await toggle.press('Space');
   let state = await page.evaluate(() => window.__pleosOptical.inspect().state);
   assert(state.lightCycle); assert(Math.abs(state.lightCycleOffset - 6.55 / 15) < 1e-9);
-  for (const key of Object.keys(custom)) if (key !== 'time') assert.equal(state[key], custom[key], `Preserve ${key}`);
+  for (const key of Object.keys(custom)) if (key !== 'time' && key !== 'lightCycleOffset') assert.equal(state[key], custom[key], `Preserve ${key}`);
   await page.reload(); await page.waitForFunction(() => window.__pleosOptical?.inspect().ready);
   assert.equal(await toggle.isChecked(), true);
   state = await page.evaluate(() => window.__pleosOptical.inspect().state);
