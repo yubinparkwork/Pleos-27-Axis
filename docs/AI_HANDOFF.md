@@ -112,18 +112,19 @@ Production geometry and expression layers should remain separable so new Looks d
 
 ## Latest Task
 
-- User request: Publish Pleos B sharing link
-- What changed: Fix Pages deployment on GPU-less runners
-- Why: Hardware-only optical QA blocked GitHub Pages
-- Main implementation decisions: Keep full GPU QA local; run geometry and build on Pages
+- User request: Share the current Pleos B local settings
+- What changed: Add a versioned shared scene with exact local camera and lighting settings
+- Why: Published code was current but browser-local settings were absent
+- Main implementation decisions: Scene URL selects an immutable snapshot with isolated autosave; preserve local working settings
 
 ## Files Changed
 
-- `.github/workflows/deploy-pages.yml` — Pages verification steps
+- `src/optical-studio/OpticalStudio.ts` — Shared scene loading
+- `src/optical-studio/shared/pleos-b-20260911.json` — Local settings snapshot
 
 ## Visual Changes
 
-- No intentional visual changes
+- Shared scene opens the current 4x5 camera, dimensions and RGB cycle
 
 ## Latest Previews
 

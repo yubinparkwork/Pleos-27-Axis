@@ -1,17 +1,21 @@
 {
   "project": "PLEOS 27 Axis",
-  "generatedAt": "2026-09-11T05:35:38.682Z",
+  "generatedAt": "2026-09-11T05:40:27.068Z",
   "git": {
     "root": ".",
     "projectPath": ".",
     "branch": "main",
-    "sourceBaseCommit": "5d98f4a8b6881abbda62295e969a579e0506d864",
+    "sourceBaseCommit": "19531976040a1b1291a04967d1fe88dadd9bf702",
     "remote": "https://github.com/yubinparkwork/Pleos-27-Axis.git",
     "dirtyBeforeHandoff": true,
     "changedBeforeHandoff": [
       {
         "status": "M",
-        "file": ".github/workflows/deploy-pages.yml"
+        "file": "src/optical-studio/OpticalStudio.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/optical-studio/shared/pleos-b-20260911.json"
       },
       {
         "status": "??",
@@ -246,7 +250,7 @@
       "sourceWidth": 1276,
       "sourceHeight": 1276,
       "guardPixels": 16,
-      "cpuSubmitMs": 0.10000002384185791
+      "cpuSubmitMs": 0
     },
     "exporting": false,
     "rendering": {
@@ -410,7 +414,7 @@
       "name": "typecheck",
       "command": "npm run typecheck",
       "status": "pass",
-      "durationMs": 2154,
+      "durationMs": 2165,
       "exitCode": 0,
       "signal": null,
       "outputTail": "> pleos-27-axis@1.0.0 typecheck\n> tsc -b --pretty false"
@@ -419,7 +423,7 @@
       "name": "verify",
       "command": "npm run verify",
       "status": "pass",
-      "durationMs": 20853,
+      "durationMs": 22060,
       "exitCode": 0,
       "signal": null,
       "outputTail": "    \"red-main\": {\n      \"width\": 432,\n      \"height\": 540\n    },\n    \"blue-main\": {\n      \"width\": 432,\n      \"height\": 540\n    },\n    \"loop-end\": {\n      \"width\": 432,\n      \"height\": 540\n    },\n    \"manual-restored\": {\n      \"width\": 432,\n      \"height\": 540\n    },\n    \"lights-off\": {\n      \"width\": 432,\n      \"height\": 540\n    },\n    \"overview-green\": {\n      \"width\": 540,\n      \"height\": 675\n    },\n    \"overview-red\": {\n      \"width\": 540,\n      \"height\": 675\n    },\n    \"overview-blue\": {\n      \"width\": 540,\n      \"height\": 675\n    }\n  },\n  \"status\": \"pass\"\n}"
@@ -428,10 +432,10 @@
       "name": "build",
       "command": "npm run build",
       "status": "pass",
-      "durationMs": 7152,
+      "durationMs": 7042,
       "exitCode": 0,
       "signal": null,
-      "outputTail": "dist/assets/fullscreen.vert-C-jkPNU4.js            0.22 kB │ gzip:   0.18 kB\ndist/assets/colors-D_b0tcXK.js                     0.28 kB │ gzip:   0.19 kB\ndist/assets/ModeRegistry-afUNfvaX.js               0.34 kB │ gzip:   0.22 kB\ndist/assets/LegacyArchiveView-CxfvYwCh.js          0.71 kB │ gzip:   0.41 kB\ndist/assets/PngMetadata-D7ZL0hXE.js                1.06 kB │ gzip:   0.57 kB\ndist/assets/RoundedBoxGeometry-CZcYavyv.js         1.72 kB │ gzip:   0.81 kB\ndist/assets/presets-BX97Zrue.js                    1.80 kB │ gzip:   0.80 kB\ndist/assets/RoomEnvironment-B4NOg-5c.js            2.07 kB │ gzip:   0.89 kB\ndist/assets/BufferGeometryUtils-CsoQxFFe.js        5.26 kB │ gzip:   1.71 kB\ndist/assets/index-BesxDZk5.js                      8.14 kB │ gzip:   3.01 kB\ndist/assets/StudioShell-9k7q1rvU.js               11.59 kB │ gzip:   3.82 kB\ndist/assets/UnrealBloomPass-mQeuDl5D.js           15.78 kB │ gzip:   3.93 kB\ndist/assets/index-Bgm4ANIy.js                     33.37 kB │ gzip:   9.99 kB\ndist/assets/AxisTrailsMode-ty1aSZbC.js            37.39 kB │ gzip:  12.39 kB\ndist/assets/LightFieldMode-CI5AOa5k.js            38.14 kB │ gzip:  12.57 kB\ndist/assets/GlassPrismMode-CRLLJRN7.js            39.73 kB │ gzip:  12.94 kB\ndist/assets/MeshBVH-BWDiuoAC.js                   47.96 kB │ gzip:  15.87 kB\ndist/assets/SMAAPass-DYQVrftP.js                  61.27 kB │ gzip:  38.28 kB\ndist/assets/OpticalStudio-BWn7QUS0.js             67.02 kB │ gzip:  23.13 kB\ndist/assets/AxisMegastructureMode-0aiiUhp3.js     97.23 kB │ gzip:  29.86 kB\ndist/assets/index-BJOUBGGp.js                    119.59 kB │ gzip:  33.76 kB\ndist/assets/AxisHabitatMode-CAignr5e.js          189.39 kB │ gzip:  66.96 kB\ndist/assets/CrystalAssembly-Ck-HUeSp.js          209.53 kB │ gzip:  55.51 kB\ndist/assets/OutputPass-BDAB8kpn.js               250.34 kB │ gzip: 102.54 kB\ndist/assets/three.module-Dc7hrohh.js             735.86 kB │ gzip: 190.70 kB\ndist/assets/DimentionR3FMode-DaSJ8eQd.js         833.79 kB │ gzip: 321.72 kB\ndist/assets/Glass3DMode-CPybaoDK.js            1,204.37 kB │ gzip: 334.02 kB\ndist/assets/KineticGlassMode-Dbk4_3OY.js       2,257.69 kB │ gzip: 838.39 kB\n✓ built in 4.45s\n\n\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit."
+      "outputTail": "dist/assets/fullscreen.vert-C-jkPNU4.js            0.22 kB │ gzip:   0.18 kB\ndist/assets/colors-D_b0tcXK.js                     0.28 kB │ gzip:   0.19 kB\ndist/assets/ModeRegistry-afUNfvaX.js               0.34 kB │ gzip:   0.22 kB\ndist/assets/LegacyArchiveView-CxfvYwCh.js          0.71 kB │ gzip:   0.41 kB\ndist/assets/PngMetadata-D7ZL0hXE.js                1.06 kB │ gzip:   0.57 kB\ndist/assets/RoundedBoxGeometry-CZcYavyv.js         1.72 kB │ gzip:   0.81 kB\ndist/assets/presets-BX97Zrue.js                    1.80 kB │ gzip:   0.80 kB\ndist/assets/RoomEnvironment-B4NOg-5c.js            2.07 kB │ gzip:   0.89 kB\ndist/assets/BufferGeometryUtils-CsoQxFFe.js        5.26 kB │ gzip:   1.71 kB\ndist/assets/index-C9wpem4b.js                      8.14 kB │ gzip:   3.00 kB\ndist/assets/StudioShell-9k7q1rvU.js               11.59 kB │ gzip:   3.82 kB\ndist/assets/UnrealBloomPass-mQeuDl5D.js           15.78 kB │ gzip:   3.93 kB\ndist/assets/index-Bgm4ANIy.js                     33.37 kB │ gzip:   9.99 kB\ndist/assets/AxisTrailsMode-ty1aSZbC.js            37.39 kB │ gzip:  12.39 kB\ndist/assets/LightFieldMode-CI5AOa5k.js            38.14 kB │ gzip:  12.57 kB\ndist/assets/GlassPrismMode-CRLLJRN7.js            39.73 kB │ gzip:  12.94 kB\ndist/assets/MeshBVH-BWDiuoAC.js                   47.96 kB │ gzip:  15.87 kB\ndist/assets/SMAAPass-DYQVrftP.js                  61.27 kB │ gzip:  38.28 kB\ndist/assets/OpticalStudio-D6_Ss5Qh.js             67.95 kB │ gzip:  23.58 kB\ndist/assets/AxisMegastructureMode-0aiiUhp3.js     97.23 kB │ gzip:  29.86 kB\ndist/assets/index-BJOUBGGp.js                    119.59 kB │ gzip:  33.76 kB\ndist/assets/AxisHabitatMode-CAignr5e.js          189.39 kB │ gzip:  66.96 kB\ndist/assets/CrystalAssembly-Ck-HUeSp.js          209.53 kB │ gzip:  55.51 kB\ndist/assets/OutputPass-BDAB8kpn.js               250.34 kB │ gzip: 102.54 kB\ndist/assets/three.module-Dc7hrohh.js             735.86 kB │ gzip: 190.70 kB\ndist/assets/DimentionR3FMode-DaSJ8eQd.js         833.79 kB │ gzip: 321.72 kB\ndist/assets/Glass3DMode-CPybaoDK.js            1,204.37 kB │ gzip: 334.02 kB\ndist/assets/KineticGlassMode-Dbk4_3OY.js       2,257.69 kB │ gzip: 838.39 kB\n✓ built in 4.33s\n\n\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit."
     }
   ],
   "browser": {

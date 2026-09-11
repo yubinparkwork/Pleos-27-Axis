@@ -1,0 +1,14 @@
+{
+  "gap": 0.015, "bevel": 0.03, "ior": 1.86, "dispersion": 0.008,
+  "roughness": 0.2, "surfaceCurvature": 0, "reflection": 2, "absorption": 0.03,
+  "lightIntensity": 1.8, "lightSpread": 0.2, "red": 0, "green": 2, "blue": 0,
+  "exposure": 1, "zoom": 3.3058260701900157,
+  "azimuth": 78.60406250000001, "elevation": 54.47843750000001,
+  "time": 0.52, "duration": 15, "speed": 0.4,
+  "dimensionTop": 1.4, "dimensionLeft": 11.85, "dimensionRight": 12,
+  "bloom": 0.18, "dimensionSpacing": 0.14, "dimensionSoftness": 1,
+  "dimensionFalloff": 1, "lightColor": "#0ADC91",
+  "dimensionSpacingTop": 0.3, "dimensionSpacingLeft": 0.085,
+  "dimensionSpacingRight": 0.06, "bounces": 12, "playing": false,
+  "aspect": "4x5", "lightCycle": true, "lightCycleOffset": 0.4686666666666667
+}

@@ -5,13 +5,17 @@ import type { OpticalState } from "./OpticalState";
 import { OPTICAL_CUBE_SCALE, getAxisCubes, getRenderAxisCubes } from "./AxisGeometry";
 import { LUMINOUS_REFERENCE, BEFORE_LUMINOUS_STORAGE_KEY } from './LuminousReference';
 import { inspectLightCycle } from './OpticalLighting';
+import pleosB from './shared/pleos-b-20260911.json';
 
 const STORAGE_KEY = "pleos-optical-studio-v1";
 
 export function mountOpticalStudio(root: HTMLElement): () => void {
+  const sharedScene = new URLSearchParams(location.search).get('scene') === 'pleos-b-20260911';
+  // A shared scene has its own saved edits; never replace the local working scene.
+  const storageKey = sharedScene ? `${STORAGE_KEY}:pleos-b-20260911` : STORAGE_KEY;
   let saved: unknown;
-  try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "null"); } catch { /* Recover corrupted state without touching the old studio. */ }
-  let state = sanitizeOpticalState(saved);
+  try { saved = JSON.parse(localStorage.getItem(storageKey) ?? "null"); } catch { /* Recover corrupted state without touching the old studio. */ }
+  let state = sanitizeOpticalState(saved ?? (sharedScene ? pleosB : null));
   let renderer: OpticalRenderer | undefined;
   let dirty = true, disposed = false, exporting = false, frame = 0, lastTime = performance.now(), lastUi = 0;
   let width = 1, height = 1, frameMs = 0;
@@ -20,7 +24,7 @@ export function mountOpticalStudio(root: HTMLElement): () => void {
       if (saved && typeof saved === 'object' && !('lightColor' in saved) && !localStorage.getItem('pleos-optical-before-dimension-layers-v1')) {
         localStorage.setItem('pleos-optical-before-dimension-layers-v1', JSON.stringify({ savedAt: new Date().toISOString(), state: saved }));
       }
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      localStorage.setItem(storageKey, JSON.stringify(state));
     }
     catch { panel.status("브라우저 저장 공간이 부족합니다. 설정 자동 저장을 사용할 수 없습니다."); }
   };

@@ -11,7 +11,7 @@
       "samples": 1,
       "bytes": 401957,
       "sha256": "98c7539299e28de3e4a2d3f4bde8a3cd3c93099d3c07eee4c64dcc2bb8ffddb3",
-      "wallMs": 401,
+      "wallMs": 443,
       "litFraction": 0.26857831790123454,
       "peak": 249,
       "meanRGB": [
@@ -41,7 +41,7 @@
       "samples": 1,
       "bytes": 130004,
       "sha256": "9fad35751d0b1773a91ed91ad4e017adb5b735732d82469a5446179b05690a73",
-      "wallMs": 145,
+      "wallMs": 170,
       "litFraction": 0.2992438271604938,
       "peak": 248,
       "meanRGB": [
@@ -56,7 +56,7 @@
       "samples": 1,
       "bytes": 130004,
       "sha256": "9fad35751d0b1773a91ed91ad4e017adb5b735732d82469a5446179b05690a73",
-      "wallMs": 160,
+      "wallMs": 164,
       "litFraction": 0.2992438271604938,
       "peak": 248,
       "meanRGB": [
@@ -71,7 +71,7 @@
       "samples": 1,
       "bytes": 130611,
       "sha256": "2677ca7e44aadf2a89c1d924d7876718d0b06e985ca8ce00bee1132449c1609c",
-      "wallMs": 138,
+      "wallMs": 182,
       "litFraction": 0.29867283950617285,
       "peak": 248,
       "meanRGB": [
@@ -86,7 +86,7 @@
       "samples": 1,
       "bytes": 135151,
       "sha256": "766336e1f89021bde1076a146ca561a81637ebce5cb8c9af6938565db2cf2829",
-      "wallMs": 118,
+      "wallMs": 139,
       "litFraction": 0.35151234567901235,
       "peak": 248,
       "meanRGB": [
@@ -101,7 +101,7 @@
       "samples": 1,
       "bytes": 129705,
       "sha256": "3412a941a28b6987b6a7061fd61219682f53b2aa1d05b17c6ec7c2ade5b962a6",
-      "wallMs": 147,
+      "wallMs": 175,
       "litFraction": 0.2834104938271605,
       "peak": 242,
       "meanRGB": [
@@ -116,7 +116,7 @@
       "samples": 1,
       "bytes": 129057,
       "sha256": "ec9125df0491f13d3c54d64e0bf9538d6cc1f9a963e91ee9867871dfe442aac0",
-      "wallMs": 157,
+      "wallMs": 153,
       "litFraction": 0.319320987654321,
       "peak": 247,
       "meanRGB": [
@@ -131,7 +131,7 @@
       "samples": 1,
       "bytes": 137132,
       "sha256": "5edc6aa237d6d75b95a3e73322f2fc461256bbb25aadeac303b0883b3cd8f835",
-      "wallMs": 188,
+      "wallMs": 181,
       "litFraction": 0.3155324074074074,
       "peak": 249,
       "meanRGB": [
@@ -146,7 +146,7 @@
       "samples": 1,
       "bytes": 116454,
       "sha256": "b3ec4a1b0d9b685c7c73ffe3b0d63607a3a5034b54e97bc2bb3bcc942fd174af",
-      "wallMs": 145,
+      "wallMs": 195,
       "litFraction": 0.278070987654321,
       "peak": 246,
       "meanRGB": [
@@ -161,7 +161,7 @@
       "samples": 1,
       "bytes": 118844,
       "sha256": "d2ebb3485017b5d24cbf043473226b471248ce5db230fc058421cdfdb0bdd5bf",
-      "wallMs": 153,
+      "wallMs": 110,
       "litFraction": 0.27510802469135803,
       "peak": 249,
       "meanRGB": [
@@ -176,7 +176,7 @@
       "samples": 1,
       "bytes": 129630,
       "sha256": "ae58373b1919e9118190942737299c517dca4a1d88899343235ea4fa75f626b3",
-      "wallMs": 145,
+      "wallMs": 139,
       "litFraction": 0.2985262345679012,
       "peak": 246,
       "meanRGB": [
@@ -191,7 +191,7 @@
       "samples": 1,
       "bytes": 4030,
       "sha256": "9839bcaab35b2a185d87854eb6ccab273ff64e0f5addc319f402df3091b7a4ff",
-      "wallMs": 164,
+      "wallMs": 155,
       "litFraction": 0,
       "peak": 0,
       "meanRGB": [
@@ -454,7 +454,7 @@
       "sourceWidth": 1276,
       "sourceHeight": 1276,
       "guardPixels": 16,
-      "cpuSubmitMs": 8.5
+      "cpuSubmitMs": 43.89999997615814
     },
     "exporting": false,
     "rendering": {
