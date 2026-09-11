@@ -32,7 +32,7 @@ await page.addInitScript(() => {
 });
 
 try {
-  await page.goto(url, { waitUntil: "domcontentloaded" });
+  await page.goto(`${url}${url.includes("?") ? "&" : "?"}renderer=studio`, { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => Boolean(window.__pleos27Axis?.inspect().ready));
   const modes = await page.evaluate(() => window.__pleos27Axis.listModes());
   await page.evaluate(() => window.__pleos27Axis.setArtboard({ id: "custom", width: 1333, height: 777, previewZoom: 1.15 }));

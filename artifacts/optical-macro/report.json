@@ -1,0 +1,28 @@
+{
+  "status": "pass",
+  "zoomRange": [
+    0.4,
+    24
+  ],
+  "keyboard": "pass",
+  "wheel": "pass",
+  "persistence": "pass",
+  "results": {
+    "4": {
+      "singleSampleRMSE": 5.630546134125758,
+      "macroSupersamplingRMSE": 3.218173941619458,
+      "comparison": "16-subpixel reference at identical state; not a physical ground-truth claim"
+    },
+    "12": {
+      "singleSampleRMSE": 5.759537430387708,
+      "macroSupersamplingRMSE": 3.729349972217381,
+      "comparison": "16-subpixel reference at identical state; not a physical ground-truth claim"
+    },
+    "24": {
+      "singleSampleRMSE": 6.639983819808209,
+      "macroSupersamplingRMSE": 3.7627931856362196,
+      "comparison": "16-subpixel reference at identical state; not a physical ground-truth claim"
+    }
+  },
+  "errors": []
+}

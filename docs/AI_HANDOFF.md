@@ -14,193 +14,137 @@ Production geometry and expression layers should remain separable so new Looks d
 
 - Entry point: `src/main.ts`
 - Default route: `/`
-- Active application: Glass3DMode / MotionStudioApp
-- Renderer: Three.js WebGPU preview + native WebGPU wavefront path tracer
-- Preview: Three.js WebGL compatibility preview
-- Projection: orthographic (OrthographicCamera)
-- Main structure: 3 closed optical solids meeting at one shared vertex
-- Studio mode: Glass 3D (renderer lifecycle owned by the active Mode)
-- Legacy routes: `?renderer=raw` and `?renderer=legacy` — Legacy / reference only
+- Active application: OpticalStudio
+- Runtime capture: available
+- Renderer: WebGL2 analytic dielectric ray integrator / linear HDR
+- Projection: orthographic
+- Main structure: three analytically intersected rounded cubes in the approved Axis relationship.
+- Browser API: `window.__pleosOptical` — inspect, set, seek, pause, capture and reset.
+- Preserved previous application: `?renderer=studio`; prior Dimention R3F and the other studio modes are available there.
+- Other reference routes: `?renderer=raw` and `?renderer=legacy`.
+- Named draft: `../pleos-snapshots/pleos-dimension-draft-20260910-155444/` is immutable and separate from this active application.
 
 ## Axis Identity
 
 - Axis family: 30deg
-- Shared origin valid: Yes
-- Shared-origin contract: [0, 0, 0]
-- Projected directions: 30°, 90°, 150°, 210°, 270°, 330°
-- Geometry relationship: three closed optical solids meet at one shared vertex.
+- Cube count: 3
+- Shared origin valid: No; inspect the current gap setting
+- Projected directions: 30°, 90°, 150°, 209.99999999999997°, 270°, 330°
+- Geometry source: `src/optical-studio/AxisGeometry.ts`; the geometry module preserves the approved unrounded legacy silhouette and common vertex at zero gap.
+- Render geometry uses bevel-aware inward radial compensation: at zero gap all three rounded-cube pairs touch without volume overlap. Positive pair clearance is sqrt(3) times gap regardless of bevel. Orientation, canonical depth and assembly centroid are preserved. Pairwise tangency is not a common rounded triple vertex; inspect runtime renderedCenters and surfacesTouch.
 - Do not change the approved shared origin, 30° projection, default camera, or three-solid silhouette without an explicit brand-structure request.
 - Materials, shaders, lighting, motion, and artboard treatment are expression layers and may evolve while the Axis contract remains fixed.
 
 ## Current Expressions / Looks
 
-### Clear
+### Optical Studio
 
-- Role: Neutral clear optical glass
-- Implementation: MeshPhysicalMaterial preset
-- Main file: `src/crystal/CrystalAssembly.ts`
-- Render strategy: path-traced-still+raster-preview
-- Motion support: Yes, via the shared Motion system
-
-### Prism
-
-- Role: Primary optical prism expression
-- Implementation: MeshPhysicalMaterial with dispersion
-- Main file: `src/crystal/CrystalAssembly.ts`
-- Render strategy: path-traced-still+raster-preview
-- Motion support: Yes, via the shared Motion system
-
-### Spectral Flow
-
-- Role: Axis-driven moving spectral light field
-- Implementation: MeshPhysicalMaterial.onBeforeCompile custom GLSL
-- Main file: `src/crystal/materials/SpectralFlowMaterial.ts`
-- Render strategy: high-resolution-raster
-- Motion support: Yes, via the shared Motion system
-
-### Soft Spectral
-
-- Role: Soft center-led optical field with blue/cyan spectral response
-- Implementation: Independent MeshPhysicalMaterial.onBeforeCompile custom GLSL
-- Main file: `src/crystal/materials/SoftSpectralMaterial.ts`
-- Render strategy: high-resolution-raster
-- Motion support: Yes, via the shared Motion system
-
-### Smoked
-
-- Role: Dark smoked optical glass
-- Implementation: MeshPhysicalMaterial preset
-- Main file: `src/crystal/CrystalAssembly.ts`
-- Render strategy: path-traced-still+raster-preview
-- Motion support: Yes, via the shared Motion system
-
-### Dimention R3F
-
-- Role: fast, noise-free optical-glass version of the canonical Glass 3D composition
-- Implementation: React Three Fiber MeshTransmissionMaterial, Environment Lightformers, moving Pleos RGB RectAreaLights, N8AO, MSAA and restrained Bloom
-- Main files: `src/modes/dimention-r3f/DimentionR3FMode.ts`, `DimentionR3FScene.tsx`, `DimentionR3FRenderer.tsx`
-- Geometry: cloned from `CrystalAssembly`, including its shared-corner and bevel-aware screen-gap compensation
-- Render strategy: realtime Three.js WebGL raster; no Monte Carlo accumulation and no path tracing
-- Presets: PLEOS Prism, Clear Studio, Dark Glass
-- Motion support: Yes, deterministic RGB/white light orbit with timeline playback and seek
-
-### Light Field
-
-- Role: Cables-inspired iridescent membrane mapped across the canonical three-cube Axis structure
-- Implementation: independent WebGL2 rounded-cube ray intersection with a world-space warped void, white crest, spectral layers and deterministic periodic motion
-- Main files: `src/modes/light-field/LightFieldMode.ts`, `LightFieldRenderer.ts`, `shaders/field.frag.glsl`
-- Render strategy: realtime raster WebGL2; no Three.js and no path tracing
-- Presets: Iridescent Pulse, Violet Membrane, Spectral White
-- Motion support: Yes, absolute-time configurable 8–16 second loop
-
-### Glass Prism
-
-- Role: three-solid optical refraction of editable background typography
-- Implementation: independent Raw WebGL2 ray-box renderer using front/back thickness, RGB Snell refraction and Fresnel response
-- Main files: `src/modes/glass-prism/GlassPrismMode.ts`, `GlassPrismRenderer.ts`, `shaders/prism.frag.glsl`
-- Render strategy: realtime raster WebGL2 with deterministic exact-size PNG output
-- Presets: Clear Glass, RGB Prism, Frosted Prism, Dark Crystal
-- Motion support: Yes, rotation, shared-corner pulse and explode/rejoin
-
-### Kinetic Glass
-
-- Role: interactive optical-glass expression of the canonical PLEOS three-cube structure
-- Implementation: Three.js MeshPhysicalMaterial with zero-gravity Rapier rigid bodies, bounded pointer repulsion and spring return
-- Main files: `src/modes/kinetic-glass/KineticGlassMode.ts`, `KineticGlassRenderer.ts`, `KineticGlassPanel.ts`
-- Render strategy: realtime Three.js raster, PMREM studio environment and restrained bloom
-- Presets: Clear Attraction, PLEOS Prism, Dark Mass
-- Motion support: Yes, live pointer interaction with stable return to the approved 30° rest positions
+- Role: editable optical glass with colored light reflecting and refracting through the canonical three cubes.
+- Implementation: independent Raw WebGL2 renderer, analytic rounded-cube intersections, iterative Snell refraction and Fresnel reflection, and wavelength-dependent RGB dispersion.
+- Lighting: four smooth studio emitters share one user-selected HEX colour in manual mode. Optional RGB cycle evaluates three spatially separate colour ribbons per emitter, with 80/10/10 power handover and Pleos secondary colours. Existing negative-fill apertures remain. No surface albedo tint or object emission. Legacy RGB weights are converted once with an original-state backup before overwrite.
+- Radiance pipeline: linear FP16 render targets, linear subpixel averaging, bounded highlight bloom, tone mapping, sRGB conversion and spatial AA. Range-compressed RGBA8 is a lower-precision fallback, not equivalent HDR quality.
+- Floating render targets active in this capture: Yes.
+- `surfaceCurvature` changes an optical shading normal to approximate a polished lens face. It does not deform the actual cube silhouette, intersection geometry or Axis structure; zero preserves flat-face normals.
+- Per-cube dimension layers: continuous 0–12 virtual cubical reflection-image layers sampled along rays refracted through the real shell. They are light-only contour fields, not opaque nested solids or new physical interfaces. Fractional last-layer activation fades smoothly; layer positions do not change with count. Spacing, softness and depth falloff are separately adjustable. Some layers can be hidden by angle, occlusion or absorption.
+- Real split-ray depth is independent of dimension count. The layer model and its radiance balance are art-directed approximations, not an energy-conserving full spectral path tracer. Secondary transmitted paths through neighbouring cubes stop after at most eight interfaces.
+- Main files: `src/optical-studio/OpticalRenderer.ts`, `src/optical-studio/optical.frag.glsl` and `src/optical-studio/OpticalResolve.ts`.
+- Settings: the complete captured settings object is preserved in `artifacts/latest/runtime-state.json` under `runtime.state`.
+- The active optical renderer does not use React Three Fiber or the previous studio's material pipeline.
+- Optical transport uses finite bounce counts and RGB wavelength sampling; it is not an offline/full spectral path tracer and does not calculate volumetric caustics. No temporal random-noise accumulation is used.
 
 ## Motion System
 
-- Runtime: `MotionEngine` + `MotionClock`
-- Current preset: `spectral-axis-sweep`
-- Available presets: spectral-axis-sweep — 7.2s, strict; shared-vertex-pulse — 5.6s, strict; explode-rejoin — 6.4s, anchored
-- Determinism: absolute-time evaluation; fixed export time is `frameIndex / fps`.
-- Current duration / FPS: 7.2s / 30 fps
-- Playback: realtime raster preview.
-- Sequence export: fixed-timestep raster PNG frames.
-- Path-traced stills: current absolute motion frame is synchronized before accumulation.
+- Runtime: absolute-time optical light loop.
+- Optional RGB lead cycle uses a saved phase anchor, quintic transitions and one full green/red/blue sequence per duration. Fractions are incident-light weights, not screen coverage. Default is disabled to preserve existing looks.
+- Current duration: 15 seconds.
+- Deterministic: Yes, reported by the runtime.
+- Captured hero time: 7.5 seconds; playback is paused before each export.
+- Playback state after capture: paused.
+- `seek(time)` supports deterministic frame inspection. The default loop is 15 seconds.
+- OpticalStudio MP4/video and automatic PNG sequence export are not implemented.
+- Dimension amounts are continuous animation-ready state, but automatic layer-count modulation has not been added.
+- Layer spacing is independently controlled per cube by dimensionSpacingTop / dimensionSpacingLeft / dimensionSpacingRight (0.06–0.3). Missing fields inherit the old shared spacing without a visual reset. Softness and depth falloff remain shared.
+- Increasing spacing also widens the gradient tail away from the shared world-space Axis origin. Smooth face-tangent directions avoid medial-axis seams; peak radiance and maximum width are bounded to avoid flat face fill. No new motion or UI control is added.
 
 ## Artboard / Export
 
-- Virtual artboard: Yes; framing is independent from viewport and Inspector width.
-- Supported formats: 정사각형 1:1 (1080 × 1080); 인스타그램 4:5 (1080 × 1350); 세로형 3:4 (1080 × 1440); 가로형 16:9 (1920 × 1080); 세로형 9:16 (1080 × 1920); 사용자 설정 (1080 × 1080)
-- Raster PNG: exact artboard or render-region pixels.
-- Path-traced still: Glass 3D Clear, Prism, and Smoked only; absent from Light Field workflow.
-- High-resolution raster: Spectral Flow and Soft Spectral.
-- Motion sequence: deterministic PNG sequence.
-- Transparency: supported.
-- PPI: PNG pHYs metadata plus physical-size print scaling.
-- Current limitation: GPU maximum texture size still limits single-pass output dimensions.
+- Captured artboard: 3840 × 3840 (main).
+- Raster export: exact-size PNG via `capture(width, height, samples)` with tiled high-resolution rendering.
+- The interface exposes native long-edge 3840px PNG with 4×4 (16) spatial samples averaged in linear light before tone mapping. Canvas2D assembles final pixels only, without display-RGB supersample averaging. Latest handoff previews below use their recorded pixel dimensions and four samples.
+- Both preview and export render off-artboard guard bands covering the scaled bloom footprint and spatial-AA reach, then crop. Outer image boundaries and internal tile seams use the same lighting support; output is not an enlarged preview screenshot.
+- Main preview retains the active artboard aspect with a maximum long edge of 1080 pixels. Portrait previews default to 1080 × 1350 and 1080 × 1920.
+- `--preview-long-edge` or `PLEOS_HANDOFF_PREVIEW_LONG_EDGE` can reduce preview dimensions; decoded PNG dimensions are recorded and checked.
+- Captured renderer limits: `{"maxOutputDimension":8192,"maxOutputPixels":34000000,"maxInternalBounces":16,"maxTextureSize":16384}`.
+- MP4 is unsupported in this application; no video export is claimed by this handoff.
+- PNG is opaque 8-bit sRGB; the new optical engine has no transparent/PPI-aware print or video export UI. Those existing workflows remain in the preserved studio instead.
 
 ## Inspector / UI
 
-- Top bar — Mode, Variation and the primary Export action.
-- Active Inspector — Style, Material, Lighting and Motion essentials in one continuous panel.
-- Contextual details — material, lighting, geometry, camera, motion, output, render region and print metadata.
-- Output — format, size, background, transparency and Mode-adapted export.
-- Technical values stay collapsed until explicitly requested.
+- OpticalStudio owns a fresh Korean interface with monochrome application controls.
+- Collapsible sections: 형태, 디멘션 레이어, 광학, 조명, 카메라, 출력. The bottom transport controls time, loop length, motion extent and artboard aspect.
+- 디멘션 레이어 owns three independent fractional slider/number controls and a collapsed spacing/softness/falloff group. 조명 owns a colour picker/HEX/Pleos swatch, optional RGB-cycle checkbox and live power fractions, plus intensity, width, exposure and highlight bloom. 광학 distinguishes lens-normal curvature from geometric bevel and ray budget.
+- 레퍼런스 무드 적용 changes optical appearance while retaining the current camera, gap and artboard; the first pre-application local setting is preserved in `pleos-optical-before-luminous-v1` rather than replacing the named draft.
+- Material, light, motion and output controls edit the independent optical state in `pleos-optical-studio-v1`. Browser origins do not share localStorage automatically.
+- The artboard and export controls belong to OpticalStudio; prior mode selectors and legacy settings remain in the preserved studio route.
+- Main files: `OpticalStudio.ts`, `OpticalPanel.ts` and `OpticalStudio.css` inside `src/optical-studio/`.
 
 ## Important Files
 
 | File | Responsibility |
 | --- | --- |
-| `src/main.ts` | Production route selection and browser inspection/export API |
-| `src/studio/StudioShell.ts` | Common Mode lifecycle and active Mode state ownership |
-| `src/studio/ModeRegistry.ts` | Registered production Mode definitions |
-| `src/studio/ModeTypes.ts` | Mode instance, capability and export-adapter contracts |
-| `src/modes/glass-3d/Glass3DMode.ts` | First production Mode; owns the current Three.js optical environment |
-| `src/modes/glass-3d/Glass3DExportAdapter.ts` | Maps common output intent to Glass 3D render strategies |
-| `src/modes/dimention-r3f/DimentionR3FMode.ts` | Independent realtime R3F mode lifecycle, state and export |
-| `src/modes/dimention-r3f/DimentionR3FScene.tsx` | Transmission glass, Lightformer studio, RGB light motion, N8AO and Bloom |
-| `src/modes/dimention-r3f/DimentionR3FState.ts` | Presets and isolated serializable realtime mode state |
-| `src/modes/light-field/LightFieldMode.ts` | Independent Light Field lifecycle, state, motion and variations |
-| `src/modes/light-field/LightFieldRenderer.ts` | Raw WebGL2 fullscreen renderer and exact-size raster output |
-| `src/modes/light-field/PngMetadata.ts` | Print PPI metadata injection for Light Field PNG output |
-| `src/modes/light-field/shaders/field.frag.glsl` | Continuous inward field, spectral response, seams and origin compression |
-| `src/modes/glass-prism/GlassPrismMode.ts` | Glass Prism lifecycle, state, variations, camera interaction and export |
-| `src/modes/glass-prism/GlassPrismRenderer.ts` | Raw WebGL2 thickness-aware RGB refraction renderer |
-| `src/modes/glass-prism/shaders/prism.frag.glsl` | Ray-box intersections, Snell refraction, Fresnel and dispersion |
-| `src/crystal/MotionStudioApp.ts` | Active scene, renderer lifecycle, UI binding, motion and export strategy |
-| `src/crystal/CrystalAssembly.ts` | Three-solid Axis geometry, physical Looks and shared-origin contract |
-| `src/crystal/materials/SpectralFlowMaterial.ts` | Independent Spectral Flow shader expression |
-| `src/crystal/PrismMotionAdapter.ts` | Applies deterministic motion patches to the three solids |
-| `src/crystal/LightingSystem.ts` | Dynamic studio lighting and Pleos lighting presets |
-| `src/crystal/StudioEnvironment.ts` | Environment and studio reflection setup |
-| `src/crystal/ui/StudioPanel.ts` | Active Inspector markup and controls |
-| `src/crystal/CrystalApp.css` | Production application and Inspector styling |
-| `src/motion/MotionEngine.ts` | Absolute-time motion evaluation |
-| `src/motion/MotionClock.ts` | Realtime and fixed-frame time source |
-| `src/motion/MotionPresetRegistry.ts` | Active motion preset registry |
-| `src/axis/angles.ts` | Canonical Axis direction families |
-| `src/artboard/FormatPresetRegistry.ts` | Supported output formats |
-| `src/artboard/CompositionAdapter.ts` | Viewport-independent artboard framing |
-| `scripts/render-motion-sequence.mjs` | Fixed-timestep PNG sequence exporter |
-| `scripts/update-ai-handoff.mjs` | Generates this handoff, runtime state and latest previews |
+| `src/main.ts` | Default OpticalStudio and preserved reference route selection |
+| `src/optical-studio/OpticalStudio.ts` | Active application lifecycle and browser inspection/export API |
+| `src/optical-studio/OpticalRenderer.ts` | Independent WebGL2 renderer and tiled PNG capture |
+| `src/optical-studio/optical.frag.glsl` | Rounded-cube intersection, optical transport and colored illumination |
+| `src/optical-studio/OpticalResolve.ts` | Linear HDR targets, supersample averaging, highlight bloom and display resolve |
+| `src/optical-studio/OpticalState.ts` | Independent optical settings and defaults |
+| `src/optical-studio/OpticalLighting.ts` | Deterministic RGB lead weights and linear emitter palette |
+| `src/optical-studio/LuminousReference.ts` | Appearance-only reference mood and pre-application backup key |
+| `src/optical-studio/AxisGeometry.ts` | Canonical three-cube coordinates and separation |
+| `src/optical-studio/OpticalPanel.ts` | Korean editing and export controls |
+| `src/optical-studio/OpticalStudio.css` | Monochrome application layout and appearance |
+| `scripts/verify-optical-geometry.mjs` | Geometry, common vertex and original silhouette checks |
+| `scripts/verify-optical-dimensions.mjs` | Continuous layers, unified colour, curvature, persistence and guarded HDR tile verification |
+| `scripts/verify-optical-light-cycle.mjs` | RGB power continuity, loop, manual roundtrip, UI persistence and captures |
+| `scripts/update-ai-handoff.mjs` | Dispatches production or explicitly requested legacy handoff |
+| `scripts/optical-handoff.mjs` | Production runtime capture, validation and current handoff |
+| `src/studio/StudioShell.ts` | Previous multi-mode studio preserved at ?renderer=studio |
 
 ## Latest Task
 
-- User request: Dimention R3F 모드에 광원별 모양·위치·크기·움직임을 슬라이더와 숫자 입력으로 조절하는 상세 조명 패널 추가
-- What changed: 상세 조명 리그 상태, 실제 R3F 광원 연결, 접이식 한글 조명 편집 UI, 저장 마이그레이션, 자동 검증을 추가했다.
-- Why: 사용자가 브랜드 조명의 형태와 공간 배치, 크기, 모션을 렌더 결과를 보며 직접 정밀 조정할 수 있게 하기 위해서다.
-- Main implementation decisions: 기존 전체 밝기/RGB/화이트/속도는 마스터로 유지하고 화이트 키, RGB 3색, 화이트 면광원, 후면 광원을 독립 리그로 확장했다. 기존 저장값은 sanitize fallback으로 안전하게 마이그레이션한다.
+- User request: Preserve current green optical look and add subtle RGB secondary illumination with cycling lead colour
+- What changed: Added optional spatial RGB emitters and smooth 80/10/10 lead handover
+- Why: Provide simultaneous supporting colours without changing cube material tint
+- Main implementation decisions: Preserve manual mode and stored settings; four existing emitter cards with separated RGB ribbons; quintic deterministic timeline; saved phase anchor
 
 ## Files Changed
 
-- `src/modes/dimention-r3f/DimentionR3FState.ts;src/modes/dimention-r3f/DimentionR3FScene.tsx;src/modes/dimention-r3f/DimentionR3FPanel.ts;src/crystal/CrystalApp.css;scripts/verify-dimention-r3f.mjs` — Changed in the latest task
+- `src/optical-studio/OpticalLighting.ts` — RGB weights and palette
+- `src/optical-studio/OpticalState.ts` — Cycle state and sanitization
+- `src/optical-studio/OpticalRenderer.ts` — Preallocated lighting uniforms
+- `src/optical-studio/optical.frag.glsl` — Spatial incident colour ribbons
+- `src/optical-studio/OpticalStudio.ts` — Phase anchor and runtime inspection
+- `src/optical-studio/OpticalPanel.ts` — Korean cycle toggle and live ratios
+- `src/optical-studio/OpticalStudio.css` — Native checkbox layout
+- `scripts/verify-optical-light-cycle.mjs` — Regression tests and captures
+- `scripts/optical-handoff.mjs` — Active lighting documentation
+- `docs/OPTICAL_STUDIO.md` — Cycle controls and limitations
+- `package.json` — Verification command
 
 ## Visual Changes
 
-- 화이트 키를 스포트/사각 면광원으로 전환 가능;RGB 반사광을 원형/타원/링으로 전환하고 개별 위치·크기·궤도를 조절 가능;고정형 화이트/후면 광원의 형태·회전·크기 조절 가능
+- Optional green-red-blue illumination cycle with persistent secondary colours
+- Geometry camera dimension layers and manual rendering preserved
 
 ## Latest Previews
 
 | Preview | Pixels | Look | Hero time |
 | --- | ---: | --- | ---: |
-| `artifacts/latest/preview-main.png` | 1080 × 1080 | prism | 3.6s |
-| `artifacts/latest/preview-4x5.png` | 1080 × 1350 | prism | 3.6s |
-| `artifacts/latest/preview-9x16.png` | 1080 × 1920 | prism | 3.6s |
+| `artifacts/latest/preview-main.png` | 1080 × 1080 | optical-glass | 7.5s |
+| `artifacts/latest/preview-4x5.png` | 1080 × 1350 | optical-glass | 7.5s |
+| `artifacts/latest/preview-9x16.png` | 1080 × 1920 | optical-glass | 7.5s |
+
+All previews were captured in this handoff run.
 
 ## Validation
 
@@ -208,21 +152,30 @@ Production geometry and expression layers should remain separable so new Looks d
 - npm run verify — PASS
 - npm run build — PASS
 - Browser console — PASS
+- Runtime inspection and three PNG captures — PASS
 
-Validation values are generated from commands executed during this handoff. `NOT-RUN` is never treated as PASS.
+Validation values are generated from commands executed during this handoff. `NOT-RUN` is never treated as PASS. A failed command remains failed even if runtime capture succeeds; `npm run verify` may stop at its first failing subcommand.
+
+
 
 ## Known Issues
 
-- None known
+- 80/10/10 describes emitter weights, not exact screen coverage; default latest previews remain manual, cycle captures are in artifacts/optical-light-cycle
+- OpticalStudio currently exports PNG stills only; MP4/video and an automatic motion-sequence exporter are unsupported.
+- Optical transport is bounded and art-directed: surface curvature uses a shading-normal approximation, secondary paths stop after eight interfaces, and no volumetric caustic/offline path-tracer equivalence is claimed.
 
 ## Next Recommended Work
 
-- 광원 프리셋 저장/불러오기;선택 광원 뷰포트 기즈모;광원 그룹 복제/삭제
+- Review the three latest previews after meaningful visual work.
+- Resolve any failed validation commands before treating the full suite as passing.
 
 ## ChatGPT Re-scan Notes
 
-- Read `artifacts/latest/runtime-state.json` for machine-readable branch, runtime, Look, motion, artboard, preview and validation state.
+- Read `artifacts/latest/runtime-state.json` for branch, complete optical settings, Axis, motion, artboard, preview dimensions and validation evidence.
 - Inspect `artifacts/latest/preview-main.png`, then compare the 4:5 and 9:16 previews for framing consistency.
-- Start with `src/studio/StudioShell.ts`, then compare `src/modes/glass-3d/Glass3DMode.ts` and `src/modes/light-field/LightFieldMode.ts` as independent production Modes.
-- Compare `src/crystal/materials/SpectralFlowMaterial.ts` with physical Look handling in `src/crystal/CrystalAssembly.ts`.
+- Start with `src/optical-studio/OpticalStudio.ts`, `OpticalRenderer.ts` and `optical.frag.glsl` for the active application.
+- Inspect `OpticalResolve.ts` before evaluating output quality; FP16 averaging and bloom occur before display encoding. Dimension sliders bound reflected ray orders, not physical cube count.
+- Compare `surfaceCurvature` with geometric bevel: the former is an explicit lens-normal approximation and must not be described as physical geometry deformation.
+- Use `window.__pleosOptical` on the default route. The older `window.__pleos27Axis` API belongs to `?renderer=studio`.
+- Refresh production handoff without `--mode`, or with `--mode optical`. Pass an explicit prior mode only when intentionally documenting the preserved studio.
 - Check Git remote information before assuming this working tree is already connected to `yubinparkwork/Pleos-27-Axis`.

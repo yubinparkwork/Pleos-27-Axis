@@ -1,0 +1,157 @@
+{
+  "errors": [],
+  "runtime": {
+    "ready": true,
+    "renderer": "WebGL2 analytic dielectric ray integrator / linear HDR",
+    "projection": "orthographic",
+    "axis": {
+      "family": "30deg",
+      "sharedOrigin": false,
+      "sharedOriginContract": [
+        0,
+        0,
+        0
+      ],
+      "surfacesTouch": false,
+      "bevelContactCompensation": true,
+      "contact": "pairwise rounded-surface tangency; no volume overlap",
+      "renderedCenters": [
+        [
+          -1.6011278969600387,
+          1.548850217541432,
+          -1.6011278969600387
+        ],
+        [
+          -1.6011278969600387,
+          -1.6011278969600387,
+          1.548850217541432
+        ],
+        [
+          1.548850217541432,
+          -1.6011278969600387,
+          -1.6011278969600387
+        ]
+      ],
+      "canonicalProjectionAngles": [
+        30,
+        90,
+        150,
+        210,
+        270,
+        330
+      ],
+      "cubeScale": 2,
+      "cubeEdgeLength": 3.3068111527572905,
+      "projectionAngles": [
+        30,
+        90,
+        150,
+        209.99999999999997,
+        270,
+        330
+      ],
+      "cubeCount": 3,
+      "defaultProjection": [
+        45,
+        35.264389682754654
+      ]
+    },
+    "state": {
+      "gap": 0.025,
+      "bevel": 0.32,
+      "ior": 1.5,
+      "dispersion": 0.045,
+      "roughness": 0.12,
+      "surfaceCurvature": 0.065,
+      "reflection": 1,
+      "absorption": 0.04,
+      "lightIntensity": 0.9,
+      "lightSpread": 1,
+      "red": 1,
+      "green": 0,
+      "blue": 0,
+      "exposure": 1,
+      "zoom": 0.63,
+      "azimuth": 45,
+      "elevation": 35.264389682754654,
+      "time": 0,
+      "duration": 15,
+      "speed": 0.4,
+      "dimensionTop": 4,
+      "dimensionLeft": 4,
+      "dimensionRight": 4,
+      "bloom": 0.18,
+      "dimensionSpacing": 0.3,
+      "dimensionSoftness": 0.55,
+      "dimensionFalloff": 0.55,
+      "lightColor": "#FFFFFF",
+      "dimensionSpacingTop": 0.3,
+      "dimensionSpacingLeft": 0.3,
+      "dimensionSpacingRight": 0.3,
+      "bounces": 16,
+      "playing": false,
+      "aspect": "main"
+    },
+    "artboard": {
+      "preset": "main",
+      "width": 3840,
+      "height": 3840
+    },
+    "motion": {
+      "time": 0,
+      "duration": 15,
+      "playing": false,
+      "deterministic": true,
+      "kind": "optical-light-loop"
+    },
+    "limits": {
+      "maxOutputDimension": 8192,
+      "maxOutputPixels": 34000000,
+      "maxInternalBounces": 16,
+      "maxTextureSize": 16384
+    },
+    "preview": {
+      "width": 824,
+      "height": 824,
+      "sampleScale": 1,
+      "sourceWidth": 848,
+      "sourceHeight": 848,
+      "guardPixels": 12,
+      "cpuSubmitMs": 0.10000002384185791
+    },
+    "exporting": false,
+    "rendering": {
+      "primaryInternalReflection": "deterministic split rays",
+      "secondaryInterfaces": 8,
+      "spectralChannels": 3,
+      "emission": false,
+      "textureFeedback": false,
+      "dimensions": {
+        "top": 4,
+        "left": 4,
+        "right": 4,
+        "spacing": {
+          "top": 0.3,
+          "left": 0.3,
+          "right": 0.3
+        },
+        "softness": 0.55,
+        "falloff": 0.55,
+        "meaning": "continuous light-only virtual cubical reflection layers, fractional last-layer fade; independent of physical ray depth",
+        "physicalSimulation": false
+      },
+      "hdr": true,
+      "resolve": "linear spatial average → finite HDR bloom → tone mapping → sRGB → spatial AA",
+      "lighting": {
+        "rig": "four smooth studio emitters with fixed world-space negative-fill apertures",
+        "color": "#FFFFFF",
+        "controls": "one shared incident colour and intensity; no material tint or object emission"
+      },
+      "surfaceFigure": {
+        "amount": 0.065,
+        "model": "smooth lens-like shading-normal approximation; geometric silhouette and medium offsets unchanged"
+      },
+      "roughness": "path-dependent emitter filtering and coherent reflection attenuation; scattered energy not fully integrated"
+    }
+  }
+}

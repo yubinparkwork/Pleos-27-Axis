@@ -1,0 +1,750 @@
+{
+  "status": "pass",
+  "baseUrl": "http://127.0.0.1:51743/",
+  "errors": [],
+  "warnings": [],
+  "dimensions": {
+    "dimensionTop": {
+      "zeroToThree": {
+        "meanAbsoluteChannelDifference": 6.804169238683127,
+        "max": 228,
+        "changedFraction": 0.12858796296296296,
+        "overOneFraction": 0.11712962962962963,
+        "pixels": 129600
+      },
+      "threeToEight": {
+        "meanAbsoluteChannelDifference": 4.101746399176955,
+        "max": 207,
+        "changedFraction": 0.09824845679012345,
+        "overOneFraction": 0.09232253086419753,
+        "pixels": 129600
+      }
+    },
+    "dimensionLeft": {
+      "zeroToThree": {
+        "meanAbsoluteChannelDifference": 6.019153806584362,
+        "max": 228,
+        "changedFraction": 0.13361111111111112,
+        "overOneFraction": 0.1223070987654321,
+        "pixels": 129600
+      },
+      "threeToEight": {
+        "meanAbsoluteChannelDifference": 4.077813786008231,
+        "max": 221,
+        "changedFraction": 0.09821759259259259,
+        "overOneFraction": 0.09341049382716049,
+        "pixels": 129600
+      }
+    },
+    "dimensionRight": {
+      "zeroToThree": {
+        "meanAbsoluteChannelDifference": 7.469817386831275,
+        "max": 223,
+        "changedFraction": 0.1343364197530864,
+        "overOneFraction": 0.12313271604938271,
+        "pixels": 129600
+      },
+      "threeToEight": {
+        "meanAbsoluteChannelDifference": 4.23977109053498,
+        "max": 218,
+        "changedFraction": 0.09785493827160494,
+        "overOneFraction": 0.09238425925925926,
+        "pixels": 129600
+      }
+    }
+  },
+  "tiled": {
+    "1": {
+      "fullFrame": {
+        "meanAbsoluteChannelDifference": 0.0001,
+        "max": 1,
+        "changedFraction": 0.00029375,
+        "overOneFraction": 0,
+        "pixels": 160000
+      },
+      "interior": {
+        "meanAbsoluteChannelDifference": 0.00010850694444444444,
+        "max": 1,
+        "changedFraction": 0.00031873914930555556,
+        "overOneFraction": 0,
+        "pixels": 147456
+      },
+      "seams": {
+        "meanAbsoluteChannelDifference": 0.00004397537379067722,
+        "max": 1,
+        "changedFraction": 0.00013192612137203166,
+        "overOneFraction": 0,
+        "pixels": 7580
+      },
+      "boundaryMargin": 8
+    },
+    "2": {
+      "fullFrame": {
+        "meanAbsoluteChannelDifference": 0.00012708333333333332,
+        "max": 1,
+        "changedFraction": 0.0003625,
+        "overOneFraction": 0,
+        "pixels": 160000
+      },
+      "interior": {
+        "meanAbsoluteChannelDifference": 0.00013789424189814814,
+        "max": 1,
+        "changedFraction": 0.0003933376736111111,
+        "overOneFraction": 0,
+        "pixels": 147456
+      },
+      "seams": {
+        "meanAbsoluteChannelDifference": 0.00008795074758135444,
+        "max": 1,
+        "changedFraction": 0.0002638522427440633,
+        "overOneFraction": 0,
+        "pixels": 7580
+      },
+      "boundaryMargin": 8
+    },
+    "4": {
+      "fullFrame": {
+        "meanAbsoluteChannelDifference": 0.0001,
+        "max": 1,
+        "changedFraction": 0.00028125,
+        "overOneFraction": 0,
+        "pixels": 160000
+      },
+      "interior": {
+        "meanAbsoluteChannelDifference": 0.00010850694444444444,
+        "max": 1,
+        "changedFraction": 0.00030517578125,
+        "overOneFraction": 0,
+        "pixels": 147456
+      },
+      "seams": {
+        "meanAbsoluteChannelDifference": 0.00004397537379067722,
+        "max": 1,
+        "changedFraction": 0.00013192612137203166,
+        "overOneFraction": 0,
+        "pixels": 7580
+      },
+      "boundaryMargin": 8
+    }
+  },
+  "checks": {
+    "perCubeStateIndependence": "pass",
+    "dimensionSpacingTop": {
+      "meanAbsoluteChannelDifference": 11.944803240740741,
+      "max": 223,
+      "changedFraction": 0.1917361111111111,
+      "overOneFraction": 0.18371527777777777,
+      "pixels": 57600
+    },
+    "dimensionSpacingLeft": {
+      "meanAbsoluteChannelDifference": 12.046880787037036,
+      "max": 227,
+      "changedFraction": 0.20409722222222224,
+      "overOneFraction": 0.1993923611111111,
+      "pixels": 57600
+    },
+    "dimensionSpacingRight": {
+      "meanAbsoluteChannelDifference": 12.474745370370371,
+      "max": 229,
+      "changedFraction": 0.20131944444444444,
+      "overOneFraction": 0.19305555555555556,
+      "pixels": 57600
+    },
+    "perCubeSpacing": "independent rendered changes; legacy equal-spacing pixel match; custom migration; three UI inputs, keyboard, wide/narrow screenshots and reload pass",
+    "surfaceCurvature": {
+      "opticalDifference": {
+        "meanAbsoluteChannelDifference": 19.781466049382715,
+        "max": 215,
+        "changedFraction": 0.5868441358024692,
+        "overOneFraction": 0.5489814814814815,
+        "pixels": 129600
+      },
+      "geometryUnchanged": true,
+      "geometry": {
+        "geometry": {
+          "centers": [
+            [
+              -1.6636117836402418,
+              1.6738179909018385,
+              -1.6636117836402418
+            ],
+            [
+              -1.6636117836402418,
+              -1.6636117836402418,
+              1.6738179909018385
+            ],
+            [
+              1.6738179909018385,
+              -1.6636117836402418,
+              -1.6636117836402418
+            ]
+          ],
+          "rotation": [
+            1,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            1
+          ],
+          "halfSize": 1.6534055763786453
+        },
+        "bevel": 0.24,
+        "axis": {
+          "family": "30deg",
+          "sharedOrigin": false,
+          "sharedOriginContract": [
+            0,
+            0,
+            0
+          ],
+          "surfacesTouch": false,
+          "bevelContactCompensation": true,
+          "contact": "pairwise rounded-surface tangency; no volume overlap",
+          "renderedCenters": [
+            [
+              -1.6167488686300895,
+              1.5800921608815337,
+              -1.6167488686300895
+            ],
+            [
+              -1.6167488686300895,
+              -1.6167488686300895,
+              1.5800921608815337
+            ],
+            [
+              1.5800921608815337,
+              -1.6167488686300895,
+              -1.6167488686300895
+            ]
+          ],
+          "canonicalProjectionAngles": [
+            30,
+            90,
+            150,
+            210,
+            270,
+            330
+          ],
+          "cubeScale": 2,
+          "cubeEdgeLength": 3.3068111527572905,
+          "projectionAngles": [
+            30,
+            90,
+            150,
+            209.99999999999997,
+            270,
+            330
+          ],
+          "cubeCount": 3,
+          "defaultProjection": [
+            45,
+            35.264389682754654
+          ]
+        }
+      }
+    },
+    "uiPersistence": "number input + ArrowUp, range ArrowRight, reload: pass",
+    "continuity": {
+      "wholeLayer": {
+        "meanAbsoluteChannelDifference": 1.4020543981481481,
+        "max": 179,
+        "changedFraction": 0.06579861111111111,
+        "overOneFraction": 0.054253472222222224,
+        "pixels": 57600
+      },
+      "below": {
+        "meanAbsoluteChannelDifference": 0.0005960648148148148,
+        "max": 5,
+        "changedFraction": 0.0015625,
+        "overOneFraction": 0.00001736111111111111,
+        "pixels": 57600
+      },
+      "above": {
+        "meanAbsoluteChannelDifference": 0.00078125,
+        "max": 1,
+        "changedFraction": 0.0021527777777777778,
+        "overOneFraction": 0,
+        "pixels": 57600
+      }
+    },
+    "dimensionSpacing": {
+      "meanAbsoluteChannelDifference": 40.438738425925926,
+      "max": 232,
+      "changedFraction": 0.6041840277777778,
+      "overOneFraction": 0.5860243055555555,
+      "pixels": 57600
+    },
+    "dimensionSoftness": {
+      "meanAbsoluteChannelDifference": 23.004236111111112,
+      "max": 216,
+      "changedFraction": 0.49366319444444445,
+      "overOneFraction": 0.45458333333333334,
+      "pixels": 57600
+    },
+    "dimensionFalloff": {
+      "meanAbsoluteChannelDifference": 6.437899305555556,
+      "max": 116,
+      "changedFraction": 0.31506944444444446,
+      "overOneFraction": 0.28100694444444446,
+      "pixels": 57600
+    },
+    "unifiedColor": "HEX normalization, invalid input recovery, accessible Pleos swatch, reload, no legacy RGB sliders: pass",
+    "colorMigration": "old RGB conversion; explicit new HEX takes precedence; fractional layers retained",
+    "originalRGBBackup": "exact original saved before overwrite; new settings and first backup persist on reload",
+    "referenceAction": {
+      "backupFailureRecovered": true,
+      "firstBackupPreserved": true,
+      "preservedKeys": [
+        "azimuth",
+        "elevation",
+        "zoom",
+        "gap",
+        "aspect",
+        "time",
+        "duration",
+        "speed",
+        "playing"
+      ],
+      "otherNamedStatesPreserved": [
+        "pleos-27-axis-studio-state-v3",
+        "pleos-27-axis-manual-save-v1",
+        "pleos-27-axis-user-variations-v1"
+      ],
+      "clickedAccessibleName": "레퍼런스 무드 적용"
+    },
+    "noEmission": "all RGB bytes zero",
+    "loop": "0s and 15s pixel-identical"
+  },
+  "captures": {
+    "dimensions-all-zero": {
+      "width": 360,
+      "height": 360,
+      "bytes": 168713,
+      "peak": 225,
+      "litFraction": 0.2848148148148148
+    },
+    "dimensionTop-3": {
+      "width": 360,
+      "height": 360,
+      "bytes": 178868,
+      "peak": 242,
+      "litFraction": 0.32679012345679015
+    },
+    "dimensionTop-8": {
+      "width": 360,
+      "height": 360,
+      "bytes": 182176,
+      "peak": 242,
+      "litFraction": 0.35652006172839507
+    },
+    "dimensionLeft-3": {
+      "width": 360,
+      "height": 360,
+      "bytes": 179666,
+      "peak": 241,
+      "litFraction": 0.3307716049382716
+    },
+    "dimensionLeft-8": {
+      "width": 360,
+      "height": 360,
+      "bytes": 183967,
+      "peak": 241,
+      "litFraction": 0.36368055555555556
+    },
+    "dimensionRight-3": {
+      "width": 360,
+      "height": 360,
+      "bytes": 180656,
+      "peak": 242,
+      "litFraction": 0.3320138888888889
+    },
+    "dimensionRight-8": {
+      "width": 360,
+      "height": 360,
+      "bytes": 185169,
+      "peak": 242,
+      "litFraction": 0.3642901234567901
+    },
+    "dimensionSpacingTop-low": {
+      "width": 240,
+      "height": 240,
+      "bytes": 95599,
+      "peak": 242,
+      "litFraction": 0.423125
+    },
+    "dimensionSpacingTop-high": {
+      "width": 240,
+      "height": 240,
+      "bytes": 96717,
+      "peak": 244,
+      "litFraction": 0.46253472222222225
+    },
+    "dimensionSpacingLeft-low": {
+      "width": 240,
+      "height": 240,
+      "bytes": 95487,
+      "peak": 242,
+      "litFraction": 0.4240625
+    },
+    "dimensionSpacingLeft-high": {
+      "width": 240,
+      "height": 240,
+      "bytes": 97194,
+      "peak": 242,
+      "litFraction": 0.4638888888888889
+    },
+    "dimensionSpacingRight-low": {
+      "width": 240,
+      "height": 240,
+      "bytes": 95792,
+      "peak": 242,
+      "litFraction": 0.4181944444444444
+    },
+    "dimensionSpacingRight-high": {
+      "width": 240,
+      "height": 240,
+      "bytes": 96893,
+      "peak": 242,
+      "litFraction": 0.46932291666666665
+    },
+    "spacing-shared-legacy": {
+      "width": 240,
+      "height": 240,
+      "bytes": 97231,
+      "peak": 244,
+      "litFraction": 0.49657986111111113
+    },
+    "spacing-explicit-equal": {
+      "width": 240,
+      "height": 240,
+      "bytes": 97231,
+      "peak": 244,
+      "litFraction": 0.49657986111111113
+    },
+    "surface-curvature-zero": {
+      "width": 360,
+      "height": 360,
+      "bytes": 196928,
+      "peak": 244,
+      "litFraction": 0.3823070987654321
+    },
+    "surface-curvature-point-one": {
+      "width": 360,
+      "height": 360,
+      "bytes": 200751,
+      "peak": 242,
+      "litFraction": 0.42822530864197533
+    },
+    "layers-continuity-2": {
+      "width": 240,
+      "height": 240,
+      "bytes": 86899,
+      "peak": 242,
+      "litFraction": 0.3322569444444444
+    },
+    "layers-continuity-2-99": {
+      "width": 240,
+      "height": 240,
+      "bytes": 87341,
+      "peak": 242,
+      "litFraction": 0.3384375
+    },
+    "layers-continuity-3": {
+      "width": 240,
+      "height": 240,
+      "bytes": 87363,
+      "peak": 242,
+      "litFraction": 0.3384375
+    },
+    "layers-continuity-3-01": {
+      "width": 240,
+      "height": 240,
+      "bytes": 87340,
+      "peak": 242,
+      "litFraction": 0.3384375
+    },
+    "layers-dimensionSpacing-low": {
+      "width": 240,
+      "height": 240,
+      "bytes": 92581,
+      "peak": 241,
+      "litFraction": 0.3745659722222222
+    },
+    "layers-dimensionSpacing-high": {
+      "width": 240,
+      "height": 240,
+      "bytes": 97231,
+      "peak": 244,
+      "litFraction": 0.5207465277777777
+    },
+    "layers-dimensionSoftness-low": {
+      "width": 240,
+      "height": 240,
+      "bytes": 95817,
+      "peak": 242,
+      "litFraction": 0.40539930555555553
+    },
+    "layers-dimensionSoftness-high": {
+      "width": 240,
+      "height": 240,
+      "bytes": 94675,
+      "peak": 245,
+      "litFraction": 0.47477430555555555
+    },
+    "layers-dimensionFalloff-low": {
+      "width": 240,
+      "height": 240,
+      "bytes": 97503,
+      "peak": 242,
+      "litFraction": 0.448125
+    },
+    "layers-dimensionFalloff-high": {
+      "width": 240,
+      "height": 240,
+      "bytes": 95864,
+      "peak": 242,
+      "litFraction": 0.4326215277777778
+    },
+    "full-frame-1x": {
+      "width": 400,
+      "height": 400,
+      "bytes": 243117,
+      "peak": 242,
+      "litFraction": 0.42663125
+    },
+    "tiled-1x": {
+      "width": 400,
+      "height": 400,
+      "bytes": 243111,
+      "peak": 242,
+      "litFraction": 0.42663125
+    },
+    "full-frame-2x": {
+      "width": 400,
+      "height": 400,
+      "bytes": 240853,
+      "peak": 242,
+      "litFraction": 0.42816875
+    },
+    "tiled-2x": {
+      "width": 400,
+      "height": 400,
+      "bytes": 240804,
+      "peak": 242,
+      "litFraction": 0.42816875
+    },
+    "full-frame-4x": {
+      "width": 400,
+      "height": 400,
+      "bytes": 239573,
+      "peak": 242,
+      "litFraction": 0.42850625
+    },
+    "tiled-4x": {
+      "width": 400,
+      "height": 400,
+      "bytes": 239584,
+      "peak": 242,
+      "litFraction": 0.42850625
+    },
+    "dimensions-lights-off": {
+      "width": 360,
+      "height": 360,
+      "bytes": 4030,
+      "peak": 0,
+      "litFraction": 0
+    },
+    "dimensions-loop-start": {
+      "width": 360,
+      "height": 360,
+      "bytes": 200751,
+      "peak": 242,
+      "litFraction": 0.42822530864197533
+    },
+    "dimensions-loop-end": {
+      "width": 360,
+      "height": 360,
+      "bytes": 200751,
+      "peak": 242,
+      "litFraction": 0.42822530864197533
+    }
+  },
+  "runtime": {
+    "ready": true,
+    "renderer": "WebGL2 analytic dielectric ray integrator / linear HDR",
+    "projection": "orthographic",
+    "axis": {
+      "family": "30deg",
+      "sharedOrigin": false,
+      "sharedOriginContract": [
+        0,
+        0,
+        0
+      ],
+      "surfacesTouch": false,
+      "bevelContactCompensation": true,
+      "contact": "pairwise rounded-surface tangency; no volume overlap",
+      "renderedCenters": [
+        [
+          -1.6167488686300895,
+          1.5800921608815337,
+          -1.6167488686300895
+        ],
+        [
+          -1.6167488686300895,
+          -1.6167488686300895,
+          1.5800921608815337
+        ],
+        [
+          1.5800921608815337,
+          -1.6167488686300895,
+          -1.6167488686300895
+        ]
+      ],
+      "canonicalProjectionAngles": [
+        30,
+        90,
+        150,
+        210,
+        270,
+        330
+      ],
+      "cubeScale": 2,
+      "cubeEdgeLength": 3.3068111527572905,
+      "projectionAngles": [
+        30,
+        90,
+        150,
+        209.99999999999997,
+        270,
+        330
+      ],
+      "cubeCount": 3,
+      "defaultProjection": [
+        45,
+        35.264389682754654
+      ]
+    },
+    "state": {
+      "gap": 0.025,
+      "bevel": 0.24,
+      "ior": 1.5,
+      "dispersion": 0.008,
+      "roughness": 0.1,
+      "surfaceCurvature": 0.1,
+      "reflection": 1,
+      "absorption": 0.03,
+      "lightIntensity": 0.9,
+      "lightSpread": 0.85,
+      "red": 1,
+      "green": 0,
+      "blue": 0,
+      "exposure": 1,
+      "zoom": 0.65,
+      "azimuth": 45,
+      "elevation": 35.264389682754654,
+      "time": 0,
+      "duration": 15,
+      "speed": 0.4,
+      "dimensionTop": 3,
+      "dimensionLeft": 4,
+      "dimensionRight": 3,
+      "bloom": 0.3,
+      "dimensionSpacing": 0.14,
+      "dimensionSoftness": 0.55,
+      "dimensionFalloff": 0.55,
+      "lightColor": "#FFFFFF",
+      "dimensionSpacingTop": 0.14,
+      "dimensionSpacingLeft": 0.14,
+      "dimensionSpacingRight": 0.14,
+      "bounces": 16,
+      "playing": false,
+      "aspect": "main",
+      "lightCycle": false,
+      "lightCycleOffset": 0
+    },
+    "artboard": {
+      "preset": "main",
+      "width": 3840,
+      "height": 3840
+    },
+    "motion": {
+      "time": 0,
+      "duration": 15,
+      "playing": false,
+      "deterministic": true,
+      "kind": "optical-light-loop"
+    },
+    "limits": {
+      "maxOutputDimension": 8192,
+      "maxOutputPixels": 34000000,
+      "maxInternalBounces": 16,
+      "maxTextureSize": 16384
+    },
+    "preview": {
+      "width": 944,
+      "height": 944,
+      "sampleScale": 1,
+      "sourceWidth": 970,
+      "sourceHeight": 970,
+      "guardPixels": 13,
+      "cpuSubmitMs": 2.700000047683716
+    },
+    "exporting": false,
+    "rendering": {
+      "primaryInternalReflection": "deterministic split rays",
+      "secondaryInterfaces": 8,
+      "spectralChannels": 3,
+      "emission": false,
+      "textureFeedback": false,
+      "dimensions": {
+        "top": 3,
+        "left": 4,
+        "right": 3,
+        "spacing": {
+          "top": 0.14,
+          "left": 0.14,
+          "right": 0.14
+        },
+        "softness": 0.55,
+        "falloff": 0.55,
+        "spread": "spacing-linked asymmetric gradient tail away from shared world Axis origin; smooth face-tangent direction and bounded width",
+        "meaning": "continuous light-only virtual cubical reflection layers, fractional last-layer fade; independent of physical ray depth",
+        "physicalSimulation": false
+      },
+      "hdr": true,
+      "resolve": "linear spatial average → finite HDR bloom → tone mapping → sRGB → spatial AA",
+      "lighting": {
+        "rig": "four smooth studio emitters with fixed world-space negative-fill apertures",
+        "color": "#FFFFFF",
+        "cycle": {
+          "enabled": false,
+          "periodSeconds": 15,
+          "phaseOffset": 0,
+          "order": "green → red → blue (rotated to chosen starting colour)",
+          "powerFractionsRGB": [
+            0.10000000149011612,
+            0.800000011920929,
+            0.10000000149011612
+          ],
+          "dominant": "그린",
+          "meaning": "emitter power fractions, not guaranteed screen colour coverage"
+        },
+        "controls": "shared intensity; optional spatial RGB ribbons with 80/10/10 power handover; no material tint or object emission"
+      },
+      "surfaceFigure": {
+        "amount": 0.1,
+        "model": "smooth lens-like shading-normal approximation; geometric silhouette and medium offsets unchanged"
+      },
+      "roughness": "path-dependent emitter filtering and coherent reflection attenuation; scattered energy not fully integrated"
+    }
+  },
+  "gpu": {
+    "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M3 Pro, Unspecified Version)",
+    "hdr": true
+  }
+}

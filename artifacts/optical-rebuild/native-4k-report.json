@@ -1,0 +1,107 @@
+{
+  "generatedAt": "2026-09-11T00:45:59.307Z",
+  "width": 2160,
+  "height": 3840,
+  "samples": 16,
+  "upscaled": false,
+  "durationMs": 5424,
+  "statePreserved": true,
+  "before": {
+    "ready": true,
+    "renderer": "WebGL2 analytic dielectric ray integrator",
+    "projection": "orthographic",
+    "axis": {
+      "family": "30deg",
+      "sharedOrigin": false,
+      "sharedOriginContract": [
+        0,
+        0,
+        0
+      ],
+      "surfacesTouch": false,
+      "canonicalProjectionAngles": [
+        30,
+        90,
+        150,
+        210,
+        270,
+        330
+      ],
+      "cubeScale": 2,
+      "cubeEdgeLength": 3.3068111527572905,
+      "projectionAngles": [
+        30,
+        90,
+        150,
+        209.99999999999997,
+        270,
+        330
+      ],
+      "cubeCount": 3,
+      "defaultProjection": [
+        45,
+        35.264389682754654
+      ]
+    },
+    "state": {
+      "gap": 0.025,
+      "bevel": 0.18,
+      "ior": 1.48,
+      "dispersion": 0.025,
+      "roughness": 0.06,
+      "reflection": 1,
+      "absorption": 0.075,
+      "lightIntensity": 0.9,
+      "lightSpread": 0.64,
+      "red": 1,
+      "green": 0.82,
+      "blue": 1.1,
+      "exposure": 1,
+      "zoom": 12,
+      "azimuth": 45,
+      "elevation": 35.264389682754654,
+      "time": 3,
+      "duration": 15,
+      "speed": 0.4,
+      "bounces": 8,
+      "playing": false,
+      "aspect": "9x16"
+    },
+    "artboard": {
+      "preset": "9x16",
+      "width": 2160,
+      "height": 3840
+    },
+    "motion": {
+      "time": 3,
+      "duration": 15,
+      "playing": false,
+      "deterministic": true,
+      "kind": "optical-light-loop"
+    },
+    "limits": {
+      "maxOutputDimension": 8192,
+      "maxOutputPixels": 34000000,
+      "maxInternalBounces": 16,
+      "maxTextureSize": 16384
+    },
+    "preview": {
+      "width": 699,
+      "height": 1244,
+      "sampleScale": 2,
+      "sourceWidth": 1398,
+      "sourceHeight": 2488,
+      "cpuSubmitMs": 9.5
+    },
+    "exporting": false,
+    "rendering": {
+      "primaryInternalReflection": "deterministic split rays",
+      "secondaryInterfaces": 5,
+      "spectralChannels": 3,
+      "emission": false,
+      "textureFeedback": false,
+      "roughness": "analytic emitter filtering, not stochastic microfacets"
+    }
+  },
+  "errors": []
+}

@@ -17,7 +17,7 @@ page.on("console", (message) => {
 });
 
 try {
-  await page.goto(baseUrl, { waitUntil: "networkidle" });
+  await page.goto(`${baseUrl}${baseUrl.includes("?") ? "&" : "?"}renderer=studio`, { waitUntil: "networkidle" });
   await page.waitForFunction(() => typeof window.__pleosAxis?.inspect === "function");
 
   const initial = await page.evaluate(() => window.__pleosAxis.inspect());

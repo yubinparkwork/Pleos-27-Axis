@@ -31,7 +31,7 @@ async function exportFrameWithRetry() {
 }
 
 try {
-  await page.goto(url, { waitUntil: "domcontentloaded" });
+  await page.goto(`${url}${url.includes("?") ? "&" : "?"}renderer=studio`, { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => Boolean(window.__pleos27Axis?.inspect().ready));
   await page.evaluate(() => {
     window.__pleos27Axis.switchMode("kinetic-glass");

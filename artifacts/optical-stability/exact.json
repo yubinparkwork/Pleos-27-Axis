@@ -1,0 +1,95 @@
+{
+  "state": {
+    "ready": true,
+    "renderer": "WebGL2 analytic dielectric ray integrator",
+    "projection": "orthographic",
+    "axis": {
+      "family": "30deg",
+      "sharedOrigin": true,
+      "sharedOriginContract": [
+        0,
+        0,
+        0
+      ],
+      "surfacesTouch": false,
+      "canonicalProjectionAngles": [
+        30,
+        90,
+        150,
+        210,
+        270,
+        330
+      ],
+      "projectionAngles": [
+        43.857094094471904,
+        90,
+        167.77590303241118,
+        223.85709409447188,
+        270,
+        347.7759030324111
+      ],
+      "cubeCount": 3,
+      "defaultProjection": [
+        45,
+        35.264389682754654
+      ]
+    },
+    "state": {
+      "gap": 0,
+      "bevel": 0.08,
+      "ior": 1.91,
+      "dispersion": 0.025,
+      "roughness": 0.06,
+      "reflection": 1,
+      "absorption": 0.075,
+      "lightIntensity": 0.9,
+      "lightSpread": 0.64,
+      "red": 2,
+      "green": 0,
+      "blue": 0,
+      "exposure": 3,
+      "zoom": 2.4,
+      "azimuth": 25.4,
+      "elevation": 27.146,
+      "time": 13.69,
+      "duration": 15,
+      "speed": 0.4,
+      "bounces": 8,
+      "playing": false,
+      "aspect": "main"
+    },
+    "artboard": {
+      "preset": "main",
+      "width": 3840,
+      "height": 3840
+    },
+    "motion": {
+      "time": 13.69,
+      "duration": 15,
+      "playing": false,
+      "deterministic": true,
+      "kind": "optical-light-loop"
+    },
+    "limits": {
+      "maxOutputDimension": 8192,
+      "maxOutputPixels": 34000000,
+      "maxInternalBounces": 16,
+      "maxTextureSize": 16384
+    },
+    "preview": {
+      "width": 960,
+      "height": 960,
+      "cpuSubmitMs": 0
+    },
+    "exporting": false,
+    "rendering": {
+      "primaryInternalReflection": "deterministic split rays",
+      "secondaryInterfaces": 5,
+      "spectralChannels": 3,
+      "emission": false,
+      "textureFeedback": false,
+      "roughness": "analytic emitter filtering, not stochastic microfacets"
+    }
+  },
+  "errors": []
+}

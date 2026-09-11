@@ -1,4 +1,30 @@
-# PLEOS 27 Axis — Multi-Mode Creative Studio
+# PLEOS 27 Axis — Optical Studio
+
+## 현재 기본 웹: Optical Studio
+
+기본 `/`는 세 큐브의 Axis 구조를 유지하는 **직접 WebGL2 선형 HDR 광학 렌더러**입니다. R3F/Three.js나 이전 화면 피드백 효과를 사용하지 않습니다. 실제 닫힌 큐브·베벨에 광선을 교차시켜 Snell 굴절, Fresnel, RGB 분산, 내부 반사를 계산합니다. 네 개의 부드러운 Pleos 스튜디오 광원과 고정된 방향성 negative fill이 반사를 만들며, 유리는 무채색·비발광 상태입니다. 선택적인 `면 곡률`은 외곽을 바꾸지 않는 렌즈 법선 근사이며 오프라인 패스 트레이서나 체적 코스틱은 아닙니다.
+
+- 실행: `npm run dev` → `http://127.0.0.1:5173/`
+- 이전 개발 스튜디오: `http://127.0.0.1:5173/?renderer=studio` (기존 코드·저장값 유지)
+- 검증: `npm run verify` (새 기본 앱), `npm run verify:legacy` (이전 모드 전체)
+- `npm run handoff:full`은 새 기본 앱의 검증·빌드·실제 캡처를 갱신합니다. 이전 앱은 `--mode dimention-r3f` 등으로 명시합니다.
+- 디멘션 레이어: 상단·왼쪽·오른쪽 큐브마다 0~12겹, 소수 입력으로 마지막 층이 부드럽게 나타납니다. 굴절된 광선으로 내부의 가상 반사상 윤곽을 샘플링하는 연출이며, 불투명 큐브를 추가하거나 물리 반사 횟수만 제한하지 않습니다. `층의 형태 조정`에서 간격·풀림·깊이 감쇠를 조절합니다.
+- 조명: 하나의 색상 선택기/HEX/Pleos 스와치와 강도로 네 방향 광원을 함께 제어합니다. 화이트에서 프리즘 분산이 가장 잘 보입니다. 이전 RGB 값은 한 색상으로 변환되며 최초 저장 전 원본은 `pleos-optical-before-dimension-layers-v1`에 보존됩니다.
+- `디멘션 레이어 → 층의 형태 조정`: 상단·왼쪽·오른쪽 층 간격을 각각 조절하고 자동 저장합니다. 기존 공통 간격은 세 값에 그대로 이어받습니다. 층 풀림·깊이 감쇠는 공통입니다.
+- 4K PNG: 현재 판형의 긴 변 3840px, 4×4(16개) 서브픽셀을 선형 광량으로 평균한 가드 타일 렌더링. FP16 HDR → bloom → 톤 매핑 → sRGB 순이며, 표시용 RGB 이미지를 확대하거나 평균하지 않습니다. FP16 미지원 시 범위 압축 RGBA8 폴백은 정밀도가 낮습니다.
+- `광학 → 레퍼런스 무드 적용`은 카메라·간격·판형을 남기고 유리/조명 표현을 변경합니다. 최초 적용 전 설정은 별도의 로컬 백업 키에 보존합니다.
+- 새 앱은 별도 키 `pleos-optical-studio-v1`에 세팅을 저장합니다. 이전 세팅이나 저장된 초안을 덮어쓰지 않습니다. 브라우저/출처가 달라지면 localStorage는 공유되지 않습니다.
+- 새 앱은 PNG만 지원합니다. 이전 MP4·패스 트레이싱 출력은 **이전 스튜디오**에 남아 있으며 이 엔진으로 자동 이식된 것은 아닙니다.
+
+엔진 선택 이유, 레퍼런스 해석, 광학 근사·출력 한계는 [Optical Studio 안내](docs/OPTICAL_STUDIO.md)를 참고하세요.
+
+## 아래는 이전 스튜디오의 기능 문서 — Legacy / reference only
+
+## 디멘션 / 네이티브 4K 출력
+
+`Dimention R3F → 디멘션`에서 세 큐브의 내부 반사층을 각각 0–24로 조절하고 자동 저장합니다. PNG·MP4의 `4K · 현재 판형 유지` 옵션은 확대 보간이 아닌 네이티브 출력입니다. 안전 한도(16MP)를 넘는 이미지는 축소 렌더 후 확대하지 않고 안내합니다. 설정, 품질 구조와 제한은 [디멘션 품질 안내](docs/DIMENSION_QUALITY.md)를 참고하세요.
+
+전용 검증: `npm run verify:dimension-quality` (기본), `npm run verify:dimension-quality -- --4k` (4K PNG + 짧은 MP4 포함).
 
 Production Modes include `Glass 3D` (Three.js optical solids with native WebGPU wavefront path tracing), `Dimention R3F` (noise-free realtime R3F transmission glass with Lightformer studio reflections and N8AO), `Light Field` (raw WebGL2 continuous spectral field), `Glass Prism` (raw WebGL2 thickness-aware RGB refraction), `Kinetic Glass` (Three.js physical glass with Rapier rigid-body interaction), `Axis Trails` (cursor-following 30° signal lines), and `Formation Loop` (three PLEOS forms rebuilt as a nonuniform HDR light network with Svelte controls, GSAP motion, WebGL shaders, instanced ghost fragments, and BVH interaction). Each preserves the canonical three-part Axis identity and shares the Shell-owned artboard, Variation, motion transport, and export entry point.
 

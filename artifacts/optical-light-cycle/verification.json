@@ -1,0 +1,89 @@
+{
+  "checks": {
+    "energyAndContinuity": {
+      "stages": [
+        [
+          0.10000000149011612,
+          0.800000011920929,
+          0.10000000149011612
+        ],
+        [
+          0.800000011920929,
+          0.10000000149011612,
+          0.10000000149011612
+        ],
+        [
+          0.10000000149011612,
+          0.10000000149011612,
+          0.800000011920929
+        ],
+        [
+          0.10000000149011612,
+          0.800000011920929,
+          0.10000000149011612
+        ]
+      ],
+      "sumError": 3.725290298461914e-8,
+      "minimum": 0.10000000149011612,
+      "maxDelta": 0.0004038512706756592,
+      "families": [
+        0,
+        1,
+        2
+      ]
+    },
+    "keyboardAnchorAndReload": "pass",
+    "loopAndManualRoundtrip": {
+      "loopDifference": 0,
+      "manualDifference": 0,
+      "greenRedDifference": 35.59714363283036,
+      "redBlueDifference": 33.870371799268405
+    },
+    "zeroLightBlack": "pass",
+    "responsive": "pass"
+  },
+  "errors": [],
+  "captures": {
+    "manual-green": {
+      "width": 432,
+      "height": 540
+    },
+    "green-main": {
+      "width": 432,
+      "height": 540
+    },
+    "red-main": {
+      "width": 432,
+      "height": 540
+    },
+    "blue-main": {
+      "width": 432,
+      "height": 540
+    },
+    "loop-end": {
+      "width": 432,
+      "height": 540
+    },
+    "manual-restored": {
+      "width": 432,
+      "height": 540
+    },
+    "lights-off": {
+      "width": 432,
+      "height": 540
+    },
+    "overview-green": {
+      "width": 540,
+      "height": 675
+    },
+    "overview-red": {
+      "width": 540,
+      "height": 675
+    },
+    "overview-blue": {
+      "width": 540,
+      "height": 675
+    }
+  },
+  "status": "pass"
+}

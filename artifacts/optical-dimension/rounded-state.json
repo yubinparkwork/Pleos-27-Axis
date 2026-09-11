@@ -1,0 +1,39 @@
+{
+  "original": {
+    "absorption": 1.15,
+    "azimuth": 46.431,
+    "bevel": 0.01,
+    "blue": 0,
+    "bounces": 5,
+    "dispersion": 0.15,
+    "duration": 15,
+    "elevation": 25.784,
+    "exposure": 0.25,
+    "gap": 0,
+    "green": 0,
+    "ior": 2.5,
+    "lightIntensity": 5,
+    "lightSpread": 2,
+    "red": 2,
+    "reflection": 2,
+    "roughness": 0.3,
+    "speed": 0.4,
+    "zoom": 0.961,
+    "time": 0.01,
+    "aspect": "4x5",
+    "playing": false
+  },
+  "adjustment": {
+    "absorption": 0.05,
+    "bevel": 0.42,
+    "bounces": 12,
+    "dispersion": 0.025,
+    "ior": 1.8,
+    "lightIntensity": 1.1,
+    "lightSpread": 0.85,
+    "reflection": 1,
+    "roughness": 0.12,
+    "exposure": 1
+  },
+  "errors": []
+}

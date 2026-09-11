@@ -1,5 +1,11 @@
 # PLEOS 27 Axis — Repository Instructions
 
+## Named draft snapshot
+
+- “플레오스 디멘션 초안” / “초안 불러와줘” refers to the immutable local snapshot in `../pleos-snapshots/pleos-dimension-draft-20260910-155444/`.
+- Read that directory's `README.md` before restoring. It contains the working source (including uncommitted changes), assets, and `.pleos/studio-state.json`, not just the Git HEAD.
+- Never overwrite this draft during development. Restore into a separate directory first; preserve the current development work and settings before switching. Do not reset or replace the current working tree without explicit user direction.
+
 ## Start every implementation task
 
 Before editing, inspect the current working state without changing it:
@@ -14,6 +20,9 @@ Preserve all existing user changes. Never run `git reset --hard`, `git clean -fd
 
 ## Production contract
 
+- The default `/` is now `src/optical-studio/OpticalStudio.ts`, a direct WebGL2 optical ray integrator. Previous multi-mode StudioShell is preserved at `?renderer=studio`, not the default production route.
+- `npm run verify` validates the new default optical app. `npm run verify:legacy` retains the previous multi-mode test chain; do not represent current-app PASS as a legacy-suite PASS.
+- New optical state uses `pleos-optical-studio-v1`. Never migrate over or delete the old StudioShell/R3F settings or the named draft implicitly.
 - The default route and active production application are documented in `docs/AI_HANDOFF.md`.
 - Preserve the approved Axis shared origin, 30° projection, three-solid relationship, default camera and silhouette unless the user explicitly requests a brand-structure change.
 - Treat materials, shaders, lighting, motion and artboard behavior as expression layers.

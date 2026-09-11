@@ -2,7 +2,7 @@ import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { chromium } from "playwright";
 import { PNG } from "pngjs";
-const port = 41743, url = `http://127.0.0.1:${port}/`, child = spawn("npm", ["run", "dev", "--", "--host", "127.0.0.1", "--port", String(port), "--strictPort"], { stdio: "ignore", shell: process.platform === "win32" });
+const port = 41743, url = `http://127.0.0.1:${port}/?renderer=studio`, child = spawn("npm", ["run", "dev", "--", "--host", "127.0.0.1", "--port", String(port), "--strictPort"], { stdio: "ignore", shell: process.platform === "win32" });
 const limit = Date.now() + 25_000; while (true) { try { if ((await fetch(url)).ok) break; } catch { /* retry */ } if (child.exitCode !== null || Date.now() > limit) throw new Error("Glass Prism verification server failed."); await new Promise((resolve) => setTimeout(resolve, 125)); }
 const browser = await chromium.launch({ headless: true }), page = await browser.newPage({ viewport: { width: 1440, height: 960 } }), errors = []; page.on("pageerror", (error) => errors.push(error.message)); page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); }); await page.addInitScript(() => localStorage.removeItem("pleos-27-axis-studio-state-v2"));
 const decode = (data) => Buffer.from(data.split(",")[1], "base64"), hash = (data) => createHash("sha256").update(decode(data)).digest("hex");

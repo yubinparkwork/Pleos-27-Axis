@@ -1,0 +1,49 @@
+{
+  "baseline": {
+    "gap": 0.025,
+    "bevel": 0.32,
+    "ior": 1.5,
+    "dispersion": 0.045,
+    "roughness": 0.12,
+    "surfaceCurvature": 0.065,
+    "reflection": 1,
+    "absorption": 0.04,
+    "lightIntensity": 0.9,
+    "lightSpread": 1,
+    "red": 1,
+    "green": 0,
+    "blue": 0,
+    "exposure": 1,
+    "zoom": 0.5,
+    "azimuth": 45,
+    "elevation": 35.264389682754654,
+    "time": 0,
+    "duration": 15,
+    "speed": 0.4,
+    "dimensionTop": 3,
+    "dimensionLeft": 4,
+    "dimensionRight": 3,
+    "bloom": 0.18,
+    "dimensionSpacing": 0.14,
+    "dimensionSoftness": 0.55,
+    "dimensionFalloff": 0.55,
+    "lightColor": "#FFFFFF",
+    "bounces": 16,
+    "playing": false,
+    "aspect": "main"
+  },
+  "captures": [
+    {
+      "name": "layers-4k",
+      "width": 3072,
+      "height": 3840,
+      "samples": 16,
+      "wallMs": 8054,
+      "patch": {
+        "zoom": 0.65,
+        "aspect": "4x5"
+      }
+    }
+  ],
+  "errors": []
+}

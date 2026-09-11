@@ -1,0 +1,1350 @@
+{
+  "state": {
+    "version": 1,
+    "preset": "pleos-prism",
+    "geometry": {
+      "gap": 0.015,
+      "bevel": 0.0125
+    },
+    "material": {
+      "roughness": 0,
+      "transmission": 1,
+      "thickness": 6,
+      "ior": 1.9,
+      "chromaticAberration": 0.194,
+      "anisotropicBlur": 0.5,
+      "attenuationDistance": 20,
+      "environment": 3.55
+    },
+    "lighting": {
+      "exposure": 0.97,
+      "master": 1.12,
+      "rgb": 0.81,
+      "white": 0.65,
+      "speed": 0.18,
+      "rgbMotionSpeed": 0.42,
+      "rgbCoverage": 0.78,
+      "bloom": 0.02,
+      "ao": 1.68,
+      "rig": {
+        "key": {
+          "enabled": true,
+          "shape": "spot",
+          "color": "#ffffff",
+          "intensity": 22,
+          "positionX": -3.6,
+          "positionY": 5.4,
+          "positionZ": -4.2,
+          "targetX": 0,
+          "targetY": 0,
+          "targetZ": 0,
+          "width": 1.8,
+          "height": 3.2,
+          "angle": 0.66,
+          "penumbra": 1,
+          "distance": 18,
+          "decay": 1.35,
+          "motionAmount": 0.8
+        },
+        "red": {
+          "enabled": true,
+          "color": "#FA293C",
+          "intensity": 1.15,
+          "positionX": 0,
+          "positionY": 0,
+          "positionZ": 0.1,
+          "angle": 0.85,
+          "penumbra": 0.92,
+          "distance": 28,
+          "decay": 1.35,
+          "orbitRadius": 5,
+          "orbitHeight": 3.1,
+          "phase": 0
+        },
+        "green": {
+          "enabled": true,
+          "color": "#0ADC91",
+          "intensity": 0.95,
+          "positionX": 0,
+          "positionY": 0,
+          "positionZ": 0,
+          "angle": 0.85,
+          "penumbra": 0.92,
+          "distance": 28,
+          "decay": 1.35,
+          "orbitRadius": 5,
+          "orbitHeight": 3.1,
+          "phase": 120
+        },
+        "blue": {
+          "enabled": true,
+          "color": "#4664FF",
+          "intensity": 1,
+          "positionX": 0,
+          "positionY": 0,
+          "positionZ": 0,
+          "angle": 0.85,
+          "penumbra": 0.92,
+          "distance": 28,
+          "decay": 1.35,
+          "orbitRadius": 5,
+          "orbitHeight": 3.1,
+          "phase": 240
+        },
+        "whiteArea": {
+          "enabled": true,
+          "shape": "ellipse",
+          "color": "#ffffff",
+          "intensity": 1.5,
+          "positionX": 0,
+          "positionY": 6,
+          "positionZ": -5,
+          "rotationX": 90,
+          "rotationY": 0,
+          "rotationZ": 0,
+          "width": 8,
+          "height": 3.2,
+          "motionAmount": 0.65
+        },
+        "rear": {
+          "enabled": true,
+          "shape": "circle",
+          "color": "#ffffff",
+          "intensity": 0.8,
+          "positionX": 0,
+          "positionY": 0,
+          "positionZ": 5,
+          "rotationX": 0,
+          "rotationY": 0,
+          "rotationZ": 0,
+          "width": 0.25,
+          "height": 0.75,
+          "motionAmount": 0.45
+        }
+      }
+    },
+    "mirror": {
+      "enabled": true,
+      "intensity": 3,
+      "bounces": 12,
+      "cubeBounces": [
+        24,
+        1,
+        24
+      ],
+      "recursionScale": 0.9,
+      "reflectivity": 0.92,
+      "absorption": 1,
+      "dispersion": 0.15,
+      "edgeIntensity": 0.8,
+      "fresnelBoost": 1,
+      "backfaceEnergy": 0.52,
+      "depthShift": 1,
+      "blur": 1,
+      "lightThreshold": 0.09
+    },
+    "camera": {
+      "panX": 0,
+      "panY": 0,
+      "freeOrbit": false,
+      "orbitYaw": 0,
+      "orbitPitch": 0,
+      "orbitZoom": 0.56,
+      "panelCollapsed": false
+    },
+    "motion": {
+      "enabled": true,
+      "playing": false,
+      "time": 0.22499999999999964,
+      "duration": 15,
+      "cubeRotationTurns": 1
+    },
+    "quality": {
+      "transmissionResolution": 512,
+      "samples": 12,
+      "multisampling": 8,
+      "maxDpr": 1.5
+    },
+    "artboard": {
+      "id": "square",
+      "width": 594,
+      "height": 841,
+      "fitMode": "contain",
+      "axisAnchor": {
+        "gridX": 0.5,
+        "gridY": 0.5
+      },
+      "scale": 2,
+      "background": "#000000",
+      "transparent": false,
+      "safeGuide": false,
+      "previewZoom": 1
+    },
+    "export": {
+      "ppi": 600,
+      "imageResolution": "artboard",
+      "videoFps": 30,
+      "videoResolution": "custom",
+      "videoWidth": 1080,
+      "videoHeight": 1920,
+      "videoBitrateMbps": 155,
+      "videoSupersampling": 2
+    }
+  },
+  "frames": [
+    {
+      "time": 0,
+      "litFraction": 0.5105113761475236,
+      "colorFractions": [
+        0.4449707483099895,
+        0.15893548943645402,
+        0.33495145631067963
+      ]
+    },
+    {
+      "time": 2.5,
+      "litFraction": 0.5374874387954055,
+      "colorFractions": [
+        0.16374057742156542,
+        0.17264547269314423,
+        0.6151379495277538
+      ]
+    },
+    {
+      "time": 5,
+      "litFraction": 0.5915196355148793,
+      "colorFractions": [
+        0.1644929203779408,
+        0.010927389880066059,
+        0.14177518477407478
+      ]
+    },
+    {
+      "time": 7.5,
+      "litFraction": 0.4357286699736165,
+      "colorFractions": [
+        0.3206137731428309,
+        0.19450084991041486,
+        0.42914503606376625
+      ]
+    },
+    {
+      "time": 10,
+      "litFraction": 0.5939097675126213,
+      "colorFractions": [
+        0.13803633422090397,
+        0.011732785061849068,
+        0.10890828811217096
+      ]
+    },
+    {
+      "time": 12.5,
+      "litFraction": 0.28869951997181487,
+      "colorFractions": [
+        0.3134494976459739,
+        0.11800639296635025,
+        0.529485997184876
+      ]
+    },
+    {
+      "time": 14.9,
+      "litFraction": 0.47333021054780866,
+      "colorFractions": [
+        0.4158525548309608,
+        0.1423448112529287,
+        0.4053727152004195
+      ]
+    }
+  ],
+  "softboxContract": {
+    "count": 18,
+    "translation": 1,
+    "colorUnchanged": true,
+    "allOff": true
+  },
+  "still4k": {
+    "width": 2160,
+    "height": 3840,
+    "bytes": 4886221
+  },
+  "errors": [],
+  "runtime": {
+    "dimensionUniforms": [
+      {
+        "cube": "RecursiveGlassReflection-0",
+        "layers": 24
+      },
+      {
+        "cube": "RecursiveGlassReflection-1",
+        "layers": 1
+      },
+      {
+        "cube": "RecursiveGlassReflection-2",
+        "layers": 24
+      }
+    ],
+    "lastCapture": {
+      "width": 2160,
+      "height": 3840,
+      "scale": 1.3888888888888888,
+      "renderWidth": 3000,
+      "renderHeight": 5333,
+      "upscaled": false
+    },
+    "dimensions": [
+      24,
+      1,
+      24
+    ],
+    "ready": true,
+    "renderer": "React Three Fiber realtime transmission + recursive FBO glass reflection + Lightformer + N8AO",
+    "pipeline": "Three.js WebGL raster",
+    "materialPipeline": "deterministic MeshPhysicalMaterial transmission + dispersion",
+    "recursionCapture": "ping-pong half-float FBO",
+    "opticalTransport": "finite RGB softbox ray intersections + Fresnel + secondary IOR path approximation, captured into recursive FBO",
+    "antialiasing": {
+      "preview": "8x MSAA + final SMAA",
+      "video": "native pixels + budgeted supersampling (up to 2x) + up to 2x MSAA + final SMAA + mipmapped reflections + analytic dimension-edge AA"
+    },
+    "lightingRig": "white key + animated Pleos RGB spotlights + studio Lightformers",
+    "rgbEnergyMode": "simultaneous-balanced-rgb",
+    "pathTracing": false,
+    "solids": 3,
+    "sharedOrigin": false,
+    "canvasCount": 1,
+    "motion": {
+      "enabled": true,
+      "playing": false,
+      "time": 14.899999999999999,
+      "duration": 15,
+      "fps": 60,
+      "cubeRotationTurns": 1,
+      "cubeRotationDegrees": -357.59999999999997,
+      "cubeRotationDirection": "clockwise-y"
+    },
+    "gpu": {
+      "maximumTextureSize": 16384,
+      "logarithmicDepthBuffer": false
+    },
+    "projection": "orthographic isometric with optional free orbit",
+    "camera": {
+      "type": "OrthographicCamera",
+      "position": [
+        0,
+        0,
+        -12
+      ],
+      "pan": [
+        0,
+        0
+      ],
+      "freeOrbit": false,
+      "orbit": [
+        0,
+        0
+      ],
+      "zoom": 0.56,
+      "panelCollapsed": false
+    },
+    "axis": {
+      "family": "30deg",
+      "sharedOrigin": false,
+      "source": "CrystalAssembly"
+    },
+    "preset": "pleos-prism",
+    "material": {
+      "roughness": 0,
+      "transmission": 1,
+      "thickness": 6,
+      "ior": 1.9,
+      "chromaticAberration": 0.194,
+      "anisotropicBlur": 0.5,
+      "attenuationDistance": 20,
+      "environment": 3.55
+    },
+    "glassReflection": {
+      "enabled": true,
+      "intensity": 3,
+      "bounces": 12,
+      "cubeBounces": [
+        24,
+        1,
+        24
+      ],
+      "recursionScale": 0.9,
+      "reflectivity": 0.92,
+      "absorption": 1,
+      "dispersion": 0.15,
+      "edgeIntensity": 0.8,
+      "fresnelBoost": 1,
+      "backfaceEnergy": 0.52,
+      "depthShift": 1,
+      "blur": 1,
+      "lightThreshold": 0.09
+    },
+    "mirror": {
+      "enabled": true,
+      "intensity": 3,
+      "bounces": 12,
+      "cubeBounces": [
+        24,
+        1,
+        24
+      ],
+      "recursionScale": 0.9,
+      "reflectivity": 0.92,
+      "absorption": 1,
+      "dispersion": 0.15,
+      "edgeIntensity": 0.8,
+      "fresnelBoost": 1,
+      "backfaceEnergy": 0.52,
+      "depthShift": 1,
+      "blur": 1,
+      "lightThreshold": 0.09
+    },
+    "lighting": {
+      "exposure": 0.97,
+      "master": 1.12,
+      "rgb": 0.81,
+      "white": 0.65,
+      "speed": 0.18,
+      "rgbMotionSpeed": 0.42,
+      "rgbCoverage": 0.78,
+      "bloom": 0.02,
+      "ao": 1.68,
+      "rig": {
+        "key": {
+          "enabled": true,
+          "shape": "spot",
+          "color": "#ffffff",
+          "intensity": 22,
+          "positionX": -3.6,
+          "positionY": 5.4,
+          "positionZ": -4.2,
+          "targetX": 0,
+          "targetY": 0,
+          "targetZ": 0,
+          "width": 1.8,
+          "height": 3.2,
+          "angle": 0.66,
+          "penumbra": 1,
+          "distance": 18,
+          "decay": 1.35,
+          "motionAmount": 0.8
+        },
+        "red": {
+          "enabled": true,
+          "color": "#FA293C",
+          "intensity": 1.15,
+          "positionX": 0,
+          "positionY": 0,
+          "positionZ": 0.1,
+          "angle": 0.85,
+          "penumbra": 0.92,
+          "distance": 28,
+          "decay": 1.35,
+          "orbitRadius": 5,
+          "orbitHeight": 3.1,
+          "phase": 0
+        },
+        "green": {
+          "enabled": true,
+          "color": "#0ADC91",
+          "intensity": 0.95,
+          "positionX": 0,
+          "positionY": 0,
+          "positionZ": 0,
+          "angle": 0.85,
+          "penumbra": 0.92,
+          "distance": 28,
+          "decay": 1.35,
+          "orbitRadius": 5,
+          "orbitHeight": 3.1,
+          "phase": 120
+        },
+        "blue": {
+          "enabled": true,
+          "color": "#4664FF",
+          "intensity": 1,
+          "positionX": 0,
+          "positionY": 0,
+          "positionZ": 0,
+          "angle": 0.85,
+          "penumbra": 0.92,
+          "distance": 28,
+          "decay": 1.35,
+          "orbitRadius": 5,
+          "orbitHeight": 3.1,
+          "phase": 240
+        },
+        "whiteArea": {
+          "enabled": true,
+          "shape": "ellipse",
+          "color": "#ffffff",
+          "intensity": 1.5,
+          "positionX": 0,
+          "positionY": 6,
+          "positionZ": -5,
+          "rotationX": 90,
+          "rotationY": 0,
+          "rotationZ": 0,
+          "width": 8,
+          "height": 3.2,
+          "motionAmount": 0.65
+        },
+        "rear": {
+          "enabled": true,
+          "shape": "circle",
+          "color": "#ffffff",
+          "intensity": 0.8,
+          "positionX": 0,
+          "positionY": 0,
+          "positionZ": 5,
+          "rotationX": 0,
+          "rotationY": 0,
+          "rotationZ": 0,
+          "width": 0.25,
+          "height": 0.75,
+          "motionAmount": 0.45
+        }
+      }
+    },
+    "geometry": {
+      "gap": 0.015,
+      "bevel": 0.0125
+    },
+    "artboard": {
+      "id": "square",
+      "width": 2160,
+      "height": 3840,
+      "fitMode": "contain",
+      "axisAnchor": {
+        "gridX": 0.5,
+        "gridY": 0.5
+      },
+      "scale": 2,
+      "background": "#000000",
+      "transparent": false,
+      "safeGuide": false,
+      "previewZoom": 1
+    },
+    "export": {
+      "rasterPng": true,
+      "transparentPng": true,
+      "rasterMp4": true,
+      "video4k": true,
+      "videoFps": 30,
+      "videoResolution": "custom",
+      "videoDimensions": [
+        1080,
+        1920
+      ],
+      "videoBitrateMbps": 155,
+      "videoSupersampling": 2,
+      "opticalConvergenceSamples": 12,
+      "streaming": "OPFS with memory fallback",
+      "ppi": 600
+    },
+    "state": {
+      "version": 1,
+      "preset": "pleos-prism",
+      "geometry": {
+        "gap": 0.015,
+        "bevel": 0.0125
+      },
+      "material": {
+        "roughness": 0,
+        "transmission": 1,
+        "thickness": 6,
+        "ior": 1.9,
+        "chromaticAberration": 0.194,
+        "anisotropicBlur": 0.5,
+        "attenuationDistance": 20,
+        "environment": 3.55
+      },
+      "lighting": {
+        "exposure": 0.97,
+        "master": 1.12,
+        "rgb": 0.81,
+        "white": 0.65,
+        "speed": 0.18,
+        "rgbMotionSpeed": 0.42,
+        "rgbCoverage": 0.78,
+        "bloom": 0.02,
+        "ao": 1.68,
+        "rig": {
+          "key": {
+            "enabled": true,
+            "shape": "spot",
+            "color": "#ffffff",
+            "intensity": 22,
+            "positionX": -3.6,
+            "positionY": 5.4,
+            "positionZ": -4.2,
+            "targetX": 0,
+            "targetY": 0,
+            "targetZ": 0,
+            "width": 1.8,
+            "height": 3.2,
+            "angle": 0.66,
+            "penumbra": 1,
+            "distance": 18,
+            "decay": 1.35,
+            "motionAmount": 0.8
+          },
+          "red": {
+            "enabled": true,
+            "color": "#FA293C",
+            "intensity": 1.15,
+            "positionX": 0,
+            "positionY": 0,
+            "positionZ": 0.1,
+            "angle": 0.85,
+            "penumbra": 0.92,
+            "distance": 28,
+            "decay": 1.35,
+            "orbitRadius": 5,
+            "orbitHeight": 3.1,
+            "phase": 0
+          },
+          "green": {
+            "enabled": true,
+            "color": "#0ADC91",
+            "intensity": 0.95,
+            "positionX": 0,
+            "positionY": 0,
+            "positionZ": 0,
+            "angle": 0.85,
+            "penumbra": 0.92,
+            "distance": 28,
+            "decay": 1.35,
+            "orbitRadius": 5,
+            "orbitHeight": 3.1,
+            "phase": 120
+          },
+          "blue": {
+            "enabled": true,
+            "color": "#4664FF",
+            "intensity": 1,
+            "positionX": 0,
+            "positionY": 0,
+            "positionZ": 0,
+            "angle": 0.85,
+            "penumbra": 0.92,
+            "distance": 28,
+            "decay": 1.35,
+            "orbitRadius": 5,
+            "orbitHeight": 3.1,
+            "phase": 240
+          },
+          "whiteArea": {
+            "enabled": true,
+            "shape": "ellipse",
+            "color": "#ffffff",
+            "intensity": 1.5,
+            "positionX": 0,
+            "positionY": 6,
+            "positionZ": -5,
+            "rotationX": 90,
+            "rotationY": 0,
+            "rotationZ": 0,
+            "width": 8,
+            "height": 3.2,
+            "motionAmount": 0.65
+          },
+          "rear": {
+            "enabled": true,
+            "shape": "circle",
+            "color": "#ffffff",
+            "intensity": 0.8,
+            "positionX": 0,
+            "positionY": 0,
+            "positionZ": 5,
+            "rotationX": 0,
+            "rotationY": 0,
+            "rotationZ": 0,
+            "width": 0.25,
+            "height": 0.75,
+            "motionAmount": 0.45
+          }
+        }
+      },
+      "mirror": {
+        "enabled": true,
+        "intensity": 3,
+        "bounces": 12,
+        "cubeBounces": [
+          24,
+          1,
+          24
+        ],
+        "recursionScale": 0.9,
+        "reflectivity": 0.92,
+        "absorption": 1,
+        "dispersion": 0.15,
+        "edgeIntensity": 0.8,
+        "fresnelBoost": 1,
+        "backfaceEnergy": 0.52,
+        "depthShift": 1,
+        "blur": 1,
+        "lightThreshold": 0.09
+      },
+      "camera": {
+        "panX": 0,
+        "panY": 0,
+        "freeOrbit": false,
+        "orbitYaw": 0,
+        "orbitPitch": 0,
+        "orbitZoom": 0.56,
+        "panelCollapsed": false
+      },
+      "motion": {
+        "enabled": true,
+        "playing": false,
+        "time": 14.899999999999999,
+        "duration": 15,
+        "cubeRotationTurns": 1
+      },
+      "quality": {
+        "transmissionResolution": 512,
+        "samples": 12,
+        "multisampling": 8,
+        "maxDpr": 1.5
+      },
+      "artboard": {
+        "id": "square",
+        "width": 2160,
+        "height": 3840,
+        "fitMode": "contain",
+        "axisAnchor": {
+          "gridX": 0.5,
+          "gridY": 0.5
+        },
+        "scale": 2,
+        "background": "#000000",
+        "transparent": false,
+        "safeGuide": false,
+        "previewZoom": 1
+      },
+      "export": {
+        "ppi": 600,
+        "imageResolution": "artboard",
+        "videoFps": 30,
+        "videoResolution": "custom",
+        "videoWidth": 1080,
+        "videoHeight": 1920,
+        "videoBitrateMbps": 155,
+        "videoSupersampling": 2
+      }
+    },
+    "studioMode": {
+      "activeMode": "dimention-r3f",
+      "modeLabel": "Dimention R3F",
+      "capabilities": {
+        "motion": true,
+        "pathTracing": false,
+        "rasterExport": true,
+        "transparency": true,
+        "print": true
+      },
+      "registeredModes": [
+        {
+          "id": "glass-3d",
+          "label": "Glass 3D",
+          "description": "Three.js optical solids, branded light and path-traced output",
+          "capabilities": {
+            "motion": true,
+            "pathTracing": true,
+            "rasterExport": true,
+            "transparency": true,
+            "print": true
+          }
+        },
+        {
+          "id": "dimention-r3f",
+          "label": "Dimention R3F",
+          "description": "PLEOS Axis optical glass rendered with realtime React Three Fiber",
+          "capabilities": {
+            "motion": true,
+            "pathTracing": false,
+            "rasterExport": true,
+            "transparency": true,
+            "print": true
+          }
+        },
+        {
+          "id": "light-field",
+          "label": "Light Field",
+          "description": "PLEOS cubes with a loopable iridescent membrane field",
+          "capabilities": {
+            "motion": true,
+            "pathTracing": false,
+            "rasterExport": true,
+            "transparency": true,
+            "print": true
+          }
+        },
+        {
+          "id": "glass-prism",
+          "label": "Glass Prism",
+          "description": "Raw WebGL2 thickness-aware RGB refraction",
+          "capabilities": {
+            "motion": true,
+            "pathTracing": false,
+            "rasterExport": true,
+            "transparency": true,
+            "print": true
+          }
+        },
+        {
+          "id": "kinetic-glass",
+          "label": "Kinetic Glass",
+          "description": "PLEOS three-cube glass attraction with Three.js and Rapier",
+          "capabilities": {
+            "motion": true,
+            "pathTracing": false,
+            "rasterExport": true,
+            "transparency": true,
+            "print": true
+          }
+        },
+        {
+          "id": "axis-trails",
+          "label": "Axis Trails",
+          "description": "Cursor-following luminous trails constrained to the PLEOS 30° axis family",
+          "capabilities": {
+            "motion": true,
+            "pathTracing": false,
+            "rasterExport": true,
+            "transparency": true,
+            "print": true
+          }
+        },
+        {
+          "id": "axis-habitat",
+          "label": "Formation Loop",
+          "description": "PLEOS solids drawn as wire, assembled from instanced fragments, materialized, disassembled and returned in a GSAP-controlled WebGL2 loop",
+          "capabilities": {
+            "motion": true,
+            "pathTracing": false,
+            "rasterExport": true,
+            "transparency": false,
+            "print": true
+          }
+        },
+        {
+          "id": "axis-megastructure",
+          "label": "Axis Megastructure",
+          "description": "An immense recursive computational environment generated outward from one readable PLEOS AXIS",
+          "capabilities": {
+            "motion": true,
+            "pathTracing": false,
+            "rasterExport": true,
+            "transparency": false,
+            "print": true
+          }
+        }
+      ],
+      "lifecycle": {
+        "mounted": true,
+        "canvasCount": 1
+      },
+      "sharedState": {
+        "artboard": {
+          "id": "square",
+          "width": 2160,
+          "height": 3840,
+          "fitMode": "contain",
+          "axisAnchor": {
+            "gridX": 0.5,
+            "gridY": 0.5
+          },
+          "scale": 2,
+          "background": "#000000",
+          "transparent": false,
+          "safeGuide": false,
+          "previewZoom": 1
+        }
+      },
+      "persistence": {
+        "version": 2,
+        "storageKey": "pleos-27-axis-studio-state-v3",
+        "fileBacked": false,
+        "updatedAt": "2026-09-10T08:59:36.954Z",
+        "modeNamespaces": [
+          "dimention-r3f"
+        ]
+      },
+      "mode": {
+        "dimensionUniforms": [
+          {
+            "cube": "RecursiveGlassReflection-0",
+            "layers": 24
+          },
+          {
+            "cube": "RecursiveGlassReflection-1",
+            "layers": 1
+          },
+          {
+            "cube": "RecursiveGlassReflection-2",
+            "layers": 24
+          }
+        ],
+        "lastCapture": {
+          "width": 2160,
+          "height": 3840,
+          "scale": 1.3888888888888888,
+          "renderWidth": 3000,
+          "renderHeight": 5333,
+          "upscaled": false
+        },
+        "dimensions": [
+          24,
+          1,
+          24
+        ],
+        "ready": true,
+        "renderer": "React Three Fiber realtime transmission + recursive FBO glass reflection + Lightformer + N8AO",
+        "pipeline": "Three.js WebGL raster",
+        "materialPipeline": "deterministic MeshPhysicalMaterial transmission + dispersion",
+        "recursionCapture": "ping-pong half-float FBO",
+        "opticalTransport": "finite RGB softbox ray intersections + Fresnel + secondary IOR path approximation, captured into recursive FBO",
+        "antialiasing": {
+          "preview": "8x MSAA + final SMAA",
+          "video": "native pixels + budgeted supersampling (up to 2x) + up to 2x MSAA + final SMAA + mipmapped reflections + analytic dimension-edge AA"
+        },
+        "lightingRig": "white key + animated Pleos RGB spotlights + studio Lightformers",
+        "rgbEnergyMode": "simultaneous-balanced-rgb",
+        "pathTracing": false,
+        "solids": 3,
+        "sharedOrigin": false,
+        "canvasCount": 1,
+        "motion": {
+          "enabled": true,
+          "playing": false,
+          "time": 14.899999999999999,
+          "duration": 15,
+          "fps": 60,
+          "cubeRotationTurns": 1,
+          "cubeRotationDegrees": -357.59999999999997,
+          "cubeRotationDirection": "clockwise-y"
+        },
+        "gpu": {
+          "maximumTextureSize": 16384,
+          "logarithmicDepthBuffer": false
+        },
+        "projection": "orthographic isometric with optional free orbit",
+        "camera": {
+          "type": "OrthographicCamera",
+          "position": [
+            0,
+            0,
+            -12
+          ],
+          "pan": [
+            0,
+            0
+          ],
+          "freeOrbit": false,
+          "orbit": [
+            0,
+            0
+          ],
+          "zoom": 0.56,
+          "panelCollapsed": false
+        },
+        "axis": {
+          "family": "30deg",
+          "sharedOrigin": false,
+          "source": "CrystalAssembly"
+        },
+        "preset": "pleos-prism",
+        "material": {
+          "roughness": 0,
+          "transmission": 1,
+          "thickness": 6,
+          "ior": 1.9,
+          "chromaticAberration": 0.194,
+          "anisotropicBlur": 0.5,
+          "attenuationDistance": 20,
+          "environment": 3.55
+        },
+        "glassReflection": {
+          "enabled": true,
+          "intensity": 3,
+          "bounces": 12,
+          "cubeBounces": [
+            24,
+            1,
+            24
+          ],
+          "recursionScale": 0.9,
+          "reflectivity": 0.92,
+          "absorption": 1,
+          "dispersion": 0.15,
+          "edgeIntensity": 0.8,
+          "fresnelBoost": 1,
+          "backfaceEnergy": 0.52,
+          "depthShift": 1,
+          "blur": 1,
+          "lightThreshold": 0.09
+        },
+        "mirror": {
+          "enabled": true,
+          "intensity": 3,
+          "bounces": 12,
+          "cubeBounces": [
+            24,
+            1,
+            24
+          ],
+          "recursionScale": 0.9,
+          "reflectivity": 0.92,
+          "absorption": 1,
+          "dispersion": 0.15,
+          "edgeIntensity": 0.8,
+          "fresnelBoost": 1,
+          "backfaceEnergy": 0.52,
+          "depthShift": 1,
+          "blur": 1,
+          "lightThreshold": 0.09
+        },
+        "lighting": {
+          "exposure": 0.97,
+          "master": 1.12,
+          "rgb": 0.81,
+          "white": 0.65,
+          "speed": 0.18,
+          "rgbMotionSpeed": 0.42,
+          "rgbCoverage": 0.78,
+          "bloom": 0.02,
+          "ao": 1.68,
+          "rig": {
+            "key": {
+              "enabled": true,
+              "shape": "spot",
+              "color": "#ffffff",
+              "intensity": 22,
+              "positionX": -3.6,
+              "positionY": 5.4,
+              "positionZ": -4.2,
+              "targetX": 0,
+              "targetY": 0,
+              "targetZ": 0,
+              "width": 1.8,
+              "height": 3.2,
+              "angle": 0.66,
+              "penumbra": 1,
+              "distance": 18,
+              "decay": 1.35,
+              "motionAmount": 0.8
+            },
+            "red": {
+              "enabled": true,
+              "color": "#FA293C",
+              "intensity": 1.15,
+              "positionX": 0,
+              "positionY": 0,
+              "positionZ": 0.1,
+              "angle": 0.85,
+              "penumbra": 0.92,
+              "distance": 28,
+              "decay": 1.35,
+              "orbitRadius": 5,
+              "orbitHeight": 3.1,
+              "phase": 0
+            },
+            "green": {
+              "enabled": true,
+              "color": "#0ADC91",
+              "intensity": 0.95,
+              "positionX": 0,
+              "positionY": 0,
+              "positionZ": 0,
+              "angle": 0.85,
+              "penumbra": 0.92,
+              "distance": 28,
+              "decay": 1.35,
+              "orbitRadius": 5,
+              "orbitHeight": 3.1,
+              "phase": 120
+            },
+            "blue": {
+              "enabled": true,
+              "color": "#4664FF",
+              "intensity": 1,
+              "positionX": 0,
+              "positionY": 0,
+              "positionZ": 0,
+              "angle": 0.85,
+              "penumbra": 0.92,
+              "distance": 28,
+              "decay": 1.35,
+              "orbitRadius": 5,
+              "orbitHeight": 3.1,
+              "phase": 240
+            },
+            "whiteArea": {
+              "enabled": true,
+              "shape": "ellipse",
+              "color": "#ffffff",
+              "intensity": 1.5,
+              "positionX": 0,
+              "positionY": 6,
+              "positionZ": -5,
+              "rotationX": 90,
+              "rotationY": 0,
+              "rotationZ": 0,
+              "width": 8,
+              "height": 3.2,
+              "motionAmount": 0.65
+            },
+            "rear": {
+              "enabled": true,
+              "shape": "circle",
+              "color": "#ffffff",
+              "intensity": 0.8,
+              "positionX": 0,
+              "positionY": 0,
+              "positionZ": 5,
+              "rotationX": 0,
+              "rotationY": 0,
+              "rotationZ": 0,
+              "width": 0.25,
+              "height": 0.75,
+              "motionAmount": 0.45
+            }
+          }
+        },
+        "geometry": {
+          "gap": 0.015,
+          "bevel": 0.0125
+        },
+        "artboard": {
+          "id": "square",
+          "width": 2160,
+          "height": 3840,
+          "fitMode": "contain",
+          "axisAnchor": {
+            "gridX": 0.5,
+            "gridY": 0.5
+          },
+          "scale": 2,
+          "background": "#000000",
+          "transparent": false,
+          "safeGuide": false,
+          "previewZoom": 1
+        },
+        "export": {
+          "rasterPng": true,
+          "transparentPng": true,
+          "rasterMp4": true,
+          "video4k": true,
+          "videoFps": 30,
+          "videoResolution": "custom",
+          "videoDimensions": [
+            1080,
+            1920
+          ],
+          "videoBitrateMbps": 155,
+          "videoSupersampling": 2,
+          "opticalConvergenceSamples": 12,
+          "streaming": "OPFS with memory fallback",
+          "ppi": 600
+        },
+        "state": {
+          "version": 1,
+          "preset": "pleos-prism",
+          "geometry": {
+            "gap": 0.015,
+            "bevel": 0.0125
+          },
+          "material": {
+            "roughness": 0,
+            "transmission": 1,
+            "thickness": 6,
+            "ior": 1.9,
+            "chromaticAberration": 0.194,
+            "anisotropicBlur": 0.5,
+            "attenuationDistance": 20,
+            "environment": 3.55
+          },
+          "lighting": {
+            "exposure": 0.97,
+            "master": 1.12,
+            "rgb": 0.81,
+            "white": 0.65,
+            "speed": 0.18,
+            "rgbMotionSpeed": 0.42,
+            "rgbCoverage": 0.78,
+            "bloom": 0.02,
+            "ao": 1.68,
+            "rig": {
+              "key": {
+                "enabled": true,
+                "shape": "spot",
+                "color": "#ffffff",
+                "intensity": 22,
+                "positionX": -3.6,
+                "positionY": 5.4,
+                "positionZ": -4.2,
+                "targetX": 0,
+                "targetY": 0,
+                "targetZ": 0,
+                "width": 1.8,
+                "height": 3.2,
+                "angle": 0.66,
+                "penumbra": 1,
+                "distance": 18,
+                "decay": 1.35,
+                "motionAmount": 0.8
+              },
+              "red": {
+                "enabled": true,
+                "color": "#FA293C",
+                "intensity": 1.15,
+                "positionX": 0,
+                "positionY": 0,
+                "positionZ": 0.1,
+                "angle": 0.85,
+                "penumbra": 0.92,
+                "distance": 28,
+                "decay": 1.35,
+                "orbitRadius": 5,
+                "orbitHeight": 3.1,
+                "phase": 0
+              },
+              "green": {
+                "enabled": true,
+                "color": "#0ADC91",
+                "intensity": 0.95,
+                "positionX": 0,
+                "positionY": 0,
+                "positionZ": 0,
+                "angle": 0.85,
+                "penumbra": 0.92,
+                "distance": 28,
+                "decay": 1.35,
+                "orbitRadius": 5,
+                "orbitHeight": 3.1,
+                "phase": 120
+              },
+              "blue": {
+                "enabled": true,
+                "color": "#4664FF",
+                "intensity": 1,
+                "positionX": 0,
+                "positionY": 0,
+                "positionZ": 0,
+                "angle": 0.85,
+                "penumbra": 0.92,
+                "distance": 28,
+                "decay": 1.35,
+                "orbitRadius": 5,
+                "orbitHeight": 3.1,
+                "phase": 240
+              },
+              "whiteArea": {
+                "enabled": true,
+                "shape": "ellipse",
+                "color": "#ffffff",
+                "intensity": 1.5,
+                "positionX": 0,
+                "positionY": 6,
+                "positionZ": -5,
+                "rotationX": 90,
+                "rotationY": 0,
+                "rotationZ": 0,
+                "width": 8,
+                "height": 3.2,
+                "motionAmount": 0.65
+              },
+              "rear": {
+                "enabled": true,
+                "shape": "circle",
+                "color": "#ffffff",
+                "intensity": 0.8,
+                "positionX": 0,
+                "positionY": 0,
+                "positionZ": 5,
+                "rotationX": 0,
+                "rotationY": 0,
+                "rotationZ": 0,
+                "width": 0.25,
+                "height": 0.75,
+                "motionAmount": 0.45
+              }
+            }
+          },
+          "mirror": {
+            "enabled": true,
+            "intensity": 3,
+            "bounces": 12,
+            "cubeBounces": [
+              24,
+              1,
+              24
+            ],
+            "recursionScale": 0.9,
+            "reflectivity": 0.92,
+            "absorption": 1,
+            "dispersion": 0.15,
+            "edgeIntensity": 0.8,
+            "fresnelBoost": 1,
+            "backfaceEnergy": 0.52,
+            "depthShift": 1,
+            "blur": 1,
+            "lightThreshold": 0.09
+          },
+          "camera": {
+            "panX": 0,
+            "panY": 0,
+            "freeOrbit": false,
+            "orbitYaw": 0,
+            "orbitPitch": 0,
+            "orbitZoom": 0.56,
+            "panelCollapsed": false
+          },
+          "motion": {
+            "enabled": true,
+            "playing": false,
+            "time": 14.899999999999999,
+            "duration": 15,
+            "cubeRotationTurns": 1
+          },
+          "quality": {
+            "transmissionResolution": 512,
+            "samples": 12,
+            "multisampling": 8,
+            "maxDpr": 1.5
+          },
+          "artboard": {
+            "id": "square",
+            "width": 2160,
+            "height": 3840,
+            "fitMode": "contain",
+            "axisAnchor": {
+              "gridX": 0.5,
+              "gridY": 0.5
+            },
+            "scale": 2,
+            "background": "#000000",
+            "transparent": false,
+            "safeGuide": false,
+            "previewZoom": 1
+          },
+          "export": {
+            "ppi": 600,
+            "imageResolution": "artboard",
+            "videoFps": 30,
+            "videoResolution": "custom",
+            "videoWidth": 1080,
+            "videoHeight": 1920,
+            "videoBitrateMbps": 155,
+            "videoSupersampling": 2
+          }
+        }
+      }
+    }
+  }
+}

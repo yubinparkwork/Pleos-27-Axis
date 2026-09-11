@@ -25,7 +25,7 @@ try {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
-  await page.goto(url, { waitUntil: "load" });
+  await page.goto(`${url}${url.includes("?") ? "&" : "?"}renderer=studio`, { waitUntil: "load" });
   await page.waitForFunction(() => Boolean(window.__pleos27Axis));
   await page.evaluate(() => window.__pleos27Axis.switchMode("glass-3d"));
   await page.waitForFunction(() => Boolean(window.__pleos27Axis?.inspect().ready));

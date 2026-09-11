@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { chromium } from "playwright";
 import { PNG } from "pngjs";
 
-const port = Number(process.env.PLEOS_LIGHT_FIELD_PORT ?? 41738); const url = `http://127.0.0.1:${port}/`;
+const port = Number(process.env.PLEOS_LIGHT_FIELD_PORT ?? 41738); const url = `http://127.0.0.1:${port}/?renderer=studio`;
 const child = spawn("npm", ["run", "dev", "--", "--host", "127.0.0.1", "--port", String(port), "--strictPort"], { stdio: "ignore", shell: process.platform === "win32" });
 const limit = Date.now() + 25_000;
 while (true) { try { if ((await fetch(url)).ok) break; } catch { /* retry */ } if (child.exitCode !== null || Date.now() > limit) throw new Error("Light Field verification server failed."); await new Promise((resolve) => setTimeout(resolve, 125)); }

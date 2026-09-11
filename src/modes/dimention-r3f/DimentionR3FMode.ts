@@ -8,6 +8,7 @@ import { DimentionR3FPanel } from "./DimentionR3FPanel";
 import { DimentionR3FRenderer } from "./DimentionR3FRenderer";
 import { cloneDimentionR3FState, createDimentionR3FState, sanitizeDimentionR3FState, type DimentionR3FPresetId, type DimentionR3FState } from "./DimentionR3FState";
 import { createVideoSink, formatBytes, resolveVideoDimensions } from "./DimentionR3FExportPipeline";
+import { planDimentionCapture } from "./DimentionCapturePlan";
 
 interface DimentionVideoExportOptions {
   download?: boolean;
@@ -29,6 +30,7 @@ export class DimentionR3FMode implements StudioModeInstance {
   private stage: HTMLElement | null = null;
   private status: HTMLElement | null = null;
   private videoJob: { cancelled: boolean } | null = null;
+  private imageJob = false;
 
   constructor(private readonly context: StudioModeContext) {}
   mount(): void {
@@ -54,7 +56,7 @@ export class DimentionR3FMode implements StudioModeInstance {
   focusExport(): void { this.panel?.focusExport(); }
   inspect(): object {
     const video = resolveVideoDimensions(this.state.artboard.width, this.state.artboard.height, this.state.export.videoResolution, this.state.export.videoWidth, this.state.export.videoHeight);
-    return { ...(this.renderer?.inspect() ?? { ready: false }), projection: "orthographic isometric with optional free orbit", camera: { type: "OrthographicCamera", position: [this.state.camera.panX, this.state.camera.panY, -12], pan: [this.state.camera.panX, this.state.camera.panY], freeOrbit: this.state.camera.freeOrbit, orbit: [this.state.camera.orbitYaw, this.state.camera.orbitPitch], zoom: this.state.camera.orbitZoom, panelCollapsed: this.state.camera.panelCollapsed }, axis: { family: "30deg", sharedOrigin: this.state.geometry.gap === 0, source: "CrystalAssembly" }, preset: this.state.preset, material: { ...this.state.material }, mirror: { ...this.state.mirror }, lighting: { ...this.state.lighting }, geometry: { ...this.state.geometry }, artboard: { ...this.state.artboard }, export: { rasterPng: true, transparentPng: true, rasterMp4: true, video4k: true, videoFps: this.state.export.videoFps, videoResolution: this.state.export.videoResolution, videoDimensions: [video.width, video.height], videoBitrateMbps: this.state.export.videoBitrateMbps, streaming: "OPFS with memory fallback", ppi: this.state.export.ppi }, state: this.getState() };
+    return { ...(this.renderer?.inspect() ?? { ready: false }), projection: "orthographic isometric with optional free orbit", camera: { type: "OrthographicCamera", position: [this.state.camera.panX, this.state.camera.panY, -12], pan: [this.state.camera.panX, this.state.camera.panY], freeOrbit: this.state.camera.freeOrbit, orbit: [this.state.camera.orbitYaw, this.state.camera.orbitPitch], zoom: this.state.camera.orbitZoom, panelCollapsed: this.state.camera.panelCollapsed }, axis: { family: "30deg", sharedOrigin: this.state.geometry.gap === 0, source: "CrystalAssembly" }, preset: this.state.preset, material: { ...this.state.material }, glassReflection: { ...this.state.mirror }, mirror: { ...this.state.mirror }, lighting: { ...this.state.lighting }, geometry: { ...this.state.geometry }, artboard: { ...this.state.artboard }, export: { rasterPng: true, transparentPng: true, rasterMp4: true, video4k: true, videoFps: this.state.export.videoFps, videoResolution: this.state.export.videoResolution, videoDimensions: [video.width, video.height], videoBitrateMbps: this.state.export.videoBitrateMbps, videoSupersampling: this.state.export.videoSupersampling, opticalConvergenceSamples: this.state.quality.samples, streaming: "OPFS with memory fallback", ppi: this.state.export.ppi }, state: this.getState() };
   }
   command(name: string, payload?: unknown): unknown {
     if (name === "play") { this.state.motion.playing = true; this.changed(); return; }
@@ -76,18 +78,26 @@ export class DimentionR3FMode implements StudioModeInstance {
   dispose(): void { if (this.videoJob) this.videoJob.cancelled = true; this.resizeObserver?.disconnect(); this.renderer?.dispose(); this.renderer = null; this.panel = null; this.cameraPanel = null; this.context.root.replaceChildren(); }
   async exportStill(quality: StudioExportQuality, download: boolean): Promise<string> {
     if (!this.renderer?.isReady()) throw new Error("Dimention R3F 렌더러를 초기화하는 중입니다.");
-    const scale = quality === "print" ? this.state.export.ppi / 72 : 1; const width = Math.round(this.state.artboard.width * scale); const height = Math.round(this.state.artboard.height * scale);
+    if (this.imageJob || this.videoJob) throw new Error("다른 내보내기가 진행 중입니다.");
+    const scale = quality === "print" ? this.state.export.ppi / 72 : 1;
+    const { width, height } = this.state.export.imageResolution === "4k"
+      ? resolveVideoDimensions(this.state.artboard.width, this.state.artboard.height, "4k", 0, 0)
+      : { width: Math.round(this.state.artboard.width * scale), height: Math.round(this.state.artboard.height * scale) };
+    this.imageJob = true;
+    this.lockEditing(true);
+    try {
     const blob = await injectPngPpiBlob(await this.renderer.exportPngBlob(width, height), this.state.export.ppi);
     if (download) {
       const url = this.downloadBlob(blob, `pleos-dimention-r3f-${this.state.preset}-${width}x${height}-${this.state.export.ppi}ppi.png`);
       return url;
     }
     return this.blobDataUrl(blob);
+    } finally { this.imageJob = false; this.lockEditing(false); }
   }
   async exportVideo(download = true, options?: DimentionVideoExportOptions): Promise<string> {
     const renderer = this.renderer;
     if (!renderer?.isReady()) throw new Error("Dimention R3F 렌더러를 초기화하는 중입니다.");
-    if (this.videoJob) throw new Error("이미 동영상을 렌더링하고 있습니다.");
+    if (this.videoJob || this.imageJob) throw new Error("다른 내보내기가 진행 중입니다.");
     if (!("VideoEncoder" in window)) throw new Error("이 브라우저는 4K MP4 인코딩을 지원하지 않습니다. 최신 Chrome 또는 Edge를 사용해 주세요.");
 
     const fps = options?.fps ?? this.state.export.videoFps;
@@ -98,7 +108,7 @@ export class DimentionR3FMode implements StudioModeInstance {
       : resolveVideoDimensions(this.state.artboard.width, this.state.artboard.height, this.state.export.videoResolution, this.state.export.videoWidth, this.state.export.videoHeight);
     const { width, height, label: resolutionLabel } = requested;
     const maximum = renderer.maximumTextureSize();
-    if (width > maximum || height > maximum) throw new Error(`출력 크기 ${width}×${height}px가 GPU 한계 ${maximum}px를 초과합니다.`);
+    planDimentionCapture(width, height, this.state.export.videoSupersampling, maximum);
 
     const encodingCanvas = document.createElement("canvas");
     encodingCanvas.width = width; encodingCanvas.height = height;
@@ -106,9 +116,12 @@ export class DimentionR3FMode implements StudioModeInstance {
     if (!context) throw new Error("동영상 프레임 캔버스를 만들 수 없습니다.");
     context.imageSmoothingEnabled = true; context.imageSmoothingQuality = "high";
     const bitrate = Math.round(this.state.export.videoBitrateMbps * 1_000_000 * (fps === 60 ? 1.25 : 1));
-    const quality = new Quality({ bitrate, bitrateMode: "constant" });
+    const quality = new Quality({ bitrate, bitrateMode: "variable" });
     if (!await canEncodeVideo("avc", { width, height, quality, hardwareAcceleration: "no-preference" })) throw new Error(`이 브라우저의 H.264 인코더가 ${width}×${height}px 출력을 지원하지 않습니다. Chrome 하드웨어 가속을 켜거나 해상도를 낮춰 주세요.`);
     const sink = await createVideoSink();
+    // Encoder / storage preflight yields to the UI. Recheck after both awaits
+    // so two fast clicks cannot start overlapping capture sessions.
+    if (this.videoJob || this.imageJob) { await sink.cancel(); throw new Error("다른 내보내기가 진행 중입니다."); }
     const output = new Output({ format: new Mp4OutputFormat({ fastStart: sink.storage === "memory" ? "in-memory" : false }), target: sink.target });
     const source = new CanvasSource(encodingCanvas, { codec: "avc", quality, keyFrameInterval: 2, latencyMode: "quality", hardwareAcceleration: "no-preference" });
     output.addVideoTrack(source, { frameRate: fps });
@@ -117,11 +130,12 @@ export class DimentionR3FMode implements StudioModeInstance {
     const originalPlaying = this.state.motion.playing;
     this.state.motion.playing = false;
     this.videoJob = { cancelled: false };
+    this.lockEditing(true);
     const startedAt = performance.now();
     this.panel?.setVideoProgress(`${resolutionLabel} · ${sink.storage === "opfs" ? "디스크 스트리밍" : "메모리 출력"} 준비`, 0, true);
     try {
       await output.start();
-      renderer.beginVideoCapture(width, height);
+      const supersampling = renderer.beginVideoCapture(width, height, this.state.export.videoSupersampling);
       for (let frame = 0; frame < totalFrames; frame += 1) {
         if (this.videoJob.cancelled) throw new DOMException("사용자가 동영상 렌더링을 취소했습니다.", "AbortError");
         this.state.motion.time = frame / fps;
@@ -133,7 +147,7 @@ export class DimentionR3FMode implements StudioModeInstance {
         const completed = frame + 1;
         const elapsed = Math.max(.001, (performance.now() - startedAt) / 1000);
         const remaining = Math.max(0, elapsed / completed * (totalFrames - completed));
-        this.panel?.setVideoProgress(`렌더링 ${completed}/${totalFrames} · 약 ${this.formatDuration(remaining)} 남음`, completed / totalFrames, true);
+        this.panel?.setVideoProgress(`렌더링 ${completed}/${totalFrames} · ${supersampling.toFixed(2)}× AA · 약 ${this.formatDuration(remaining)} 남음`, completed / totalFrames, true);
       }
       this.panel?.setVideoProgress("MP4 파일을 마무리하는 중…", 1, true);
       await output.finalize();
@@ -141,7 +155,7 @@ export class DimentionR3FMode implements StudioModeInstance {
       const filename = `pleos-dimention-r3f-${this.state.preset}-${duration.toFixed(1)}s-${fps}fps-${width}x${height}.mp4`;
       const url = download ? this.downloadBlob(result.blob, filename) : URL.createObjectURL(result.blob);
       if (!download) window.setTimeout(() => URL.revokeObjectURL(url), 5 * 60_000);
-      this.panel?.setVideoProgress(`완료 · ${width}×${height}px · ${formatBytes(result.size)}`, 1, false);
+      this.panel?.setVideoProgress(`완료 · ${width}×${height}px · ${supersampling.toFixed(2)}× AA · ${formatBytes(result.size)}`, 1, false);
       return url;
     } catch (error) {
       if (output.state !== "finalized" && output.state !== "canceled") await output.cancel().catch(() => undefined);
@@ -152,6 +166,7 @@ export class DimentionR3FMode implements StudioModeInstance {
     } finally {
       renderer.endVideoCapture();
       this.videoJob = null;
+      this.lockEditing(false);
       this.state.motion.time = originalTime;
       this.state.motion.playing = originalPlaying;
       renderer.setState(this.state);
@@ -160,6 +175,13 @@ export class DimentionR3FMode implements StudioModeInstance {
     }
   }
   cancelVideo(): void { if (this.videoJob) this.videoJob.cancelled = true; }
+  private lockEditing(locked: boolean): void {
+    this.context.root.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLButtonElement>("input, select, button").forEach(control => {
+      if (control.hasAttribute("data-r3f-video-cancel")) return;
+      if (locked) { control.dataset.exportWasDisabled = String(control.disabled); control.disabled = true; }
+      else if (control.dataset.exportWasDisabled !== undefined) { control.disabled = control.dataset.exportWasDisabled === "true"; delete control.dataset.exportWasDisabled; }
+    });
+  }
   private mountPanel(): void {
     const host = this.context.root.querySelector<HTMLElement>("[data-r3f-panel-host]"); if (!host) return;
     this.panel = new DimentionR3FPanel(host, this.state, { change: () => this.changed(), preset: (id) => this.applyPreset(id), reset: () => this.applyPreset("pleos-prism"), export: async () => {
@@ -178,7 +200,7 @@ export class DimentionR3FMode implements StudioModeInstance {
     });
   }
   private applyPreset(id: DimentionR3FPresetId): void { const artboard = { ...this.state.artboard, axisAnchor: { ...this.state.artboard.axisAnchor } }; this.state = createDimentionR3FState(id); this.state.artboard = { ...this.state.artboard, ...artboard, axisAnchor: { ...artboard.axisAnchor } }; this.renderer?.setState(this.state); this.mountPanel(); this.resize(); this.context.notifyStateChange(); }
-  private changed(): void { this.renderer?.setState(this.state); this.panel?.sync(); this.cameraPanel?.sync(); this.resize(); this.context.notifyStateChange(); }
+  private changed(): void { this.state.motion.time = Math.min(this.state.motion.time, this.state.motion.duration); this.renderer?.setState(this.state); this.panel?.sync(); this.cameraPanel?.sync(); this.syncTransport(); this.resize(); this.context.notifyStateChange(); }
   private commitCameraOrbit(yaw: number, pitch: number, zoom: number): void { this.state.camera.orbitYaw = Math.round(Math.max(-180, Math.min(180, yaw)) * 10) / 10; this.state.camera.orbitPitch = Math.round(Math.max(-80, Math.min(80, pitch)) * 10) / 10; this.state.camera.orbitZoom = Math.round(Math.max(.25, Math.min(4, zoom)) * 100) / 100; this.cameraPanel?.sync(); this.context.notifyStateChange(); }
   private applyCameraPanelState(): void { this.context.root.querySelector<HTMLElement>(".dimention-r3f-app")?.classList.toggle("dimention-camera-collapsed", this.state.camera.panelCollapsed); }
   private bindTransport(): void {

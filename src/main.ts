@@ -1,8 +1,4 @@
 import "./style.css";
-import "./crystal/CrystalApp.css";
-import "./modes/axis-habitat/AxisHabitat.css";
-import "./modes/axis-megastructure/AxisMegastructure.css";
-import "./modes/dimention-r3f/DimentionR3F.css";
 import type { ArtboardState } from "./artboard/ArtboardState";
 import type { StudioExportQuality } from "./studio/ModeTypes";
 
@@ -11,6 +7,16 @@ if (!root) throw new Error("Missing #app root");
 
 async function mount(): Promise<void> {
   const route = new URLSearchParams(location.search).get("renderer");
+  if (!route || route === "optical") {
+    const { mountOpticalStudio } = await import("./optical-studio/OpticalStudio");
+    const dispose = mountOpticalStudio(root!);
+    addEventListener("beforeunload", dispose, { once: true });
+    return;
+  }
+  await Promise.all([
+    import("./crystal/CrystalApp.css"), import("./modes/axis-habitat/AxisHabitat.css"),
+    import("./modes/axis-megastructure/AxisMegastructure.css"), import("./modes/dimention-r3f/DimentionR3F.css"),
+  ]);
   if (route === "raw") {
     const [{ RawStudioApp, createDefaultRawStudioState }, { RawStudioRendererController }] = await Promise.all([import("./studio"), import("./raw-webgl/renderer")]);
     const initialState = createDefaultRawStudioState();

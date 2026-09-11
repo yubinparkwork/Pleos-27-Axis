@@ -33,7 +33,7 @@ page.on("console", (message) => { if (message.type() === "error") errors.push(me
 await page.addInitScript(() => localStorage.removeItem("pleos-27-axis-studio-state-v2"));
 
 try {
-  await page.goto(url, { waitUntil: "domcontentloaded" });
+  await page.goto(`${url}${url.includes("?") ? "&" : "?"}renderer=studio`, { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => Boolean(window.__pleos27Axis));
   await page.evaluate(() => window.__pleos27Axis.switchMode("axis-habitat"));
   await page.waitForFunction(() => window.__pleos27Axis?.getActiveMode() === "axis-habitat" && window.__pleos27Axis.inspect().ready === true);

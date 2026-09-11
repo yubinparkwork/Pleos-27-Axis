@@ -1,0 +1,182 @@
+.optical-studio {
+  --optical-bg: #08090b;
+  --optical-panel: #111214;
+  --optical-field: #191b1e;
+  --optical-text: #eceef1;
+  --optical-muted: #a1a4ac;
+  --optical-line: rgba(255, 255, 255, .1);
+  --optical-control-line: #626670;
+  --optical-focus: #a4c4ff;
+  width: 100%;
+  height: 100%;
+  min-width: 320px;
+  display: grid;
+  grid-template-rows: 54px minmax(0, 1fr);
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--optical-bg);
+  color: var(--optical-text);
+  color-scheme: dark;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+.optical-studio *,
+.optical-studio *::before,
+.optical-studio *::after { box-sizing: border-box; }
+.optical-studio button,
+.optical-studio input,
+.optical-studio select { font: inherit; }
+.optical-studio button,
+.optical-studio select,
+.optical-studio summary { -webkit-tap-highlight-color: transparent; }
+.optical-studio button,
+.optical-studio select { cursor: pointer; }
+.optical-studio button { color: inherit; }
+.optical-studio button:disabled,
+.optical-studio input:disabled,
+.optical-studio select:disabled { cursor: default; opacity: .45; }
+.optical-studio :is(button, input, select, a, summary):focus-visible {
+  outline: 2px solid var(--optical-focus);
+  outline-offset: 3px;
+}
+.optical-studio svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+.optical-studio .optical-icon-fill { fill: currentColor; stroke: none; }
+
+.optical-studio .optical-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 0 18px 0 22px; background: var(--optical-panel); border-bottom: 1px solid var(--optical-line); }
+.optical-studio .optical-identity { display: flex; align-items: baseline; gap: 18px; min-width: 0; }
+.optical-studio .optical-identity strong { font-size: 13px; font-weight: 600; letter-spacing: .12em; white-space: nowrap; }
+.optical-studio .optical-identity strong span { margin-left: 8px; font-weight: 400; color: #bdc0c6; }
+.optical-studio .optical-subtitle { color: var(--optical-muted); font-size: 11px; white-space: nowrap; }
+.optical-studio .optical-header-actions { display: flex; align-items: center; gap: 20px; }
+.optical-studio .optical-archive-link { display: flex; align-items: center; gap: 8px; min-height: 30px; color: var(--optical-muted); font-size: 11px; text-decoration: none; white-space: nowrap; }
+.optical-studio .optical-archive-link:hover { color: var(--optical-text); }
+.optical-studio .optical-icon-button { width: 30px; height: 30px; display: inline-grid; place-items: center; padding: 0; background: transparent; border: 1px solid transparent; border-radius: 3px; }
+.optical-studio .optical-icon-button:hover:not(:disabled) { background: #23252a; border-color: #484b52; }
+.optical-studio .optical-icon-button:active:not(:disabled) { background: #30333a; }
+
+.optical-studio .optical-workspace { display: grid; grid-template-columns: minmax(0, 1fr) 304px; min-height: 0; position: relative; }
+.optical-studio .optical-stage { display: grid; grid-template-rows: minmax(0, 1fr) auto; min-width: 0; min-height: 0; }
+.optical-studio .optical-viewport { position: relative; min-width: 0; min-height: 0; overflow: hidden; background: #050608; }
+.optical-studio #optical-canvas { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: block; max-width: 100%; max-height: 100%; touch-action: none; cursor: grab; }
+.optical-studio #optical-canvas:active { cursor: grabbing; }
+.optical-studio .optical-viewport-caption { position: absolute; inset: 21px 22px auto; display: flex; align-items: center; justify-content: space-between; color: #acafb7; font-size: 10px; letter-spacing: .1em; pointer-events: none; }
+.optical-studio .optical-viewport-hint { position: absolute; bottom: 16px; left: 22px; margin: 0; padding: 3px 0; color: #9b9fa7; font-size: 10px; pointer-events: none; }
+
+.optical-studio .optical-inspector { display: grid; grid-template-rows: 45px minmax(0, 1fr) auto; min-width: 0; min-height: 0; background: var(--optical-panel); border-left: 1px solid var(--optical-line); }
+.optical-studio .optical-inspector-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 17px; border-bottom: 1px solid var(--optical-line); font-size: 11px; font-weight: 500; }
+.optical-studio .optical-text-button { min-height: 28px; padding: 3px 4px; margin-right: -4px; color: var(--optical-muted); background: transparent; border: 1px solid transparent; border-radius: 3px; font-size: 10px; }
+.optical-studio .optical-text-button:hover:not(:disabled) { color: var(--optical-text); background: #23252a; }
+.optical-studio .optical-text-button:active:not(:disabled) { background: #30333a; }
+.optical-studio .optical-inspector-scroll { min-height: 0; overflow-x: hidden; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #4b4e55 transparent; }
+.optical-studio .optical-section { padding: 0 17px; border-bottom: 1px solid var(--optical-line); }
+.optical-studio .optical-section summary { min-height: 43px; display: flex; align-items: center; gap: 10px; cursor: pointer; list-style: none; font-size: 11px; font-weight: 500; user-select: none; }
+.optical-studio .optical-section summary::-webkit-details-marker { display: none; }
+.optical-studio .optical-section summary:hover { color: #fff; }
+.optical-studio .optical-section-en { margin-left: auto; color: var(--optical-muted); font-size: 10px; font-weight: 400; }
+.optical-studio .optical-chevron { width: 5px; height: 5px; border-right: 1px solid #c3c6cd; border-bottom: 1px solid #c3c6cd; transform: rotate(-45deg); margin: -2px 2px 0 4px; }
+.optical-studio .optical-section[open] .optical-chevron { transform: rotate(45deg); }
+.optical-studio .optical-section-content { padding-bottom: 13px; }
+.optical-studio .optical-section-note { margin: 0 0 12px; color: var(--optical-muted); font-size: 10px; line-height: 1.6; }
+.optical-studio .optical-control { display: grid; grid-template-columns: 82px minmax(30px, 1fr) 58px; align-items: center; gap: 10px; min-height: 33px; }
+.optical-studio .optical-control > label { color: #c4c6cc; font-size: 11px; line-height: 1.35; }
+.optical-studio .optical-control-group { margin: 8px 0; }
+.optical-studio .optical-layer-advanced { margin-top: 10px; border-top: 1px solid var(--optical-line); }
+.optical-studio .optical-layer-advanced summary { min-height: 34px; color: var(--optical-muted); font-size: 10px; }
+.optical-studio .optical-color-control { display: grid; grid-template-columns: 82px 30px minmax(0,1fr); gap: 10px; align-items: center; margin-bottom: 8px; }
+.optical-studio .optical-color-control label { color: #c4c6cc; font-size: 11px; }
+.optical-studio input[type="color"] { width: 30px; height: 28px; padding: 2px; border: 1px solid var(--optical-control-line); background: var(--optical-field); border-radius: 3px; cursor: pointer; }
+.optical-studio [data-optical-color-hex] { width: 100%; height: 28px; min-width: 0; padding: 3px 7px; color: var(--optical-text); background: var(--optical-field); border: 1px solid var(--optical-control-line); border-radius: 3px; font-variant-numeric: tabular-nums; }
+.optical-studio [data-optical-color-hex][aria-invalid="true"] { border-style: dashed; outline: 1px solid #fff; }
+.optical-studio .optical-light-swatches { display: flex; gap: 8px; margin: 10px 0; }
+.optical-studio .optical-light-swatches button { width: 28px; height: 26px; border: 4px solid var(--optical-panel); outline: 1px solid var(--optical-control-line); border-radius: 3px; background: var(--swatch); }
+.optical-studio .optical-light-swatches button[aria-pressed="true"] { outline: 2px solid #fff; }
+.optical-studio .optical-number-wrap { position: relative; min-width: 0; }
+.optical-studio input[type="number"] { width: 100%; min-width: 0; height: 26px; padding: 3px 6px; border: 1px solid var(--optical-control-line); border-radius: 3px; background: var(--optical-field); color: var(--optical-text); font-size: 11px; font-variant-numeric: tabular-nums; text-align: right; -moz-appearance: textfield; appearance: textfield; }
+.optical-studio input[type="number"]::-webkit-inner-spin-button,
+.optical-studio input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.optical-studio input[type="number"]:hover:not(:disabled) { border-color: #9b9fa8; }
+.optical-studio .optical-number-wrap:has(.optical-unit) input { padding-right: 16px; }
+.optical-studio .optical-unit { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); color: var(--optical-muted); font-size: 10px; pointer-events: none; }
+.optical-studio input[type="range"] { --optical-range-fill: 0%; appearance: none; width: 100%; min-width: 0; height: 26px; margin: 0; background: transparent; cursor: ew-resize; }
+.optical-studio input[type="range"]::-webkit-slider-runnable-track { height: 2px; border-radius: 1px; background: linear-gradient(to right, #c9ccd3 0 var(--optical-range-fill), #656a74 var(--optical-range-fill) 100%); }
+.optical-studio input[type="range"]::-moz-range-track { height: 2px; border-radius: 1px; background: #656a74; }
+.optical-studio input[type="range"]::-moz-range-progress { height: 2px; background: #c9ccd3; }
+.optical-studio input[type="range"]::-webkit-slider-thumb { appearance: none; width: 8px; height: 10px; margin-top: -4px; border: 0; border-radius: 2px; background: #d7dae0; }
+.optical-studio input[type="range"]::-moz-range-thumb { width: 8px; height: 10px; border: 0; border-radius: 2px; background: #d7dae0; }
+.optical-studio input[type="range"]:hover:not(:disabled)::-webkit-slider-thumb { background: #fff; }
+.optical-studio input[type="range"]:hover:not(:disabled)::-moz-range-thumb { background: #fff; }
+.optical-studio .optical-output-details { margin: 0; font-size: 10px; }
+.optical-studio .optical-output-details > div { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; padding: 5px 0; }
+.optical-studio .optical-output-details dt { color: var(--optical-muted); }
+.optical-studio .optical-output-details dd { margin: 0; font-variant-numeric: tabular-nums; }
+
+.optical-studio .optical-export-area { padding: 13px 17px 15px; border-top: 1px solid var(--optical-line); background: var(--optical-panel); }
+.optical-studio .optical-status { min-height: 16px; margin: 0 0 9px; color: var(--optical-muted); font-size: 10px; line-height: 1.5; overflow-wrap: anywhere; }
+.optical-studio .optical-status[data-state="error"] { color: #ffb8b8; }
+.optical-studio .optical-status[data-state="busy"] { color: var(--optical-text); }
+.optical-studio .optical-export-button { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 35px; padding: 8px 12px; background: #e1e4e9; color: #101216; border: 1px solid #e1e4e9; border-radius: 3px; font-size: 11px; font-weight: 600; }
+.optical-studio .optical-export-button:hover:not(:disabled) { background: #fff; border-color: #fff; }
+.optical-studio .optical-export-button:active:not(:disabled) { background: #c8ccd4; border-color: #c8ccd4; }
+.optical-studio .optical-export-button:disabled { opacity: .65; }
+.optical-studio .optical-export-description { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; margin: 8px 0 0; color: var(--optical-muted); font-size: 10px; font-variant-numeric: tabular-nums; }
+
+.optical-studio .optical-transport { padding: 10px 20px 11px; border-top: 1px solid var(--optical-line); background: var(--optical-panel); }
+.optical-studio .optical-timeline { display: grid; grid-template-columns: 30px 66px minmax(0, 1fr) 58px; gap: 12px; align-items: center; }
+.optical-studio .optical-time { color: var(--optical-text); font-size: 11px; font-variant-numeric: tabular-nums; text-align: center; }
+.optical-studio .optical-total-time { color: var(--optical-muted); font-size: 10px; font-variant-numeric: tabular-nums; text-align: right; }
+.optical-studio .optical-transport-options { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 18px; margin-top: 7px; }
+.optical-studio .optical-format-control { display: flex; align-items: center; gap: 9px; color: var(--optical-muted); font-size: 10px; }
+.optical-studio select { min-height: 26px; min-width: 72px; padding: 3px 20px 3px 8px; border: 1px solid var(--optical-control-line); border-radius: 3px; background: var(--optical-field); color: var(--optical-text); font-size: 11px; }
+.optical-studio select:hover:not(:disabled) { border-color: #9b9fa8; }
+.optical-studio .optical-motion-settings { display: flex; align-items: center; gap: 16px; }
+.optical-studio .optical-inline-control { display: flex; align-items: center; gap: 7px; color: var(--optical-muted); font-size: 10px; }
+.optical-studio .optical-inline-control .optical-compact-number { width: 45px; }
+.optical-studio .optical-inline-unit { min-width: 10px; }
+
+.optical-studio.optical-inspector-collapsed .optical-workspace { grid-template-columns: minmax(0, 1fr); }
+.optical-studio.optical-inspector-collapsed .optical-inspector { display: none; }
+
+@media (max-width: 1000px) {
+  .optical-studio .optical-identity { gap: 12px; }
+  .optical-studio .optical-transport { padding-right: 14px; padding-left: 14px; }
+  .optical-studio .optical-timeline { grid-template-columns: 30px 61px minmax(0, 1fr) 52px; gap: 8px; }
+  .optical-studio .optical-transport-options { gap: 8px; }
+  .optical-studio .optical-motion-settings { gap: 10px; }
+}
+
+@media (max-width: 700px) {
+  .optical-studio { grid-template-rows: 50px minmax(0, 1fr); }
+  .optical-studio .optical-header { padding: 0 12px 0 15px; gap: 12px; }
+  .optical-studio .optical-identity { flex-direction: column; align-items: flex-start; gap: 1px; }
+  .optical-studio .optical-identity strong { font-size: 11px; }
+  .optical-studio .optical-subtitle { font-size: 9px; }
+  .optical-studio .optical-header-actions { gap: 12px; }
+  .optical-studio .optical-archive-link { font-size: 10px; gap: 4px; }
+  .optical-studio .optical-workspace { grid-template-columns: minmax(0, 1fr); }
+  .optical-studio .optical-inspector { position: absolute; z-index: 5; top: 0; bottom: 0; right: 0; width: min(320px, 100%); box-shadow: -20px 0 55px rgb(0 0 0 / .4); }
+  .optical-studio .optical-inspector-heading { min-height: 45px; }
+  .optical-studio .optical-viewport-caption { inset: 17px 16px auto; }
+  .optical-studio .optical-viewport-hint { left: 16px; bottom: 12px; }
+  .optical-studio .optical-icon-button { width: 34px; height: 34px; }
+  .optical-studio .optical-timeline { grid-template-columns: 34px 62px minmax(0, 1fr) 52px; }
+  .optical-studio input[type="range"] { height: 32px; }
+  .optical-studio .optical-control { min-height: 36px; }
+  .optical-studio .optical-section summary { min-height: 46px; }
+}
+
+@media (max-width: 380px) {
+  .optical-studio .optical-identity strong span { margin-left: 3px; }
+  .optical-studio .optical-header-actions { gap: 5px; }
+  .optical-studio .optical-transport { padding-right: 10px; padding-left: 10px; }
+  .optical-studio .optical-transport-options { align-items: flex-start; }
+  .optical-studio .optical-format-control { gap: 6px; }
+  .optical-studio .optical-format-control > span { display: none; }
+  .optical-studio .optical-inline-control { gap: 5px; }
+  .optical-studio .optical-motion-settings { gap: 8px; }
+}
+.optical-cycle-toggle { display: flex; align-items: center; gap: 8px; min-height: 32px; font-size: 12px; cursor: pointer; }
+.optical-cycle-toggle input { width: 24px; height: 24px; margin: 0; accent-color: #dddddd; }
+.optical-cycle-toggle:has(input:disabled) { opacity: .5; cursor: wait; }

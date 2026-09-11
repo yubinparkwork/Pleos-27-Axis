@@ -115,9 +115,10 @@ function decodePng(dataUrl) {
 
 async function captureRuntime(options = {}) {
   const server = await ensureServer();
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({ headless: true, ...(process.env.PLEOS_QA_HARDWARE === "1" ? {channel: "chrome", args: ["--enable-gpu", "--use-angle=metal"]} : {}) });
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 });
   const page = await context.newPage();
+  await page.route("**/favicon.ico", route => route.fulfill({status: 204}));
   const browserErrors = [];
   page.on("pageerror", (error) => browserErrors.push(error.message));
   page.on("console", (message) => {
@@ -125,7 +126,9 @@ async function captureRuntime(options = {}) {
   });
 
   try {
-    await page.goto(appUrl, { waitUntil: "load" });
+    const studioUrl = new URL(appUrl);
+    studioUrl.searchParams.set("renderer", "studio");
+    await page.goto(studioUrl.toString(), { waitUntil: "load" });
     await page.waitForFunction(() => Boolean(window.__pleos27Axis?.inspect().ready), undefined, { timeout: 20_000 });
     const requestedMode = options.mode ?? "glass-3d";
     await page.evaluate((mode) => window.__pleos27Axis.switchMode(mode), requestedMode);
@@ -428,6 +431,12 @@ ${markdownList(nextWork.slice(0, 5), "No immediate follow-up recommended")}
 }
 
 const args = parseArguments(process.argv.slice(2));
+// The production route has its own runtime and export API. Keep the prior
+// multi-mode generator available only when a legacy mode is explicitly named.
+if (!args.mode || args.mode === "optical" || args.mode === "optical-studio") {
+  const { runOpticalHandoff } = await import("./optical-handoff.mjs");
+  await runOpticalHandoff({ args, projectRoot, detectedRemote, projectPath });
+} else {
 const full = args.full === "true";
 const validationRuns = full
   ? [runValidation("typecheck", "typecheck"), runValidation("verify", "verify"), runValidation("build", "build")]
@@ -550,3 +559,4 @@ const summary = {
 };
 process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);
 if (summary.status === "fail") process.exitCode = 1;
+}
