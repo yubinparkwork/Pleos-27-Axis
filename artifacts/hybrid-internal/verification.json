@@ -1,0 +1,8 @@
+{
+  "status": "pass",
+  "checks": {
+    "noUnreflectedProxy": 0.0000016666666666666667,
+    "reflectedFaces": 22.580381666666668
+  },
+  "errors": []
+}

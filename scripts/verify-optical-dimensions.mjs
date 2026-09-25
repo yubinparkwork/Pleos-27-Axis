@@ -115,7 +115,7 @@ try {
   assert.ok(!/SwiftShader|llvmpipe|software rasterizer/i.test(report.gpu.renderer), 'Hardware GPU required for this optical QA');
   const allZero = Object.fromEntries(keys.map(key => [key, 0]));
   const direct = await capture('dimensions-all-zero', allZero);
-  assert.ok(metrics(direct).litFraction > .01, 'Zero dimension depth must preserve direct glass');
+  assert.equal(metrics(direct).peak, 0, 'Dimension-only expression must not retain direct surface illumination');
   for (const key of keys) {
     const three = await capture(`${key}-3`, { ...allZero, [key]: 3 });
     const eight = await capture(`${key}-8`, { ...allZero, [key]: 8 });
@@ -147,7 +147,7 @@ try {
     return [s.dimensionSpacingTop, s.dimensionSpacingLeft, s.dimensionSpacingRight];
   });
   assert.deepEqual(spacingMigration, [.225, .1, .225]);
-  await page.locator('.optical-layer-advanced > summary').click();
+  await page.locator('[data-optical-section="dimensions"] .optical-layer-advanced > summary').click();
   const spacingTop = page.getByRole('spinbutton', { name: '상단 층 간격', exact: true });
   await spacingTop.fill('.12'); await spacingTop.press('ArrowUp'); await spacingTop.press('Tab');
   const spacingLeft = page.getByRole('slider', { name: '왼쪽 층 간격 슬라이더', exact: true });

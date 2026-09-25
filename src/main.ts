@@ -7,7 +7,7 @@ if (!root) throw new Error("Missing #app root");
 
 async function mount(): Promise<void> {
   const route = new URLSearchParams(location.search).get("renderer");
-  if (!route || route === "optical") {
+  if (!route || route === "optical" || route === 'axis-space') {
     const { mountOpticalStudio } = await import("./optical-studio/OpticalStudio");
     const dispose = mountOpticalStudio(root!);
     addEventListener("beforeunload", dispose, { once: true });

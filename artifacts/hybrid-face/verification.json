@@ -1,0 +1,517 @@
+{
+  "status": "pass",
+  "errors": [],
+  "checks": {
+    "faceReflectionDifference": 45.827035,
+    "zeroRestoresV3": 0.000005,
+    "openingChangesReflectionDomain": 46.69574333333333,
+    "zeroRestoresV2": 0.0022533333333333333,
+    "actualInternalBounceDifference": 6.50068,
+    "openCapContinuity": 0.6690166666666667,
+    "hybridDistortion-difference": 14.384376666666666,
+    "hybridDensity-difference": 32.26829333333333,
+    "hybridColorMix-difference": 27.920608333333334,
+    "hybridFaceWidth-difference": 43.745135,
+    "hybridRefractionOverlap-difference": 12.20882,
+    "noEmission": true,
+    "loopDifference": 0,
+    "noPageOverflow": true,
+    "newControlsKeyboardPersistenceAndNarrow": true,
+    "independentPersistence": true,
+    "sequenceNavigationPreservesHybrid": true,
+    "hybridVersusB": 114.74079666666667,
+    "unchangedB": 0,
+    "originalAStillActive": true,
+    "transitionAndMotion": true
+  },
+  "images": {
+    "main-rgb": {
+      "width": 800,
+      "height": 1000,
+      "meanRGB": [
+        117.70969875,
+        136.80357875,
+        144.66158
+      ],
+      "litFraction": 0.9636625
+    },
+    "sub-red": {
+      "width": 800,
+      "height": 1000,
+      "meanRGB": [
+        141.67873875,
+        90.19288875,
+        102.1864675
+      ],
+      "litFraction": 0.95162125
+    },
+    "sub-green": {
+      "width": 800,
+      "height": 1000,
+      "meanRGB": [
+        52.1352,
+        186.77198,
+        162.1433225
+      ],
+      "litFraction": 0.9715275
+    },
+    "sub-blue": {
+      "width": 800,
+      "height": 1000,
+      "meanRGB": [
+        56.07552625,
+        105.8467175,
+        166.1674575
+      ],
+      "litFraction": 0.9756975
+    },
+    "hybrid": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        118.13011,
+        136.948865,
+        144.86037
+      ],
+      "litFraction": 0.965095
+    },
+    "face-off": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        73.339885,
+        85.27828,
+        103.881305
+      ],
+      "litFraction": 0.881425
+    },
+    "archived-v3": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        73.339885,
+        85.278285,
+        103.881305
+      ],
+      "litFraction": 0.881425
+    },
+    "closed": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        80.840125,
+        96.69639,
+        116.02703
+      ],
+      "litFraction": 0.928485
+    },
+    "archived-closed-v2": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        80.84082,
+        96.696615,
+        116.02738
+      ],
+      "litFraction": 0.92849
+    },
+    "one-bounce": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        75.380395,
+        87.884725,
+        110.862465
+      ],
+      "litFraction": 0.92098
+    },
+    "sixteen-bounces": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        80.840125,
+        96.69639,
+        116.02703
+      ],
+      "litFraction": 0.928485
+    },
+    "nearly-open": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        117.504145,
+        136.140385,
+        144.321955
+      ],
+      "litFraction": 0.963725
+    },
+    "fully-open": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        118.13011,
+        136.948865,
+        144.86037
+      ],
+      "litFraction": 0.965095
+    },
+    "partial-kv-3x2": {
+      "width": 960,
+      "height": 640,
+      "meanRGB": [
+        107.58565755208333,
+        142.3962841796875,
+        125.910048828125
+      ],
+      "litFraction": 0.8906884765625
+    },
+    "poster-a-series": {
+      "width": 707,
+      "height": 1000,
+      "meanRGB": [
+        111.49255728429986,
+        130.4578090523338,
+        138.69203253182462
+      ],
+      "litFraction": 0.9316407355021217
+    },
+    "hybridDistortion-zero": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        120.82681,
+        137.46155,
+        146.74053
+      ],
+      "litFraction": 0.966235
+    },
+    "hybridDistortion-one": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        113.528695,
+        134.426715,
+        140.08355
+      ],
+      "litFraction": 0.963575
+    },
+    "hybridDensity-zero": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        100.94544,
+        124.36969,
+        129.2721
+      ],
+      "litFraction": 0.953515
+    },
+    "hybridDensity-one": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        137.469595,
+        152.201335,
+        161.69999
+      ],
+      "litFraction": 0.974335
+    },
+    "hybridColorMix-zero": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        80.418785,
+        136.427465,
+        130.1704
+      ],
+      "litFraction": 0.957495
+    },
+    "hybridColorMix-one": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        128.35035,
+        136.364025,
+        147.31979
+      ],
+      "litFraction": 0.96647
+    },
+    "hybridFaceWidth-zero": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        93.12028,
+        109.18215,
+        121.30623
+      ],
+      "litFraction": 0.90207
+    },
+    "hybridFaceWidth-one": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        135.321225,
+        151.04808,
+        158.92082
+      ],
+      "litFraction": 0.99673
+    },
+    "hybridRefractionOverlap-zero": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        108.56111,
+        131.326735,
+        138.13736
+      ],
+      "litFraction": 0.93749
+    },
+    "hybridRefractionOverlap-one": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        124.205085,
+        140.85721,
+        149.52447
+      ],
+      "litFraction": 0.973795
+    },
+    "lights-off": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        0,
+        0,
+        0
+      ],
+      "litFraction": 0
+    },
+    "loop-start": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        133.856385,
+        109.364445,
+        119.58721
+      ],
+      "litFraction": 0.95476
+    },
+    "loop-end": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        133.856385,
+        109.364445,
+        119.58721
+      ],
+      "litFraction": 0.95476
+    },
+    "hall-depth-concept": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        92.35046,
+        125.061195,
+        121.56327
+      ],
+      "litFraction": 0.96243
+    },
+    "view--45": {
+      "width": 240,
+      "height": 300,
+      "meanRGB": [
+        15.516555555555556,
+        9.107513888888889,
+        13.639472222222222
+      ],
+      "litFraction": 0.31445833333333334
+    },
+    "view-0": {
+      "width": 240,
+      "height": 300,
+      "meanRGB": [
+        104.83106944444444,
+        93.304125,
+        98.795
+      ],
+      "litFraction": 0.896
+    },
+    "view-45": {
+      "width": 240,
+      "height": 300,
+      "meanRGB": [
+        104.67204166666667,
+        106.887375,
+        122.94483333333334
+      ],
+      "litFraction": 0.9566111111111111
+    },
+    "view-90": {
+      "width": 240,
+      "height": 300,
+      "meanRGB": [
+        94.40975,
+        67.78804166666667,
+        82.3411111111111
+      ],
+      "litFraction": 0.80175
+    },
+    "view-135": {
+      "width": 240,
+      "height": 300,
+      "meanRGB": [
+        22.596083333333333,
+        10.758652777777778,
+        19.13175
+      ],
+      "litFraction": 0.4256111111111111
+    },
+    "minimum-hybrid": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        87.60225,
+        74.67626,
+        72.538985
+      ],
+      "litFraction": 0.928265
+    },
+    "B-comparison": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        16.774075,
+        24.401585,
+        18.609955
+      ],
+      "litFraction": 0.517155
+    },
+    "B-before-revision": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        16.774075,
+        24.401585,
+        18.609955
+      ],
+      "litFraction": 0.517155
+    },
+    "A-comparison": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        68.313195,
+        56.46987,
+        68.710775
+      ],
+      "litFraction": 0.920235
+    },
+    "transition-gray": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        0,
+        0,
+        0
+      ],
+      "litFraction": 0
+    },
+    "transition-middle": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        115.96971,
+        110.51511,
+        117.091315
+      ],
+      "litFraction": 0.915025
+    },
+    "transition-dimensions": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        111.413815,
+        140.708185,
+        130.92135
+      ],
+      "litFraction": 0.94854
+    }
+  },
+  "heroState": {
+    "hybridDistortion": 0.55,
+    "hybridDensity": 0.55,
+    "hybridColorMix": 0.6,
+    "hybridColorMode": 1,
+    "hybridDepthFlow": 0,
+    "hybridDepthCycles": 1,
+    "hybridOpening": 1,
+    "hybridFaceReflection": 0.7,
+    "hybridFaceWidth": 0.5,
+    "hybridRefractionOverlap": 0.55,
+    "cameraFloat": 0,
+    "cameraFloatX": 4,
+    "cameraFloatY": 3,
+    "cameraFloatSeconds": 15,
+    "axisMotion": 0,
+    "axisYaw": 24,
+    "axisRoll": 12,
+    "axisMoveSeconds": 8,
+    "cameraMotion": 0,
+    "cameraOrbitHorizontal": -24,
+    "cameraOrbitVertical": 6,
+    "cameraMoveSeconds": 8,
+    "identityLayerStagger": 0,
+    "identityEngraving": 1,
+    "identityAxisAccent": 1,
+    "identityTransition": 0,
+    "identityHold": 5.3,
+    "identityDissolve": 3,
+    "identityCenterVersion": 0,
+    "dimensionDelayTop": 5.6,
+    "dimensionDelayLeft": 7.7,
+    "dimensionDelayRight": 0,
+    "lightMotionCycles": 1,
+    "layerFadeAmount": 0.6,
+    "layerFadeCycles": 4,
+    "layerStagger": 0.32,
+    "panX": -11.5,
+    "gap": 0.015,
+    "bevel": 0.03,
+    "ior": 1.86,
+    "dispersion": 0.008,
+    "roughness": 0.2,
+    "surfaceCurvature": 0,
+    "reflection": 2,
+    "absorption": 0,
+    "lightIntensity": 3.25,
+    "lightSpread": 1.14,
+    "red": 1,
+    "green": 0,
+    "blue": 0,
+    "exposure": 0.59,
+    "zoom": 1.485,
+    "azimuth": 32.275,
+    "elevation": 40.055,
+    "time": 2,
+    "duration": 20,
+    "speed": 0,
+    "dimensionTop": 5.05,
+    "dimensionLeft": 11.85,
+    "dimensionRight": 12,
+    "bloom": 0.18,
+    "dimensionSpacing": 0.14,
+    "dimensionSoftness": 1,
+    "dimensionFalloff": 1,
+    "lightColor": "#FA293C",
+    "dimensionSpacingTop": 0.3,
+    "dimensionSpacingLeft": 0.085,
+    "dimensionSpacingRight": 0.06,
+    "bounces": 16,
+    "playing": false,
+    "aspect": "4x5",
+    "lightCycle": true,
+    "lightCycleOffset": 0,
+    "videoLongEdge": 3840,
+    "videoFps": 30,
+    "videoSamples": 4
+  }
+}

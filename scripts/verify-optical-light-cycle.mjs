@@ -44,7 +44,7 @@ try {
   await page.waitForFunction(() => window.__pleosOptical?.inspect().ready);
   await page.evaluate(s => window.__pleosOptical.set(s), custom);
   const pure = await page.evaluate(async () => {
-    const { writeLightWeights, startingLightFamily } = await import('/src/optical-studio/OpticalLighting.ts');
+    const { PLEOS_CYCLE_COLORS, writeLightPalette, writeLightWeights, startingLightFamily } = await import('/src/optical-studio/OpticalLighting.ts');
     const s = window.__pleosOptical.inspect().state, w = new Float32Array(3);
     const stages = [];
     for (const time of [0, 5, 10, 15]) { writeLightWeights({ ...s, time }, w); stages.push([...w]); }
@@ -56,11 +56,59 @@ try {
       if (previous) maxDelta = Math.max(maxDelta, ...w.map((v, i) => Math.abs(v - previous[i])));
       previous = [...w];
     }
-    return { stages, sumError, minimum, maxDelta, families: ['#FA293C', '#0CFFA8', '#2350FF'].map(startingLightFamily) };
+    const orderCases = [];
+    const paletteCases = [];
+    for (const lightColor of ['#EE1020', '#0CFFA8', '#1234DD', '#FFFFFF']) {
+      for (const timing of [{ duration: 15, lightCycleOffset: 0 }, { duration: 150.5, lightCycleOffset: .37 }]) {
+        const weights = [];
+        // Sample safely inside each plateau, including the wrapped final stage.
+        for (let stage = 0; stage <= 3; stage++) {
+          const phase = (timing.lightCycleOffset + (stage + .1) / 3) % 1;
+          writeLightWeights({ ...s, ...timing, lightColor, time: phase * timing.duration }, w);
+          weights.push([...w]);
+        }
+        // The transition midpoint shares 45/45/10 power in the forward RGB order.
+        const handovers = [];
+        for (let stage = 0; stage < 3; stage++) {
+          const phase = (timing.lightCycleOffset + (stage + .675) / 3) % 1;
+          writeLightWeights({ ...s, ...timing, lightColor, time: phase * timing.duration }, w);
+          handovers.push([...w]);
+        }
+        orderCases.push({ lightColor, ...timing, weights, handovers });
+      }
+      const palette = new Float32Array(9), family = startingLightFamily(lightColor);
+      writeLightPalette({ ...s, lightColor }, palette);
+      const expected = PLEOS_CYCLE_COLORS.flatMap((hex, i) => {
+        const value = Number.parseInt((i === family ? lightColor : hex).slice(1), 16);
+        return [16, 8, 0].map(shift => {
+          const channel = ((value >> shift) & 255) / 255;
+          return channel <= .04045 ? channel / 12.92 : ((channel + .055) / 1.055) ** 2.4;
+        });
+      });
+      paletteCases.push({ lightColor, family, maxError: Math.max(...palette.map((v, i) => Math.abs(v - expected[i]))) });
+    }
+    return { stages, sumError, minimum, maxDelta, orderCases, paletteCases,
+      families: ['#FA293C', '#0CFFA8', '#2350FF'].map(startingLightFamily) };
   });
   assert.deepEqual(pure.families, [0, 1, 2]);
-  assert.deepEqual(pure.stages.map(w => w.indexOf(Math.max(...w))), [1, 0, 2, 1]);
+  assert.deepEqual(pure.stages.map(w => w.indexOf(Math.max(...w))), [0, 1, 2, 0]);
   assert(pure.sumError < 1e-6 && pure.minimum >= .09999 && pure.maxDelta < .001);
+  for (const test of pure.orderCases) {
+    const label = `${test.lightColor}, duration ${test.duration}, offset ${test.lightCycleOffset}`;
+    assert.deepEqual(test.weights.map(w => w.indexOf(Math.max(...w))), [0, 1, 2, 0], `Fixed RGB order: ${label}`);
+    for (let stage = 0; stage < test.weights.length; stage++) {
+      for (let channel = 0; channel < 3; channel++) {
+        assert(Math.abs(test.weights[stage][channel] - (channel === stage % 3 ? .8 : .1)) < 1e-6, `80/10/10 plateau: ${label}`);
+      }
+    }
+    for (let stage = 0; stage < test.handovers.length; stage++) {
+      for (let channel = 0; channel < 3; channel++) {
+        const expected = channel === stage || channel === (stage + 1) % 3 ? .45 : .1;
+        assert(Math.abs(test.handovers[stage][channel] - expected) < 1e-6, `Forward RGB handover: ${label}`);
+      }
+    }
+  }
+  assert(pure.paletteCases.every(test => test.maxError < 1e-6), 'Custom colours update their palette family without changing RGB order');
   report.checks.energyAndContinuity = pure;
   const render = async (name, patch, w = 432, h = 540, samples = 4) => {
     const data = await page.evaluate(async ({ patch, w, h, samples }) => {
@@ -74,7 +122,7 @@ try {
   const manual = await render('manual-green', { lightCycle: false });
   // Keyboard control is real, and enabling at a nonzero frame anchors to it.
   await page.evaluate(() => window.__pleosOptical.seek(6.55));
-  const toggle = page.getByRole('checkbox', { name: 'RGB 주도색 순환', exact: true });
+  const toggle = page.locator('[data-optical-cycle]');
   await toggle.focus(); await toggle.press('Space');
   let state = await page.evaluate(() => window.__pleosOptical.inspect().state);
   assert(state.lightCycle); assert(Math.abs(state.lightCycleOffset - 6.55 / 15) < 1e-9);
@@ -84,20 +132,20 @@ try {
   state = await page.evaluate(() => window.__pleosOptical.inspect().state);
   assert(Math.abs(state.lightCycleOffset - 6.55 / 15) < 1e-9);
   report.checks.keyboardAnchorAndReload = 'pass';
-  const green = await render('green-main', { time: 0, lightCycleOffset: 0 });
-  const red = await render('red-main', { time: 5 });
+  const red = await render('red-main', { time: 0, lightCycleOffset: 0 });
+  const green = await render('green-main', { time: 5 });
   const blue = await render('blue-main', { time: 10 });
   const end = await render('loop-end', { time: 15 });
-  assert.equal(mad(green, end), 0, 'Loop must close byte-identically');
-  assert(mad(green, red) > 1 && mad(red, blue) > 1, 'Distinct lead colours');
+  assert.equal(mad(red, end), 0, 'Loop must close byte-identically');
+  assert(mad(red, green) > 1 && mad(green, blue) > 1, 'Distinct lead colours');
   const restored = await render('manual-restored', { time: 0, lightCycle: false });
   assert.equal(mad(manual, restored), 0, 'Manual colour must remain unchanged');
-  report.checks.loopAndManualRoundtrip = { loopDifference: mad(green, end), manualDifference: mad(manual, restored), greenRedDifference: mad(green, red), redBlueDifference: mad(red, blue) };
+  report.checks.loopAndManualRoundtrip = { loopDifference: mad(red, end), manualDifference: mad(manual, restored), redGreenDifference: mad(red, green), greenBlueDifference: mad(green, blue) };
   const black = await render('lights-off', { lightCycle: true, lightCycleOffset: 0, lightIntensity: 0 });
   assert(black.data.every((v, i) => i % 4 === 3 || v === 0), 'No light means no cube emission');
   report.checks.zeroLightBlack = 'pass';
   await page.evaluate(() => window.__pleosOptical.set({ lightIntensity: 1.8, zoom: .63, azimuth: 45, elevation: 35.264389682754654 }));
-  for (const [name, time] of [['green', 0], ['red', 5], ['blue', 10]]) await render(`overview-${name}`, { time }, 540, 675, 4);
+  for (const [name, time] of [['red', 0], ['green', 5], ['blue', 10]]) await render(`overview-${name}`, { time }, 540, 675, 4);
   await page.screenshot({ path: fileURLToPath(new URL('panel-wide.png', output)) });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.reload(); await page.waitForFunction(() => window.__pleosOptical?.inspect().ready);

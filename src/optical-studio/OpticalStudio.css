@@ -112,6 +112,9 @@
 .optical-studio .optical-output-details > div { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; padding: 5px 0; }
 .optical-studio .optical-output-details dt { color: var(--optical-muted); }
 .optical-studio .optical-output-details dd { margin: 0; font-variant-numeric: tabular-nums; }
+.optical-studio .optical-video-settings { display: grid; gap: 7px; margin: 14px 0 12px; }
+.optical-studio .optical-output-control { display: grid; grid-template-columns: 82px minmax(0, 1fr); align-items: center; gap: 10px; min-height: 28px; color: #c4c6cc; font-size: 11px; }
+.optical-studio .optical-output-control select { width: 100%; min-width: 0; }
 
 .optical-studio .optical-export-area { padding: 13px 17px 15px; border-top: 1px solid var(--optical-line); background: var(--optical-panel); }
 .optical-studio .optical-status { min-height: 16px; margin: 0 0 9px; color: var(--optical-muted); font-size: 10px; line-height: 1.5; overflow-wrap: anywhere; }
@@ -122,6 +125,20 @@
 .optical-studio .optical-export-button:active:not(:disabled) { background: #c8ccd4; border-color: #c8ccd4; }
 .optical-studio .optical-export-button:disabled { opacity: .65; }
 .optical-studio .optical-export-description { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; margin: 8px 0 0; color: var(--optical-muted); font-size: 10px; font-variant-numeric: tabular-nums; }
+.optical-studio .optical-video-button { margin-top: 12px; background: var(--optical-field); color: var(--optical-text); border-color: var(--optical-control-line); }
+.optical-studio .optical-video-button:hover:not(:disabled) { background: #30333a; border-color: #a1a4ac; }
+.optical-studio .optical-video-button:active:not(:disabled) { background: #3c3f45; }
+.optical-studio .optical-video-progress { margin-top: 12px; }
+.optical-studio .optical-video-progress[hidden] { display: none; }
+.optical-studio .optical-video-progress progress { display: block; appearance: none; width: 100%; height: 3px; border: 0; background: #474a51; }
+.optical-studio .optical-video-progress progress::-webkit-progress-bar { background: #474a51; }
+.optical-studio .optical-video-progress progress::-webkit-progress-value { background: #eceef1; }
+.optical-studio .optical-video-progress progress::-moz-progress-bar { background: #eceef1; }
+.optical-studio .optical-video-progress-row { display: flex; gap: 10px; align-items: flex-start; justify-content: space-between; margin-top: 5px; }
+.optical-studio [data-optical-video-status] { min-width: 0; margin: 5px 0 0; color: var(--optical-muted); font-size: 10px; line-height: 1.5; overflow-wrap: anywhere; }
+.optical-studio [data-optical-video-status][data-state="busy"] { color: var(--optical-text); }
+.optical-studio [data-optical-video-status][data-state="error"] { color: #eceef1; }
+.optical-studio [data-optical-action="cancel-video"] { flex: none; min-width: 35px; }
 
 .optical-studio .optical-transport { padding: 10px 20px 11px; border-top: 1px solid var(--optical-line); background: var(--optical-panel); }
 .optical-studio .optical-timeline { display: grid; grid-template-columns: 30px 66px minmax(0, 1fr) 58px; gap: 12px; align-items: center; }
@@ -180,3 +197,6 @@
 .optical-cycle-toggle { display: flex; align-items: center; gap: 8px; min-height: 32px; font-size: 12px; cursor: pointer; }
 .optical-cycle-toggle input { width: 24px; height: 24px; margin: 0; accent-color: #dddddd; }
 .optical-cycle-toggle:has(input:disabled) { opacity: .5; cursor: wait; }
+.optical-studio .optical-control[hidden],
+.optical-studio .optical-section[hidden],
+.optical-studio .optical-section-note[hidden] { display: none !important; }

@@ -161,7 +161,19 @@ try {
   report.checks.loopDifference = imageDifference(baseline, loopEnd);
   assert.ok(report.checks.loopDifference.meanAbsoluteChannelDifference < .02 && report.checks.loopDifference.changedFraction < .001, "Loop endpoints differ visibly");
 
-  for (const [key, value] of [["gap", .3], ["bevel", 0], ["ior", 1.95], ["dispersion", .14], ["roughness", 0], ["bounces", 1]]) {
+  // The current expression intentionally excludes physical-shell radiance.
+  // Its former ray-budget control must be disabled, and must not secretly
+  // reintroduce a painted surface when restored from an older saved setting.
+  const shellBudget = await capture('qa-change-bounces', { ...baselineState, bounces: 1 });
+  assert.deepEqual(shellBudget.data, baseline.data, 'Shell budget changed dimension-only expression');
+  assert.equal(await page.locator('[data-optical-range="bounces"]').isDisabled(), true);
+  assert.equal(await page.locator('[data-optical-number="bounces"]').isDisabled(), true);
+  assert.equal(await page.locator('[data-optical-range="ior"]').isDisabled(), false);
+  assert.equal(await page.locator('[data-optical-number="ior"]').isDisabled(), false);
+  report.checks.shellRadianceExcluded = true;
+  const noDimensions = await capture('qa-no-dimensions', { ...baselineState, dimensionTop: 0, dimensionLeft: 0, dimensionRight: 0 });
+  assert.equal(report.captures['qa-no-dimensions'].peak, 0, 'Surface radiance remains without dimensions');
+  for (const [key, value] of [["gap", .3], ["bevel", 0], ["ior", 1.95], ["dispersion", .14], ["roughness", 0]]) {
     const changed = await capture(`qa-change-${key}`, { ...baselineState, [key]: value });
     const difference = imageDifference(baseline, changed);
     assert.ok(difference.meanAbsoluteChannelDifference > .05 && difference.changedFraction > .001, `${key} does not change the rendered image`);

@@ -32,6 +32,16 @@ Preserve all existing user changes. Never run `git reset --hard`, `git clean -fd
 
 ## Completion workflow
 
+### Major-change snapshots
+
+After a major renderer, visual expression, interaction, or export architecture change,
+save a separately runnable local version with `node scripts/save-site-version.mjs "의미 있는 한글 이름"`
+after tests pass and before the final handoff update. Do not snapshot small fixes or analysis-only work.
+Never auto-commit or auto-push to create a checkpoint. Existing checkpoint ids are immutable.
+Local-build snapshots live in ignored `public/versions/`; preserve that directory and explicitly migrate
+their files if moving machines or deploying. Do not claim these are backed up on GitHub.
+Named user settings are separate from site-code snapshots and must remain untouched.
+
 After meaningful implementation work is genuinely complete, use this order:
 
 1. Implement

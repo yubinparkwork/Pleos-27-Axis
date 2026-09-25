@@ -135,7 +135,18 @@ async function captureRuntime({ projectRoot, latestDirectory, appUrl, args }) {
     });
     await page.goto(appUrl, { waitUntil: "load" });
     await page.waitForFunction(() => window.__pleosOptical?.inspect().ready === true, undefined, { timeout: 30_000 });
+    if (args["camera-motion"] !== undefined) {
+      const enabled = Number(args["camera-motion"]);
+      if (![0, 1].includes(enabled)) throw new Error('--camera-motion must be 0 or 1');
+      await page.evaluate(cameraMotion => window.__pleosOptical.set({ cameraMotion }), enabled);
+    }
     result.initialRuntime = await page.evaluate(() => window.__pleosOptical.inspect());
+    if (args["axis-motion"] !== undefined) {
+      const enabled = Number(args["axis-motion"]);
+      if (![0,1].includes(enabled)) throw new Error('--axis-motion must be 0 or 1');
+      await page.evaluate(axisMotion => window.__pleosOptical.set({axisMotion,cameraMotion:0}),enabled);
+      result.initialRuntime = await page.evaluate(() => window.__pleosOptical.inspect());
+    }
     if (result.initialRuntime.axis?.cubeCount !== 3) throw new Error("OpticalStudio did not report the required three-cube structure.");
     const duration = Number(result.initialRuntime.motion?.duration);
     const requestedTime = args["hero-time"] === undefined ? NaN : Number(args["hero-time"]);
@@ -181,8 +192,8 @@ async function captureRuntime({ projectRoot, latestDirectory, appUrl, args }) {
         heroTime: result.heroTime,
         samples: 4,
         mode: "optical-studio",
-        look: result.heroRuntime.state?.preset ?? "optical-glass",
-        motionPreset: "light-orbit",
+        look: result.heroRuntime.hybrid?.look ?? result.heroRuntime.rendering?.expression ?? result.heroRuntime.state?.preset ?? "not-captured",
+        motionPreset: result.heroRuntime.motion?.kind ?? "not-captured",
       });
     }
     result.heroRuntime = await page.evaluate(() => window.__pleosOptical.inspect());
@@ -223,11 +234,12 @@ ${PROJECT_INTENT}
 - Entry point: \`src/main.ts\`
 - Default route: \`/\`
 - Active application: OpticalStudio
+- Captured look: ${runtime?.hybrid?.look ?? runtimeState.activeExpression ?? "not captured"}; the default B route remains \`/\`.
 - Runtime capture: ${runtime ? "available" : "FAILED; implementation description below is not runtime verification"}
-- Renderer: ${runtime?.renderer ?? "Raw WebGL2 optical renderer (runtime not captured)"}
+- Renderer: ${runtime?.renderer ?? "Raw WebGL2 dimension renderer (runtime not captured)"}
 - Projection: ${runtime?.projection ?? "not captured"}
 - Main structure: three analytically intersected rounded cubes in the approved Axis relationship.
-- Browser API: \`window.__pleosOptical\` — inspect, set, seek, pause, capture and reset.
+- Browser API: \`window.__pleosOptical\` — inspect, set, seek, pause, capture, exportVideo, cancelVideo and reset.
 - Preserved previous application: \`?renderer=studio\`; prior Dimention R3F and the other studio modes are available there.
 - Other reference routes: \`?renderer=raw\` and \`?renderer=legacy\`.
 - Named draft: \`../pleos-snapshots/pleos-dimension-draft-20260910-155444/\` is immutable and separate from this active application.
@@ -247,34 +259,55 @@ ${PROJECT_INTENT}
 
 ### Optical Studio
 
-- Role: editable optical glass with colored light reflecting and refracting through the canonical three cubes.
-- Implementation: independent Raw WebGL2 renderer, analytic rounded-cube intersections, iterative Snell refraction and Fresnel reflection, and wavelength-dependent RGB dispersion.
-- Lighting: four smooth studio emitters share one user-selected HEX colour in manual mode. Optional RGB cycle evaluates three spatially separate colour ribbons per emitter, with 80/10/10 power handover and Pleos secondary colours. Existing negative-fill apertures remain. No surface albedo tint or object emission. Legacy RGB weights are converted once with an original-state backup before overwrite.
+- Role: editable virtual optical reflection layers on the approved three-cube Axis structure. The pre-emission reflection expression has been restored from saved-20260915085224893; saved settings and the later native MP4 workflow remain intact.
+- Implementation: independent Raw WebGL2 analytic optical-image renderer. Active expression: ${runtime?.rendering?.expression ?? 'not captured'}; emission enabled: ${runtime?.rendering?.emission ?? 'not captured'}; physical-shell radiance: ${runtime?.rendering?.shellRadiance ?? 'not captured'}. Virtual image rays use a limited Snell-based deflection with RGB IOR differences and continuous grazing projection; reflected studio illumination, Fresnel and depth attenuation shape the contour light.
+- Lighting: four smooth analytic studio emitters and fixed world-space negative-fill apertures. Manual HEX and the Pleos RGB palette are preserved. Optional red → green → blue circulation transfers base incident-light energy weights 80/10/10. This is not a surface-albedo fill or self-emitting object material.
 - Radiance pipeline: linear FP16 render targets, linear subpixel averaging, bounded highlight bloom, tone mapping, sRGB conversion and spatial AA. Range-compressed RGBA8 is a lower-precision fallback, not equivalent HDR quality.
 - Floating render targets active in this capture: ${runtime?.rendering?.hdr === true ? "Yes" : runtime?.rendering?.hdr === false ? "No; packed RGBA8 fallback" : "not captured"}.
-- \`surfaceCurvature\` changes an optical shading normal to approximate a polished lens face. It does not deform the actual cube silhouette, intersection geometry or Axis structure; zero preserves flat-face normals.
-- Per-cube dimension layers: continuous 0–12 virtual cubical reflection-image layers sampled along rays refracted through the real shell. They are light-only contour fields, not opaque nested solids or new physical interfaces. Fractional last-layer activation fades smoothly; layer positions do not change with count. Spacing, softness and depth falloff are separately adjustable. Some layers can be hidden by angle, occlusion or absorption.
-- Real split-ray depth is independent of dimension count. The layer model and its radiance balance are art-directed approximations, not an energy-conserving full spectral path tracer. Secondary transmitted paths through neighbouring cubes stop after at most eight interfaces.
+- Reflection control model: ${runtime?.rendering?.surfaceFigure?.model ?? 'not captured'}. View-invariant radiance reported: ${runtime?.rendering?.viewInvariantRadiance ?? 'not captured'}. Optical projection, reflected direction, Fresnel, occlusion and layer overlap vary with the viewing angle; the RGB lead cycle remains time-based.
+- Dimension layers: ${runtime?.rendering?.dimensions?.meaning ?? 'not captured'}. Captured counts: top ${runtime?.state?.dimensionTop ?? '?'}, left ${runtime?.state?.dimensionLeft ?? '?'}, right ${runtime?.state?.dimensionRight ?? '?'}. Per-cube spacing and common softness/falloff remain editable; no opaque nested solids are inserted.
+- The layer model is art-directed, not a physical glass or full spectral path tracer. Physical ray budget active: ${runtime?.rendering?.physicalRayBudgetActive ?? 'not captured'}; physical IOR active: ${runtime?.rendering?.physicalIORActive ?? 'not captured'}. IOR controls are active again. Stored bounce limits remain retained but disabled because physical-shell ray tracing is not the active expression.
 - Main files: \`src/optical-studio/OpticalRenderer.ts\`, \`src/optical-studio/optical.frag.glsl\` and \`src/optical-studio/OpticalResolve.ts\`.
 - Settings: the complete captured settings object is preserved in \`artifacts/latest/runtime-state.json\` under \`runtime.state\`.
 - The active optical renderer does not use React Three Fiber or the previous studio's material pipeline.
-- Optical transport uses finite bounce counts and RGB wavelength sampling; it is not an offline/full spectral path tracer and does not calculate volumetric caustics. No temporal random-noise accumulation is used.
+- RGB IOR differences are a three-channel optical approximation, not full spectral transport. Physical-shell tracing is inactive in default B, but active in cube0914 and Hybrid V2. The removed dimensionEmission.glsl experiment exists only in local archive saved-20260915090434072, not current source. No volumetric caustics or temporal random-noise accumulation are used.
+
+### A/B Hybrid — opt-in expression
+
+- Route: \`?look=hybrid-ab\`, also available as \`A/B 통합안 · 현재 조정\` in the version dropdown. This independent shader variant keeps B at the default \`/\` and preserves the 09.14 cube A expression at \`?look=cube0914\`.
+- V2 contract: actual A finite-cube entry refraction, rounded internal reflection images and bounded multi-bounce \`traceGlass\`, plus B's single sharp Axis anchor and motion. Suppress exterior first reflection to .035 and direct unreflected transmission to .12, retaining deeper internal reflections. This is deterministic ray integration plus authored virtual images, not Monte Carlo path tracing. V1 is preserved in local snapshot \`saved-20260921073913986\`.
+- Current V3: \`hybridOpening\` defaults to 1. Extend the A optical boundary domain AND each reflection-image domain away from the shared origin by the same amount; keep the three Axis-facing planes and local optical curvature fixed. At full opening remote caps cannot reflect internal rays. Smooth distant falloff is not a mask at the former cube boundary. Zero restores closed V2, preserved as \`saved-20260921082636619\`. B and original A are untouched. The domain is bounded, not an infinite physical medium.
+- Controls: \`hybridDistortion\` changes inner optical-image curvature; \`hybridDensity\` relaxes attenuation; \`hybridColorMix\` adjusts RGB overlap. \`bounces\` controls actual internal ray depth (1–16); escaped open rays may terminate earlier. Layer-zero and canonical solid geometry remain unchanged, while the expression's optical carrier extends. Partial opening can retain distant closing silhouettes; view-dependent refraction remains.
+- Colour: RGB circulation or four fixed compositions — balanced main, red dominant, green dominant and blue dominant. Fixed composition locks colour weights while the existing motion continues. These are incident-light weights, not promises of equal screen area.
+- Optional depth study: \`hybridDepthFlow\` and \`hybridDepthCycles\` move virtual images inward over a deterministic loop. This is a concept test; Hall D screen shape, dimensions and viewing position have not been calibrated.
+- Persistence: first use seeds from readable B settings, then saves independently under \`pleos-optical-studio-v1:hybrid-ab\`; A/B settings and immutable snapshots remain separate. Native long-edge 3840px PNG and deterministic MP4 reuse the existing guarded HDR export path and codec limitations.
+- Current V4 adds broad optical shoulders on open images using the same RGB rig, a bounded face aperture and displaced optical normals, not opaque geometry or emission. Controls: \`hybridFaceReflection\` (0–2, default .7), \`hybridFaceWidth\` (0–1, .5), \`hybridRefractionOverlap\` (0–1, .55). Strength 0 restores V3 (\`saved-20260922034933369\`); opening 0 keeps V2. Additional shoulders are bounded to eight images. These are art-directed reflection images, not a full scattering simulation. Dedicated QA artifacts: \`artifacts/hybrid-face/\`.
+- Captured hybrid metadata: ${runtime?.hybrid ? `\`${JSON.stringify(runtime.hybrid)}\`` : "not active in this capture; availability is not a verification result"}.
+- V6 removes V5's broad pocket approximation and adds A's closed rounded-cube secondary optical transport, with Fresnel/TIR and neighbouring cube transmission. Exterior reflection and bounce-zero direct transmission are excluded. Open-surface-to-proxy mapping is art directed, not a physically open glass simulation. See \`hybridInternalReflection.glsl\` and \`scripts/verify-hybrid-internal.mjs\`.
+- Hybrid transition revision 1 synchronizes image formation, optical reflection and gray-carrier release. Zero stagger no longer bypasses the fade-in. Existing loop envelopes blend in late. V6 retains the gray intro but intentionally changes completed V4 pixels. Boundary/30fps-frame/archived-V4/MP4 checks: \`scripts/verify-hybrid-transition.mjs\`, \`artifacts/hybrid-transition/\`.
+- Direction and acceptance criteria: [HYBRID_AB_DIRECTION.md](HYBRID_AB_DIRECTION.md). Dedicated checks: [verify-hybrid-ab.mjs](../scripts/verify-hybrid-ab.mjs); the optional \`PLEOS_HYBRID_4K=1\` path checks native 4K PNG and a short MP4. A handoff pass alone does not assert that these dedicated checks ran.
 
 ## Motion System
 
-- Runtime: absolute-time optical light loop.
-- Optional RGB lead cycle uses a saved phase anchor, quintic transitions and one full green/red/blue sequence per duration. Fractions are incident-light weights, not screen coverage. Default is disabled to preserve existing looks.
+- Runtime: ${motion?.kind ?? 'not captured'}; absolute-time evaluation.
+- Axis model motion: ${JSON.stringify(motion?.axis ?? null)}. OpticalAxisMotion.ts rigidly rotates the complete local geometry and light field about the shared origin, tracing inverse-transformed rays with the world camera fixed. Axis motion takes precedence over camera motion; old named saves remain disabled by default.
+- Camera-only motion: ${JSON.stringify(motion?.camera ?? null)}. OpticalCameraMotion.ts evaluates an eased out-and-back orbit from saved camera angles; the 25Axis hold remains fixed. Base angles, geometry, pan and zoom are not animated or overwritten. Old saves default to disabled. Preview, PNG and MP4 share the same evaluated pose.
+- Active 25엑시스 transition: ${motion?.identityTransition ? `\`${JSON.stringify(motion.identityTransition)}\`` : 'not captured'}.
+- Axis accent: one eased key-light envelope per enabled transition loop, applied only to the existing nearest-Axis layer-zero contour. It reuses that contour's refraction, Fresnel and appearance masks; no screen-space line, new geometry or shifted layer timing. The 축 강조 강도 control is 0–2 in 0.05 steps (0 disables, default 1). Actual strength/timing are in the captured transition.axisAccent object.
+- Optional RGB lead cycle uses a saved phase anchor, quintic transitions and one fixed red/green/blue sequence per duration, independent of custom palette edits. Fractions are base incident-light energy weights, not screen coverage. Default is disabled to preserve existing looks.
 - Current duration: ${motion?.duration ?? "not captured"} seconds.
 - Deterministic: ${motion?.deterministic === true ? "Yes, reported by the runtime" : "not confirmed by capture"}.
 - Captured hero time: ${runtimeState.heroTime ?? "not captured"} seconds; playback is paused before each export.
 - Playback state after capture: ${motion?.playing === false ? "paused" : motion?.playing === true ? "playing" : "not captured"}.
 - \`seek(time)\` supports deterministic frame inspection. The default loop is 15 seconds.
-- OpticalStudio MP4/video and automatic PNG sequence export are not implemented.
+- MP4: ${runtime?.videoExport?.deterministic ? 'fixed-time sequential frames through exportVideo; includes the active transition and layer stagger; no realtime recording.' : 'not confirmed by runtime inspection.'} Automatic PNG sequence UI is not implemented.
 - Dimension amounts are continuous animation-ready state, but automatic layer-count modulation has not been added.
-- Layer spacing is independently controlled per cube by dimensionSpacingTop / dimensionSpacingLeft / dimensionSpacingRight (0.06–0.3). Missing fields inherit the old shared spacing without a visual reset. Softness and depth falloff remain shared.
-- Increasing spacing also widens the gradient tail away from the shared world-space Axis origin. Smooth face-tangent directions avoid medial-axis seams; peak radiance and maximum width are bounded to avoid flat face fill. No new motion or UI control is added.
+- Layer spacing is independently controlled per cube by dimensionSpacingTop / dimensionSpacingLeft / dimensionSpacingRight (0.06–0.3). Missing fields inherit the old shared spacing without resetting saved values. Softness and depth falloff remain shared.
+- Spacing widens the existing contour lobe away from the shared world-space Axis. Straight contour geometry, world-axis distance and bounded width avoid bent bands and flat face fill. Layer fades, per-region timing and the 25엑시스 reveal stagger remain independent controls.
 
 ## Artboard / Export
+
+- Available aspect presets from runtime: ${JSON.stringify(runtime?.artboard?.supportedFormats ?? null)}. A-series is portrait 1:√2, not a physical print-size/PPI selector. PNG uses nearest-pixel dimensions; MP4 rounds odd dimensions up by one pixel for encoder compatibility. UI and output use the same helpers.
 
 - Captured artboard: ${runtimeState.artboard ? `${runtimeState.artboard.width} × ${runtimeState.artboard.height} (${runtimeState.artboard.preset ?? "custom"})` : "not captured"}.
 - Raster export: exact-size PNG via \`capture(width, height, samples)\` with tiled high-resolution rendering.
@@ -283,18 +316,20 @@ ${PROJECT_INTENT}
 - Main preview retains the active artboard aspect with a maximum long edge of 1080 pixels. Portrait previews default to 1080 × 1350 and 1080 × 1920.
 - \`--preview-long-edge\` or \`PLEOS_HANDOFF_PREVIEW_LONG_EDGE\` can reduce preview dimensions; decoded PNG dimensions are recorded and checked.
 - Captured renderer limits: ${runtime?.limits ? `\`${JSON.stringify(runtime.limits)}\`` : "not captured"}.
-- MP4 is unsupported in this application; no video export is claimed by this handoff.
-- PNG is opaque 8-bit sRGB; the new optical engine has no transparent/PPI-aware print or video export UI. Those existing workflows remain in the preserved studio instead.
+- Video capability reported by runtime: ${runtime?.videoExport ? `\`${JSON.stringify(runtime.videoExport)}\`` : 'not captured'}.
+- MP4 controls: long edge 3840/1920px, 24/30/60fps, 4/16 spatial samples, same camera/aspect and full timeline. A reusable guarded-tile frame capture feeds the browser encoder sequentially; OPFS disk output or a bounded 256MiB memory fallback. Abort/error releases output resources and restores preview state. Actual codec support is checked before rendering, never silently downscaled.
+- PNG and MP4 are opaque 8-bit sRGB; MP4 is lossy and silent. No transparent/PPI-aware print or HDR-video UI. The older print workflows remain in the preserved studio instead.
 
 ## Inspector / UI
 
 - OpticalStudio owns a fresh Korean interface with monochrome application controls.
-- Collapsible sections: 형태, 디멘션 레이어, 광학, 조명, 카메라, 출력. The bottom transport controls time, loop length, motion extent and artboard aspect.
-- 디멘션 레이어 owns three independent fractional slider/number controls and a collapsed spacing/softness/falloff group. 조명 owns a colour picker/HEX/Pleos swatch, optional RGB-cycle checkbox and live power fractions, plus intensity, width, exposure and highlight bloom. 광학 distinguishes lens-normal curvature from geometric bevel and ray budget.
+- Collapsible sections: 25엑시스 → 디멘션, 빛 모션, 영역별 타이밍, 형태, 디멘션 레이어, 광학, 조명, 카메라, 출력. Existing section IDs and handlers remain compatible. The bottom transport controls time, loop length, light travel amount and artboard aspect.
+- 디멘션 레이어 has three independent 0–50 layer sliders and a collapsed spacing/softness/falloff group. 조명 has the preserved colour picker/HEX/Pleos palette, RGB-cycle toggle, live base energy fractions, light intensity, source width, exposure and bloom. 광학 controls active IOR, dispersion, diffusion, reflection concentration/gain and absorption; only the preserved physical-ray bounce limit is disabled.
 - 레퍼런스 무드 적용 changes optical appearance while retaining the current camera, gap and artboard; the first pre-application local setting is preserved in \`pleos-optical-before-luminous-v1\` rather than replacing the named draft.
-- Material, light, motion and output controls edit the independent optical state in \`pleos-optical-studio-v1\`. Browser origins do not share localStorage automatically.
+- Layer, lighting, motion and output controls edit the independent optical state in \`pleos-optical-studio-v1\`. Browser origins do not share localStorage automatically.
 - The artboard and export controls belong to OpticalStudio; prior mode selectors and legacy settings remain in the preserved studio route.
 - Main files: \`OpticalStudio.ts\`, \`OpticalPanel.ts\` and \`OpticalStudio.css\` inside \`src/optical-studio/\`.
+- Hybrid-only additions: A/B 통합 재질, 정지 컬러 / 순환 and the collapsed 공간 깊이 테스트 (Hall D 도면 미반영). Its colour selector replaces the visible legacy RGB-cycle toggle; ordinary B and cube0914 panels retain their own controls.
 
 ## Important Files
 
@@ -302,17 +337,24 @@ ${PROJECT_INTENT}
 | --- | --- |
 | \`src/main.ts\` | Default OpticalStudio and preserved reference route selection |
 | \`src/optical-studio/OpticalStudio.ts\` | Active application lifecycle and browser inspection/export API |
-| \`src/optical-studio/OpticalRenderer.ts\` | Independent WebGL2 renderer and tiled PNG capture |
-| \`src/optical-studio/optical.frag.glsl\` | Rounded-cube intersection, optical transport and colored illumination |
+| \`src/optical-studio/OpticalRenderer.ts\` | Independent WebGL2 renderer and reusable guarded-tile PNG/video frame capture |
+| \`src/optical-studio/OpticalVideoExporter.ts\` | Deterministic native-resolution MP4 encoding, bounded storage and cancellation |
+| \`scripts/verify-optical-video.mjs\` | Real 4K MP4 decode comparison, timing, cancellation and UI verification |
+| \`src/optical-studio/optical.frag.glsl\` | Axis intersections, virtual refracted contour layers and transition-only first-layer key-light accent |
+| \`src/optical-studio/IdentityAxisAccent.ts\` | Single eased Axis-light envelope within the unchanged 25엑시스 transition timing |
 | \`src/optical-studio/OpticalResolve.ts\` | Linear HDR targets, supersample averaging, highlight bloom and display resolve |
 | \`src/optical-studio/OpticalState.ts\` | Independent optical settings and defaults |
-| \`src/optical-studio/OpticalLighting.ts\` | Deterministic RGB lead weights and linear emitter palette |
+| \`src/optical-studio/OpticalLighting.ts\` | Deterministic RGB base incident-light weights and linear palette |
+| \`src/optical-studio/HybridAB.ts\` | Opt-in hybrid route, independent seed/defaults, RGB compositions and inspection metadata |
+| \`src/optical-studio/hybridOptics.glsl\` | V2 fully refracted finite reflection-image family with B temporal gates |
+| [docs/HYBRID_AB_DIRECTION.md](HYBRID_AB_DIRECTION.md) | A/B design contract, KV/crop/POP directions, print checks and uncalibrated Hall D scope |
+| [scripts/verify-hybrid-ab.mjs](../scripts/verify-hybrid-ab.mjs) | Hybrid controls, colour captures, loop, independent persistence, unchanged A/B and optional 4K PNG/short MP4 checks |
 | \`src/optical-studio/LuminousReference.ts\` | Appearance-only reference mood and pre-application backup key |
 | \`src/optical-studio/AxisGeometry.ts\` | Canonical three-cube coordinates and separation |
 | \`src/optical-studio/OpticalPanel.ts\` | Korean editing and export controls |
 | \`src/optical-studio/OpticalStudio.css\` | Monochrome application layout and appearance |
 | \`scripts/verify-optical-geometry.mjs\` | Geometry, common vertex and original silhouette checks |
-| \`scripts/verify-optical-dimensions.mjs\` | Continuous layers, unified colour, curvature, persistence and guarded HDR tile verification |
+| \`scripts/verify-optical-dimensions.mjs\` | Continuous layers, optical colour/core, persistence and guarded HDR tile verification |
 | \`scripts/verify-optical-light-cycle.mjs\` | RGB power continuity, loop, manual roundtrip, UI persistence and captures |
 | \`scripts/update-ai-handoff.mjs\` | Dispatches production or explicitly requested legacy handoff |
 | \`scripts/optical-handoff.mjs\` | Production runtime capture, validation and current handoff |
@@ -362,10 +404,11 @@ ${markdownList(nextWork.slice(0, 5), "No immediate follow-up recommended")}
 - Read \`artifacts/latest/runtime-state.json\` for branch, complete optical settings, Axis, motion, artboard, preview dimensions and validation evidence.
 - Inspect \`artifacts/latest/preview-main.png\`, then compare the 4:5 and 9:16 previews for framing consistency.
 - Start with \`src/optical-studio/OpticalStudio.ts\`, \`OpticalRenderer.ts\` and \`optical.frag.glsl\` for the active application.
-- Inspect \`OpticalResolve.ts\` before evaluating output quality; FP16 averaging and bloom occur before display encoding. Dimension sliders bound reflected ray orders, not physical cube count.
-- Compare \`surfaceCurvature\` with geometric bevel: the former is an explicit lens-normal approximation and must not be described as physical geometry deformation.
+- Inspect \`OpticalResolve.ts\` before evaluating output quality; FP16 averaging and bloom occur before display encoding. Dimension sliders bound authored optical-image layer count, not physical cubes or physical reflection bounces.
+- Compare \`surfaceCurvature\` with geometric bevel: the former changes the reflected-light filter's normal concentration, not refracted projection or geometric structure. Inspect \`IdentityAxisAccent.ts\` and the layer-zero accent in \`optical.frag.glsl\`; strength 0 disables the new transition emphasis without changing layer timing.
 - Use \`window.__pleosOptical\` on the default route. The older \`window.__pleos27Axis\` API belongs to \`?renderer=studio\`.
 - Refresh production handoff without \`--mode\`, or with \`--mode optical\`. Pass an explicit prior mode only when intentionally documenting the preserved studio.
+- To capture the hybrid expression, set \`PLEOS_HANDOFF_URL\` to the running site's \`?look=hybrid-ab\` URL. Inspect \`runtime.hybrid\` and the captured look; this does not change the default route.
 - Check Git remote information before assuming this working tree is already connected to \`yubinparkwork/Pleos-27-Axis\`.
 `;
 }
@@ -394,11 +437,11 @@ export async function runOpticalHandoff({ args, projectRoot, detectedRemote, pro
     project: "PLEOS 27 Axis",
     generatedAt: new Date().toISOString(),
     git: { root: ".", projectPath, branch, sourceBaseCommit, remote, dirtyBeforeHandoff: statusBefore.length > 0, changedBeforeHandoff: statusBefore },
-    app: { entryPoint: "src/main.ts", defaultRoute: "/", activeApplication: "OpticalStudio", renderer: runtime?.renderer ?? null, projection: runtime?.projection ?? null, referenceRoutes: ["?renderer=studio", "?renderer=raw", "?renderer=legacy"] },
+    app: { entryPoint: "src/main.ts", defaultRoute: "/", activeApplication: "OpticalStudio", look: runtime?.hybrid?.look ?? runtime?.rendering?.expression ?? runtime?.state?.preset ?? null, renderer: runtime?.renderer ?? null, projection: runtime?.projection ?? null, referenceRoutes: ["?renderer=studio", "?renderer=raw", "?renderer=legacy"] },
     runtime,
     axis: runtime?.axis ?? null,
     artboard: capture.initialRuntime?.artboard ?? null,
-    activeExpression: runtime?.state?.preset ?? "optical-glass",
+    activeExpression: runtime?.hybrid?.look ?? runtime?.rendering?.expression ?? runtime?.state?.preset ?? null,
     motion: runtime?.motion ?? null,
     heroTime: capture.heroTime,
     previews: capture.previews,
@@ -423,8 +466,8 @@ export async function runOpticalHandoff({ args, projectRoot, detectedRemote, pro
   for (const run of validationRuns.filter((run) => run.status === "fail")) {
     knownIssues.push(`${run.command} failed with exit code ${run.exitCode}; see Validation and runtime-state.json for the command output. This failure is not waived.`);
   }
-  knownIssues.push("OpticalStudio currently exports PNG stills only; MP4/video and an automatic motion-sequence exporter are unsupported.");
-  knownIssues.push("Optical transport is bounded and art-directed: surface curvature uses a shading-normal approximation, secondary paths stop after eight interfaces, and no volumetric caustic/offline path-tracer equivalence is claimed.");
+  knownIssues.push(runtime?.videoExport ? "MP4 depends on the browser supporting the requested dimensions/fps; lossy 8-bit output has no alpha/audio/HDR. Long exports must keep the tab open; automatic PNG sequence UI is not implemented." : "MP4 capability was not confirmed by runtime inspection.");
+  knownIssues.push("Dimension contours are bounded, art-directed virtual optical images; reflected direction, Fresnel, projection/overlap/occlusion vary with view. They are not a volumetric caustic or full spectral path tracer.");
   if (runtime?.rendering?.hdr === false) knownIssues.push("This capture used range-compressed RGBA8 fallback instead of floating render targets; highlight precision is lower than FP16 HDR.");
   const handoff = makeHandoff({
     runtimeState,
@@ -440,6 +483,7 @@ export async function runOpticalHandoff({ args, projectRoot, detectedRemote, pro
     status: Object.values(validation).includes("fail") ? "fail" : "pass",
     mode: full ? "full" : "fast",
     activeApplication: "OpticalStudio",
+    look: runtimeState.activeExpression,
     handoff: "docs/AI_HANDOFF.md",
     runtime: "artifacts/latest/runtime-state.json",
     previews: capture.previews.map((preview) => ({ file: preview.file, width: preview.width, height: preview.height })),

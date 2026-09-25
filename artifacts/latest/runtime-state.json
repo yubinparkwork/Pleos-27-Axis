@@ -1,14 +1,30 @@
 {
   "project": "PLEOS 27 Axis",
-  "generatedAt": "2026-09-11T05:48:40.850Z",
+  "generatedAt": "2026-09-22T06:58:19.013Z",
   "git": {
     "root": ".",
     "projectPath": ".",
     "branch": "main",
-    "sourceBaseCommit": "87e090e8d3dabe52706d670f8f15a5d6bec8bb1e",
+    "sourceBaseCommit": "7fc92f6356e224fab32215d9e359c75b58e474e1",
     "remote": "https://github.com/yubinparkwork/Pleos-27-Axis.git",
     "dirtyBeforeHandoff": true,
     "changedBeforeHandoff": [
+      {
+        "status": "M",
+        "file": ".github/workflows/deploy-pages.yml"
+      },
+      {
+        "status": "M",
+        "file": ".gitignore"
+      },
+      {
+        "status": "M",
+        "file": "AGENTS.md"
+      },
+      {
+        "status": "M",
+        "file": "README.md"
+      },
       {
         "status": "M",
         "file": "artifacts/latest/preview-4x5.png"
@@ -27,7 +43,47 @@
       },
       {
         "status": "M",
+        "file": "artifacts/optical-light-cycle/blue-main.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-light-cycle/green-main.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-light-cycle/loop-end.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-light-cycle/manual-green.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-light-cycle/manual-restored.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-light-cycle/overview-blue.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-light-cycle/overview-green.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-light-cycle/overview-red.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-light-cycle/panel-narrow.png"
+      },
+      {
+        "status": "M",
         "file": "artifacts/optical-light-cycle/panel-wide.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-light-cycle/red-main.png"
       },
       {
         "status": "M",
@@ -35,7 +91,67 @@
       },
       {
         "status": "M",
+        "file": "artifacts/optical-rebuild/qa-baseline.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-rebuild/qa-change-bevel.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-rebuild/qa-change-bounces.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-rebuild/qa-change-dispersion.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-rebuild/qa-change-gap.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-rebuild/qa-change-ior.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-rebuild/qa-change-roughness.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-rebuild/qa-loop-end.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-rebuild/qa-motion-midpoint.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-rebuild/qa-repeat.png"
+      },
+      {
+        "status": "M",
         "file": "artifacts/optical-rebuild/qa-report.json"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-rebuild/qa-ui-narrow-inspector.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-rebuild/qa-ui-narrow.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-rebuild/qa-ui-wide.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-rebuild/qa-wide-bevel.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-rebuild/qa-zero-gap-rounded-contact.png"
       },
       {
         "status": "M",
@@ -43,7 +159,175 @@
       },
       {
         "status": "M",
+        "file": "artifacts/optical-refinement/dimensionLeft-3.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/dimensionLeft-8.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/dimensionRight-3.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/dimensionRight-8.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/dimensionSpacingLeft-high.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/dimensionSpacingLeft-low.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/dimensionSpacingRight-high.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/dimensionSpacingRight-low.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/dimensionSpacingTop-high.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/dimensionSpacingTop-low.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/dimensionTop-3.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/dimensionTop-8.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/dimensions-all-zero.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/dimensions-loop-end.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/dimensions-loop-start.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/full-frame-1x.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/full-frame-2x.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/full-frame-4x.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/layers-continuity-2-99.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/layers-continuity-2.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/layers-continuity-3-01.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/layers-continuity-3.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/layers-dimensionFalloff-high.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/layers-dimensionFalloff-low.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/layers-dimensionSoftness-high.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/layers-dimensionSoftness-low.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/layers-dimensionSpacing-high.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/layers-dimensionSpacing-low.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/spacing-explicit-equal.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/spacing-shared-legacy.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/spacing-ui-narrow.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/spacing-ui-wide.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/surface-curvature-point-one.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/surface-curvature-zero.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/tiled-1x.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/tiled-2x.png"
+      },
+      {
+        "status": "M",
+        "file": "artifacts/optical-refinement/tiled-4x.png"
+      },
+      {
+        "status": "M",
         "file": "docs/AI_HANDOFF.md"
+      },
+      {
+        "status": "M",
+        "file": "docs/OPTICAL_STUDIO.md"
+      },
+      {
+        "status": "M",
+        "file": "index.html"
+      },
+      {
+        "status": "M",
+        "file": "package.json"
+      },
+      {
+        "status": "M",
+        "file": "scripts/optical-handoff.mjs"
+      },
+      {
+        "status": "M",
+        "file": "scripts/verify-optical-dimensions.mjs"
       },
       {
         "status": "M",
@@ -51,7 +335,2779 @@
       },
       {
         "status": "M",
+        "file": "scripts/verify-optical-studio.mjs"
+      },
+      {
+        "status": "M",
+        "file": "src/main.ts"
+      },
+      {
+        "status": "M",
+        "file": "src/optical-studio/OpticalLighting.ts"
+      },
+      {
+        "status": "M",
+        "file": "src/optical-studio/OpticalPanel.ts"
+      },
+      {
+        "status": "M",
+        "file": "src/optical-studio/OpticalRenderer.ts"
+      },
+      {
+        "status": "M",
+        "file": "src/optical-studio/OpticalState.ts"
+      },
+      {
+        "status": "M",
+        "file": "src/optical-studio/OpticalStudio.css"
+      },
+      {
+        "status": "M",
         "file": "src/optical-studio/OpticalStudio.ts"
+      },
+      {
+        "status": "M",
+        "file": "src/optical-studio/optical.frag.glsl"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/camera-continuity/azimuth--90--1.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/camera-continuity/azimuth--90-1.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/camera-continuity/azimuth-0--1.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/camera-continuity/azimuth-0-1.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/camera-continuity/azimuth-45--1.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/camera-continuity/azimuth-45-1.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/camera-continuity/azimuth-90--1.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/camera-continuity/azimuth-90-1.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/camera-continuity/elevation-0--1.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/camera-continuity/elevation-0-1.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/camera-continuity/report.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/cube0914/camera-midpoint.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/cube0914/fork.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/cube0914/original.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/cube0914/panel-narrow.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/cube0914/panel-wide.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/cube0914/verification.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/cube0914/video-2160.mp4"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/cube0914/video-320.mp4"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/current-user-angle.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/layers-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/light-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/native-4k.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/report.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/rotation-contact-sheet.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/transition-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/transition-11.55.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/transition-16.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/transition-5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/transition-6.5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/transition-8.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/yaw--120.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/yaw--150.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/yaw--180.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/yaw--30.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/yaw--60.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/yaw--90.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/yaw-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/yaw-120.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/yaw-150.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/yaw-30.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/yaw-60.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/dimension-light/yaw-90.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/actual-settings.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/azimuth--15.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/azimuth--30.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/azimuth--45.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/azimuth--60.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/azimuth--75.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/azimuth--90.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/azimuth-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/azimuth-15.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/azimuth-30.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/azimuth-45.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/azimuth-60.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/azimuth-75.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/azimuth-90.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-azimuth-0-0.001-lower.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-azimuth-0-0.001-upper.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-azimuth-0-0.01-lower.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-azimuth-0-0.01-upper.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-azimuth-0-0.1-lower.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-azimuth-0-0.1-upper.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-azimuth-45-0.001-lower.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-azimuth-45-0.001-upper.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-azimuth-45-0.01-lower.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-azimuth-45-0.01-upper.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-azimuth-45-0.1-lower.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-azimuth-45-0.1-upper.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-azimuth-90-0.001-lower.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-azimuth-90-0.001-upper.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-azimuth-90-0.01-lower.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-azimuth-90-0.01-upper.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-azimuth-90-0.1-lower.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-azimuth-90-0.1-upper.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-elevation-0-0.001-lower.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-elevation-0-0.001-upper.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-elevation-0-0.01-lower.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-elevation-0-0.01-upper.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-elevation-0-0.1-lower.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/continuity-elevation-0-0.1-upper.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/elevation--15.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/elevation--30.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/elevation--45.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/elevation-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/elevation-15.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/elevation-30.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/elevation-45.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/elevation-60.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/elevation-75.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/full-frame-2x.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/inactive-bounces-1.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/inactive-ior-1.01.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/inactive-ior-2.5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/loop-end.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/loop-start.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/report.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/structural-baseline.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/tiled-2x.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/transition-complete.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/transition-disabled.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/transition-gray.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/transition-middle.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/zero-gain.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/zero-intensity.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/after/zero-layers.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/actual-settings.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/azimuth--15.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/azimuth--30.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/azimuth--45.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/azimuth--60.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/azimuth--75.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/azimuth--90.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/azimuth-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/azimuth-15.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/azimuth-30.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/azimuth-45.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/azimuth-60.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/azimuth-75.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/azimuth-90.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/elevation--15.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/elevation--30.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/elevation--45.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/elevation-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/elevation-15.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/elevation-30.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/elevation-45.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/elevation-60.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/elevation-75.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/report.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/emissive-dimensions/before/structural-baseline.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/A-comparison.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/B-before-revision.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/B-comparison.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/hall-depth-concept.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/hybrid.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/hybridColorMix-one.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/hybridColorMix-zero.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/hybridDensity-one.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/hybridDensity-zero.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/hybridDistortion-one.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/hybridDistortion-zero.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/lights-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/loop-end.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/loop-start.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/main-rgb-4k.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/main-rgb.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/minimum-hybrid.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/motion-first-frame.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/motion-test.mp4"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/one-bounce.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/partial-kv-3x2.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/poster-a-series.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/sixteen-bounces.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/snapshot-narrow.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/sub-blue.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/sub-green.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/sub-red.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/transition-dimensions.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/transition-gray.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/transition-middle.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/verification.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/view--45.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/view-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/view-135.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/view-45.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab-v2/view-90.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/A-comparison.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/B-comparison.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/archive-panel.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/archive-verification.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/hall-depth-concept.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/hybrid.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/hybridColorMix-one.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/hybridColorMix-zero.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/hybridDensity-one.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/hybridDensity-zero.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/hybridDistortion-one.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/hybridDistortion-zero.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/lights-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/loop-end.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/loop-start.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/main-rgb-4k.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/main-rgb.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/motion-test.mp4"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/neutral-hybrid.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/partial-kv-3x2.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/poster-a-series.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/sub-blue.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/sub-green.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/sub-red.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/verification.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/view--45.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/view-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/view-135.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/view-45.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-ab/view-90.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/A-comparison.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/B-before-revision.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/B-comparison.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/archived-closed-v2.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/archived-v3.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/closed.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/face-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/fully-open.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/hall-depth-concept.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/hybrid.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/hybridColorMix-one.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/hybridColorMix-zero.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/hybridDensity-one.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/hybridDensity-zero.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/hybridDistortion-one.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/hybridDistortion-zero.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/hybridFaceWidth-one.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/hybridFaceWidth-zero.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/hybridRefractionOverlap-one.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/hybridRefractionOverlap-zero.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/lights-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/loop-end.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/loop-start.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/main-rgb-4k.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/main-rgb.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/minimum-hybrid.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/motion-test.mp4"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/nearly-open.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/one-bounce.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/panel-390.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/panel-narrow.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/panel-wide.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/partial-kv-3x2.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/poster-a-series.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/sixteen-bounces.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/sub-blue.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/sub-green.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/sub-red.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/transition-dimensions.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/transition-gray.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/transition-middle.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/verification.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/view--45.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/view-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/view-135.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/view-45.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-face/view-90.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-internal/internal-faces.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-internal/one-bounce.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-internal/v4-one-bounce.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-internal/v4-sixteen-bounces.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-internal/verification.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/A-comparison.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/B-before-revision.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/B-comparison.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/archived-closed-v2.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/archived-v3.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/closed.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/fully-open.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/hall-depth-concept.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/hybrid.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/hybridColorMix-one.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/hybridColorMix-zero.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/hybridDensity-one.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/hybridDensity-zero.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/hybridDistortion-one.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/hybridDistortion-zero.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/lights-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/loop-end.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/loop-start.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/main-rgb-4k.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/main-rgb.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/minimum-hybrid.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/motion-test.mp4"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/nearly-open.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/one-bounce.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/open-0.25.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/open-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/open-1.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/panel-390.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/partial-kv-3x2.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/poster-a-series.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/sixteen-bounces.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/sub-blue.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/sub-green.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/sub-red.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/transition-dimensions.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/transition-gray.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/transition-middle.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/verification.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/view--45.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/view-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/view-135.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/view-45.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-open/view-90.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition-audit/audit.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition-audit/onset-strength-0.7.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition-audit/onset-strength-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition-audit/t-2.99.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition-audit/t-3.001.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition-audit/t-3.03.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition-audit/t-3.25.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition-audit/t-3.5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition-audit/t-3.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition-audit/t-4.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition-audit/t-5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition-audit/t-6.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition-audit/t-7.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition/end-minus-1ms.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition/end.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition/old-end.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition/old-onset.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition/old-start.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition/start-plus-1ms.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition/start.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition/t-3.5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition/t-4.5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition/t-4.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition/t-5.5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition/t-5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition/t-6.5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition/t-6.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition/t-7.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition/transition.mp4"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/hybrid-transition/verification.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/accent-full-frame.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/accent-repeated.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/accent-tiled.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/accent-zero-before.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/accent-zero-completed.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/accent-zero-middle.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/archive-before.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/archive-completed.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/archive-middle.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/continuity-5.3-after.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/continuity-5.3-before.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/continuity-6.949999999999999-after.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/continuity-6.949999999999999-before.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/continuity-8.3-after.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/continuity-8.3-before.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/hold5-dissolve5-before-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/hold5-dissolve5-before-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/hold5-dissolve5-completed-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/hold5-dissolve5-completed-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/hold5-dissolve5-peak-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/hold5-dissolve5-peak-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/normal-loop-end.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/normal-loop-start.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/outside-0-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/outside-0-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/outside-150.5-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/outside-150.5-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/outside-3-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/outside-3-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/outside-40-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/outside-40-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/outside-5.3-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/outside-5.3-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/outside-8.3-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/outside-8.3-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-0-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-0-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-1-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-1-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-10-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-10-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-11-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-11-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-12-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-12-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-13-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-13-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-14-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-14-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-15-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-15-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-16-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-16-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-17-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-17-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-18-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-18-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-19-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-19-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-2-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-2-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-20-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-20-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-3-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-3-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-4-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-4-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-5-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-5-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-6-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-6-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-7-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-7-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-8-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-8-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-9-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/pulse-9-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/report.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/transition-disabled-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-axis-accent/transition-disabled-on.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-engraving/diagnostic-dimension-complete-lit.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-engraving/diagnostic-dimension-complete-no-reflected-light.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-engraving/diagnostic-erosion-lit.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-engraving/diagnostic-erosion-no-reflected-light.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-engraving/diagnostic-marked-face-lit.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-engraving/diagnostic-marked-face-no-reflected-light.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-engraving/diagnostic-settled-light-lit.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-engraving/diagnostic-settled-light-no-reflected-light.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-engraving/dimension-complete.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-engraving/endpoint-15.00-enabled.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-engraving/endpoint-15.00-ordinary.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-engraving/endpoint-8.30-enabled.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-engraving/endpoint-8.30-ordinary.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-engraving/erosion.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-engraving/marked-face.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-engraving/onset-gray.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-engraving/settled-light.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-engraving/source-gray.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-engraving/stages-contact-sheet.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-engraving/verification.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/dimensionLeft-first-only-count.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/dimensionLeft-first-only-gated.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/dimensionRight-first-only-count.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/dimensionRight-first-only-gated.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/dimensionTop-first-only-count.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/dimensionTop-first-only-gated.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/endpoint-15-ordinary.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/endpoint-15-simultaneous.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/endpoint-15-staggered.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/endpoint-8.5-ordinary.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/endpoint-8.5-simultaneous.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/endpoint-8.5-staggered.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/future-0.9-all.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/future-0.9-eligible.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/future-1.4-all.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/future-1.4-eligible.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/future-1.8-all.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/future-1.8-eligible.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/future-2.25-all.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/future-2.25-eligible.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/future-4.25-all.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/future-4.25-eligible.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/menu-verification.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/panel-minimum.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/panel-wide.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/second-excluded.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/second-repeat.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/second-supersampled-repeat.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/second-supersampled.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/second-visible.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/snapshot-menu-latest.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/snapshot-predecessor-after.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/snapshot-predecessor-before.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-layer-stagger/verification.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/capture-report.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/milestone-11p0s.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/milestone-2p5s.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/milestone-5p2s.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/milestone-6p3s.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/milestone-7p3s.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/milestone-8p3s.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/panel-narrow.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/panel-wide.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-center-15p00.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-center-3p00.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-center-5p30.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-center-6p80.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-center-8p30.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-dissolve-midpoint.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-dissolve-repeat.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-final-disabled.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-final-enabled.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-full-frame-1x.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-full-frame-2x.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-normal-before.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-normal-restored.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-pan-15p00.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-pan-3p00.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-pan-5p30.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-pan-6p80.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-pan-8p30.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-sequence-before.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-sequence-restored.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-source-monochrome.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-start-zero.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-tiled-1x.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/qa-tiled-2x.png"
+      },
+      {
+        "status": "??",
+        "file": "\"artifacts/identity-transition/transition-preview 2.mp4\""
+      },
+      {
+        "status": "??",
+        "file": "\"artifacts/identity-transition/transition-preview 3.mp4\""
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/transition-preview.mp4"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/identity-transition/verification.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/layer-fades/frame-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/layer-fades/frame-15.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/layer-fades/frame-7.5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/layer-fades/verification.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/open-dimensions/closed.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/open-dimensions/layers-off.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/open-dimensions/open.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/open-dimensions/verification.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-aspects/3x2-narrow.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-aspects/3x2-wide.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-aspects/3x2.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-aspects/a-series-narrow.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-aspects/a-series-wide.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-aspects/a-series.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-aspects/report.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-axis-motion/float-narrow.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-axis-motion/float-wide.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-axis-motion/narrow.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-axis-motion/report.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-axis-motion/swing-11.325.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-axis-motion/swing-13.4333333333.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-axis-motion/swing-30.3.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-axis-motion/swing-5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-axis-motion/swing-7.1083333333.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-axis-motion/swing-9.2166666667.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-axis-motion/time-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-axis-motion/time-13.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-axis-motion/time-20.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-axis-motion/time-30.3.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-axis-motion/time-5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-axis-motion/time-6.5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-axis-motion/time-8.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-axis-motion/wide.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-camera-motion/panel-narrow.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-camera-motion/panel-wide.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-camera-motion/report.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-camera-motion/time-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-camera-motion/time-13.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-camera-motion/time-20.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-camera-motion/time-30.3.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-camera-motion/time-5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-camera-motion/time-6.5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-camera-motion/time-8.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-rebuild/qa-no-dimensions.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-video/after-cancel-first-frame.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-video/after-cancel-reference.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-video/after-cancel.mp4"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-video/axis-accent-minimum.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-video/axis-accent-wide.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-video/native-4k-16spp-60fps.mp4"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-video/native-4k-16spp-first-frame.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-video/native-4k-16spp-reference.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-video/native-4k-4x5.mp4"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-video/native-4k-first-frame.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-video/native-4k-png-reference.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-video/panel-minimum.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-video/panel-narrow.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-video/panel-wide.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-video/ui-button-loop.mp4"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-video/unsupported-browser-message.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/optical-video/verification.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/after-far-straight/frame-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/after-far-straight/frame-10.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/after-far-straight/frame-15.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/after-far-straight/frame-5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/after-far-straight/state.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/after/frame-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/after/frame-10.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/after/frame-15.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/after/frame-5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/after/state.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/axis-edge-flow/frame-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/axis-edge-flow/frame-10.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/axis-edge-flow/frame-15.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/axis-edge-flow/frame-5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/axis-edge-flow/state.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/axis-fold/frame-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/axis-fold/frame-10.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/axis-fold/frame-15.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/axis-fold/frame-5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/axis-fold/state.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/before-far-straight/frame-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/before-far-straight/frame-10.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/before-far-straight/frame-15.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/before-far-straight/frame-5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/before-far-straight/state.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/before/frame-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/before/frame-10.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/before/frame-15.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/before/frame-5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/before/state.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/boundary-anchored/frame-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/boundary-anchored/frame-10.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/boundary-anchored/frame-15.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/boundary-anchored/frame-5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/boundary-anchored/state.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/open-dimensions/frame-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/open-dimensions/frame-10.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/open-dimensions/frame-15.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/open-dimensions/frame-5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/open-dimensions/state.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/steady-layer-fades/frame-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/steady-layer-fades/frame-10.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/steady-layer-fades/frame-15.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/steady-layer-fades/frame-5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/steady-layer-fades/state.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/straight-light/frame-0.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/straight-light/frame-10.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/straight-light/frame-15.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/straight-light/frame-5.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/reflection-flow/straight-light/state.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/sequence-version-menu/saved-20260915064626099-15s.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/sequence-version-menu/saved-20260915064626099-6.5s.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/sequence-version-menu/saved-20260915064626099-narrow.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/sequence-version-menu/saved-20260915064626099-wide.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/sequence-version-menu/saved-20260915065311136-15s.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/sequence-version-menu/saved-20260915065311136-6.5s.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/sequence-version-menu/saved-20260915065311136-narrow.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/sequence-version-menu/saved-20260915065311136-wide.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/sequence-version-menu/verification.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/version-archive/20260911-b-settings.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/version-archive/20260911-b.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/version-archive/saved-20260913141931349.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/version-archive/saved-20260913143525402.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/version-archive/saved-20260913150050902.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/version-archive/saved-20260913150336228.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/version-archive/saved-20260914093551440.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/version-archive/saved-20260914094359616.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/version-archive/saved-20260914094839691.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/version-archive/saved-20260914095518462.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/version-archive/saved-20260914100301996.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/version-archive/saved-20260914100944103.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/version-archive/verification.json"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/view-color/0--45.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/view-color/0-45.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/view-color/10--45.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/view-color/10-45.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/view-color/5--45.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/view-color/5-45.png"
+      },
+      {
+        "status": "??",
+        "file": "artifacts/view-color/report.json"
+      },
+      {
+        "status": "??",
+        "file": "docs/AXIS_SWING.md"
+      },
+      {
+        "status": "??",
+        "file": "docs/CUBE0914_MOTION.md"
+      },
+      {
+        "status": "??",
+        "file": "docs/HYBRID_AB_DIRECTION.md"
+      },
+      {
+        "status": "??",
+        "file": "docs/IDENTITY25_TRANSITION.md"
+      },
+      {
+        "status": "??",
+        "file": "docs/checkpoints/2026-09-16-before-lighting.md"
+      },
+      {
+        "status": "??",
+        "file": "experiments/dimension-light/README.md"
+      },
+      {
+        "status": "??",
+        "file": "experiments/dimension-light/dimension-light.glsl"
+      },
+      {
+        "status": "??",
+        "file": "experiments/dimension-light/verify-dimension-light.mjs"
+      },
+      {
+        "status": "??",
+        "file": "public/named-settings-store.html"
+      },
+      {
+        "status": "??",
+        "file": "public/named-settings-store.js"
+      },
+      {
+        "status": "??",
+        "file": "public/version-menu.js"
+      },
+      {
+        "status": "??",
+        "file": "scripts/analyze-pleos25.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/build-version-archive.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/capture-identity-transition.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/capture-reflection-flow.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/prepare-version-compatibility.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/save-site-version.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-camera-continuity.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-cube0914.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-dimension-timing.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-hybrid-ab.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-hybrid-internal.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-hybrid-transition.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-identity-axis-accent.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-identity-engraving.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-identity-layer-stagger-menu.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-identity-layer-stagger.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-identity-transition.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-layer-fades.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-light-motion-panel.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-named-settings.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-open-dimensions.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-optical-aspects.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-optical-axis-motion.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-optical-camera-motion.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-optical-video.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-sequence-version-menu.mjs"
+      },
+      {
+        "status": "??",
+        "file": "scripts/verify-version-archive.mjs"
+      },
+      {
+        "status": "??",
+        "file": "src/optical-studio/Cube0914.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/optical-studio/HybridAB.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/optical-studio/Identity25.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/optical-studio/IdentityAxisAccent.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/optical-studio/IdentityLayerTiming.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/optical-studio/OpticalAxisMotion.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/optical-studio/OpticalCameraFloat.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/optical-studio/OpticalCameraMotion.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/optical-studio/OpticalVideoExporter.ts"
+      },
+      {
+        "status": "??",
+        "file": "src/optical-studio/cube0914.frag.glsl"
+      },
+      {
+        "status": "??",
+        "file": "src/optical-studio/hybridInternalReflection.glsl"
+      },
+      {
+        "status": "??",
+        "file": "src/optical-studio/hybridOptics.glsl"
+      },
+      {
+        "status": "??",
+        "file": "src/optical-studio/identity25-keyframes.json"
+      },
+      {
+        "status": "??",
+        "file": "src/optical-studio/identity25.glsl"
       },
       {
         "status": "??",
@@ -152,6 +3208,10 @@
       {
         "status": "??",
         "file": "tmp/verify-video.log"
+      },
+      {
+        "status": "??",
+        "file": "versions.json"
       }
     ]
   },
@@ -159,7 +3219,8 @@
     "entryPoint": "src/main.ts",
     "defaultRoute": "/",
     "activeApplication": "OpticalStudio",
-    "renderer": "WebGL2 analytic dielectric ray integrator / linear HDR",
+    "look": "hybrid-ab",
+    "renderer": "WebGL2 analytic optical contours / linear HDR",
     "projection": "orthographic",
     "referenceRoutes": [
       "?renderer=studio",
@@ -168,8 +3229,45 @@
     ]
   },
   "runtime": {
+    "hybrid": {
+      "look": "hybrid-ab",
+      "revision": 6,
+      "base": "A closed optical proxy internal-reflection paths + open B anchor and motion",
+      "internalFaceTransport": "secondary closed rounded-cube proxy; no exterior or unreflected transmission; art-directed open-domain mapping",
+      "opening": 1,
+      "openAtFull": true,
+      "transitionRevision": 1,
+      "transition": "shared contour formation, optical shoulder growth and gray-carrier release",
+      "faceReflection": {
+        "strength": 0.7,
+        "width": 0.5,
+        "overlap": 0.55,
+        "maxImages": 8
+      },
+      "color": "RGB 순환",
+      "powerFractionsRGB": [
+        0.6935999989509583,
+        0.15320000052452087,
+        0.15320000052452087
+      ],
+      "outerAxisLocked": true,
+      "shellRadiance": true,
+      "exteriorReflectionScale": 0.035,
+      "directTransmissionScale": 0.12,
+      "internalBounceBudget": 16,
+      "physicalPathTracing": false,
+      "distortion": 0.55,
+      "density": 0.55,
+      "depthStudy": {
+        "amount": 0,
+        "cycles": 1,
+        "calibratedHallD": false,
+        "note": "concept only; screen geometry and viewing position required"
+      }
+    },
+    "expressionSource": null,
     "ready": true,
-    "renderer": "WebGL2 analytic dielectric ray integrator / linear HDR",
+    "renderer": "WebGL2 analytic optical contours / linear HDR",
     "projection": "orthographic",
     "axis": {
       "family": "30deg",
@@ -210,12 +3308,12 @@
       "cubeScale": 2,
       "cubeEdgeLength": 3.3068111527572905,
       "projectionAngles": [
-        9.31640830154197,
+        45.53738007212621,
         90,
-        103.90944952658475,
-        189.316408301542,
+        157.88193385704812,
+        225.5373800721262,
         270,
-        283.90944952658475
+        337.8819338570481
       ],
       "cubeCount": 3,
       "defaultProjection": [
@@ -224,6 +3322,43 @@
       ]
     },
     "state": {
+      "hybridDistortion": 0.55,
+      "hybridDensity": 0.55,
+      "hybridColorMix": 0.6,
+      "hybridColorMode": 0,
+      "hybridDepthFlow": 0,
+      "hybridDepthCycles": 1,
+      "hybridOpening": 1,
+      "hybridFaceReflection": 0.7,
+      "hybridFaceWidth": 0.5,
+      "hybridRefractionOverlap": 0.55,
+      "cameraFloat": 0,
+      "cameraFloatX": 4,
+      "cameraFloatY": 3,
+      "cameraFloatSeconds": 15,
+      "axisMotion": 0,
+      "axisYaw": 24,
+      "axisRoll": 12,
+      "axisMoveSeconds": 8,
+      "cameraMotion": 0,
+      "cameraOrbitHorizontal": -24,
+      "cameraOrbitVertical": 6,
+      "cameraMoveSeconds": 8,
+      "identityLayerStagger": 0,
+      "identityEngraving": 1,
+      "identityAxisAccent": 1,
+      "identityTransition": 0,
+      "identityHold": 5.3,
+      "identityDissolve": 3,
+      "identityCenterVersion": 0,
+      "dimensionDelayTop": 5.6,
+      "dimensionDelayLeft": 7.7,
+      "dimensionDelayRight": 0,
+      "lightMotionCycles": 1,
+      "layerFadeAmount": 1,
+      "layerFadeCycles": 4,
+      "layerStagger": 0.32,
+      "panX": -11.5,
       "gap": 0.015,
       "bevel": 0.03,
       "ior": 1.86,
@@ -231,47 +3366,167 @@
       "roughness": 0.2,
       "surfaceCurvature": 0,
       "reflection": 2,
-      "absorption": 0.03,
-      "lightIntensity": 1.8,
-      "lightSpread": 0.2,
-      "red": 0,
-      "green": 2,
+      "absorption": 0,
+      "lightIntensity": 3.25,
+      "lightSpread": 1.14,
+      "red": 1,
+      "green": 0,
       "blue": 0,
-      "exposure": 1,
-      "zoom": 3.3058260701900157,
-      "azimuth": 78.60406250000001,
-      "elevation": 54.47843750000001,
-      "time": 7.5,
-      "duration": 15,
-      "speed": 0.4,
-      "dimensionTop": 1.4,
+      "exposure": 0.59,
+      "zoom": 1.485,
+      "azimuth": 32.275,
+      "elevation": 40.055,
+      "time": 2,
+      "duration": 20,
+      "speed": 0,
+      "dimensionTop": 5.05,
       "dimensionLeft": 11.85,
       "dimensionRight": 12,
       "bloom": 0.18,
       "dimensionSpacing": 0.14,
       "dimensionSoftness": 1,
       "dimensionFalloff": 1,
-      "lightColor": "#0ADC91",
+      "lightColor": "#FA293C",
       "dimensionSpacingTop": 0.3,
       "dimensionSpacingLeft": 0.085,
       "dimensionSpacingRight": 0.06,
-      "bounces": 12,
+      "bounces": 16,
       "playing": false,
       "aspect": "4x5",
       "lightCycle": true,
-      "lightCycleOffset": 0.4686666666666667
+      "lightCycleOffset": 0,
+      "videoLongEdge": 3840,
+      "videoFps": 30,
+      "videoSamples": 4
     },
     "artboard": {
       "preset": "4x5",
       "width": 3072,
-      "height": 3840
+      "height": 3840,
+      "supportedFormats": [
+        {
+          "id": "main",
+          "label": "1:1",
+          "ratio": 1
+        },
+        {
+          "id": "4x5",
+          "label": "4:5",
+          "ratio": 0.8
+        },
+        {
+          "id": "9x16",
+          "label": "9:16",
+          "ratio": 0.5625
+        },
+        {
+          "id": "16x9",
+          "label": "16:9",
+          "ratio": 1.7777777777777777
+        },
+        {
+          "id": "a-series",
+          "label": "A시리즈 · 세로",
+          "ratio": 0.7071067811865475
+        },
+        {
+          "id": "3x2",
+          "label": "3:2",
+          "ratio": 1.5
+        }
+      ]
     },
     "motion": {
-      "time": 7.5,
-      "duration": 15,
+      "time": 2,
+      "duration": 20,
       "playing": false,
       "deterministic": true,
-      "kind": "optical-light-loop"
+      "float": {
+        "enabled": false,
+        "start": 0,
+        "period": 20,
+        "cycles": 1,
+        "x": 0,
+        "y": 0,
+        "units": "percent of artboard width/height",
+        "method": "bounded image-plane translation; fixed viewing direction and depth"
+      },
+      "axis": {
+        "enabled": false,
+        "yaw": 0,
+        "roll": 0,
+        "weight": 0,
+        "start": 0,
+        "peak": 1.6666666666666667,
+        "end": 20,
+        "cycles": 3,
+        "period": 6.666666666666667,
+        "requestedYaw": 24,
+        "requestedRoll": 12,
+        "safeYaw": 20,
+        "safeRoll": 12,
+        "safetyLimited": true,
+        "pivot": [
+          0,
+          0,
+          0
+        ],
+        "method": "eased signed 0 → positive → 0 → negative → 0 swing; view-octant safety envelope; fixed camera; rigid shared Axis"
+      },
+      "camera": {
+        "enabled": false,
+        "start": 0,
+        "peak": 8,
+        "end": 20,
+        "weight": 0,
+        "azimuth": 32.275,
+        "elevation": 40.055,
+        "baseAzimuth": 32.275,
+        "baseElevation": 40.055,
+        "horizontal": -24,
+        "vertical": 6,
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "method": "fixed Axis geometry; eased out-and-back orthographic camera orbit; saved pan and zoom unchanged"
+      },
+      "kind": "optical-light-loop",
+      "identityTransition": {
+        "enabled": false,
+        "name": "25엑시스",
+        "sourceSegment": 5.3,
+        "lightingBuildSeconds": 3,
+        "layerAppearance": {
+          "enabled": false,
+          "staggerSeconds": 0,
+          "count": 12,
+          "firstStart": 5.3,
+          "fadeSeconds": 0.8,
+          "lastStart": 5.3,
+          "completeAt": 6.1,
+          "order": "boundary nearest shared Axis first, then progressively inset images away from Axis"
+        },
+        "axisAccent": {
+          "enabled": false,
+          "progress": 0,
+          "envelope": 0,
+          "intensity": 1,
+          "amount": 0,
+          "start": 5.42,
+          "peak": 6.199999999999999,
+          "end": 8.18,
+          "role": "single eased highlight on the existing animated Axis folds; no new geometry or change to layer timing"
+        },
+        "oneShot": false,
+        "loop": true,
+        "isolatedSettings": false,
+        "center": "constant camera pan for every phase; sequence starts at panX zero; subsequent manual changes preserved",
+        "method": "co-moving affine faces; dimension contours engrave narrow light into gray carriers, open into gradients, then locally release the carrier around the marks; only late residual closure; no two-shot crossfade",
+        "source": "procedural six-plane fit; no video or reference texture"
+      },
+      "dimensions": "fixed contours and normals; staggered whole-layer fades; outer anchor retains 25% visibility; period follows duration"
     },
     "limits": {
       "maxOutputDimension": 8192,
@@ -282,59 +3537,101 @@
     "preview": {
       "width": 995,
       "height": 1244,
-      "sampleScale": 2,
-      "sourceWidth": 2054,
-      "sourceHeight": 2552,
+      "sampleScale": 1,
+      "sourceWidth": 1027,
+      "sourceHeight": 1276,
       "guardPixels": 16,
-      "cpuSubmitMs": 0.10000002384185791
+      "cpuSubmitMs": 0.10000014305114746
     },
     "exporting": false,
+    "videoExport": {
+      "busy": false,
+      "status": "대기 중",
+      "progress": 0,
+      "format": "MP4 / H.264 preferred, HEVC Main8 fallback at unchanged resolution / sRGB 8-bit, no audio",
+      "deterministic": true,
+      "maxLongEdge": 3840,
+      "fps": [
+        24,
+        30,
+        60
+      ],
+      "spatialSamples": [
+        4,
+        16
+      ],
+      "method": "sequential fixed-time guarded HDR tiles; bounded encoder queue; no screen recording or upscaling"
+    },
     "rendering": {
-      "primaryInternalReflection": "deterministic split rays",
-      "secondaryInterfaces": 8,
+      "expression": "hybrid-ab",
+      "primaryInternalReflection": "refracted virtual cubical light images",
+      "secondaryInterfaces": 0,
       "spectralChannels": 3,
       "emission": false,
       "textureFeedback": false,
+      "shellRadiance": true,
+      "physicalRayBudgetActive": true,
+      "physicalIORActive": true,
+      "viewInvariantRadiance": false,
+      "visibilityNote": "Restored studio reflections; projection, overlap, reflected direction and Fresnel vary with view.",
+      "axisFold": "B single boundary anchor + one-sided open A rounded internal reflection images",
       "dimensions": {
-        "top": 1.4,
+        "top": 5.05,
         "left": 11.85,
         "right": 12,
-        "spacing": {
-          "top": 0.3,
-          "left": 0.085,
-          "right": 0.06
-        },
-        "softness": 1,
-        "falloff": 1,
-        "spread": "spacing-linked asymmetric gradient tail away from shared world Axis origin; smooth face-tangent direction and bounded width",
-        "meaning": "continuous light-only virtual cubical reflection layers, fractional last-layer fade; independent of physical ray depth",
-        "physicalSimulation": false
+        "max": 50,
+        "openExterior": true,
+        "opening": 1,
+        "openAxisAnchor": true
       },
       "hdr": true,
       "resolve": "linear spatial average → finite HDR bloom → tone mapping → sRGB → spatial AA",
       "lighting": {
-        "rig": "four smooth studio emitters with fixed world-space negative-fill apertures",
-        "color": "#0ADC91",
+        "rig": "studio ribbons reflected through A optical paths; external mirror scale .035, direct transmission .12",
+        "color": "#FA293C",
         "cycle": {
-          "enabled": true,
-          "periodSeconds": 15,
-          "phaseOffset": 0.4686666666666667,
-          "order": "green → red → blue (rotated to chosen starting colour)",
+          "look": "hybrid-ab",
+          "revision": 6,
+          "base": "A closed optical proxy internal-reflection paths + open B anchor and motion",
+          "internalFaceTransport": "secondary closed rounded-cube proxy; no exterior or unreflected transmission; art-directed open-domain mapping",
+          "opening": 1,
+          "openAtFull": true,
+          "transitionRevision": 1,
+          "transition": "shared contour formation, optical shoulder growth and gray-carrier release",
+          "faceReflection": {
+            "strength": 0.7,
+            "width": 0.5,
+            "overlap": 0.55,
+            "maxImages": 8
+          },
+          "color": "RGB 순환",
           "powerFractionsRGB": [
-            0.10000000149011612,
-            0.800000011920929,
-            0.10000000149011612
+            0.6935999989509583,
+            0.15320000052452087,
+            0.15320000052452087
           ],
-          "dominant": "그린",
-          "meaning": "emitter power fractions, not guaranteed screen colour coverage"
+          "outerAxisLocked": true,
+          "shellRadiance": true,
+          "exteriorReflectionScale": 0.035,
+          "directTransmissionScale": 0.12,
+          "internalBounceBudget": 16,
+          "physicalPathTracing": false,
+          "distortion": 0.55,
+          "density": 0.55,
+          "depthStudy": {
+            "amount": 0,
+            "cycles": 1,
+            "calibratedHallD": false,
+            "note": "concept only; screen geometry and viewing position required"
+          }
         },
-        "controls": "shared intensity; optional spatial RGB ribbons with 80/10/10 power handover; no material tint or object emission"
+        "controls": "isolated RGB cycle / main balanced / three dominant static compositions"
       },
       "surfaceFigure": {
-        "amount": 0,
-        "model": "smooth lens-like shading-normal approximation; geometric silhouette and medium offsets unchanged"
+        "amount": 0.55,
+        "model": "A refracted image rays and rounded local normals; one-sided optical domain extension, remote caps nonreflecting at full opening"
       },
-      "roughness": "path-dependent emitter filtering and coherent reflection attenuation; scattered energy not fully integrated"
+      "roughness": "emitter filtering on virtual image rays; scattered energy not fully integrated"
     }
   },
   "axis": {
@@ -376,12 +3673,12 @@
     "cubeScale": 2,
     "cubeEdgeLength": 3.3068111527572905,
     "projectionAngles": [
-      9.31640830154197,
+      45.53738007212621,
       90,
-      103.90944952658475,
-      189.316408301542,
+      157.88193385704812,
+      225.5373800721262,
       270,
-      283.90944952658475
+      337.8819338570481
     ],
     "cubeCount": 3,
     "defaultProjection": [
@@ -392,50 +3689,167 @@
   "artboard": {
     "preset": "4x5",
     "width": 3072,
-    "height": 3840
+    "height": 3840,
+    "supportedFormats": [
+      {
+        "id": "main",
+        "label": "1:1",
+        "ratio": 1
+      },
+      {
+        "id": "4x5",
+        "label": "4:5",
+        "ratio": 0.8
+      },
+      {
+        "id": "9x16",
+        "label": "9:16",
+        "ratio": 0.5625
+      },
+      {
+        "id": "16x9",
+        "label": "16:9",
+        "ratio": 1.7777777777777777
+      },
+      {
+        "id": "a-series",
+        "label": "A시리즈 · 세로",
+        "ratio": 0.7071067811865475
+      },
+      {
+        "id": "3x2",
+        "label": "3:2",
+        "ratio": 1.5
+      }
+    ]
   },
-  "activeExpression": "optical-glass",
+  "activeExpression": "hybrid-ab",
   "motion": {
-    "time": 7.5,
-    "duration": 15,
+    "time": 2,
+    "duration": 20,
     "playing": false,
     "deterministic": true,
-    "kind": "optical-light-loop"
+    "float": {
+      "enabled": false,
+      "start": 0,
+      "period": 20,
+      "cycles": 1,
+      "x": 0,
+      "y": 0,
+      "units": "percent of artboard width/height",
+      "method": "bounded image-plane translation; fixed viewing direction and depth"
+    },
+    "axis": {
+      "enabled": false,
+      "yaw": 0,
+      "roll": 0,
+      "weight": 0,
+      "start": 0,
+      "peak": 1.6666666666666667,
+      "end": 20,
+      "cycles": 3,
+      "period": 6.666666666666667,
+      "requestedYaw": 24,
+      "requestedRoll": 12,
+      "safeYaw": 20,
+      "safeRoll": 12,
+      "safetyLimited": true,
+      "pivot": [
+        0,
+        0,
+        0
+      ],
+      "method": "eased signed 0 → positive → 0 → negative → 0 swing; view-octant safety envelope; fixed camera; rigid shared Axis"
+    },
+    "camera": {
+      "enabled": false,
+      "start": 0,
+      "peak": 8,
+      "end": 20,
+      "weight": 0,
+      "azimuth": 32.275,
+      "elevation": 40.055,
+      "baseAzimuth": 32.275,
+      "baseElevation": 40.055,
+      "horizontal": -24,
+      "vertical": 6,
+      "target": [
+        0,
+        0,
+        0
+      ],
+      "method": "fixed Axis geometry; eased out-and-back orthographic camera orbit; saved pan and zoom unchanged"
+    },
+    "kind": "optical-light-loop",
+    "identityTransition": {
+      "enabled": false,
+      "name": "25엑시스",
+      "sourceSegment": 5.3,
+      "lightingBuildSeconds": 3,
+      "layerAppearance": {
+        "enabled": false,
+        "staggerSeconds": 0,
+        "count": 12,
+        "firstStart": 5.3,
+        "fadeSeconds": 0.8,
+        "lastStart": 5.3,
+        "completeAt": 6.1,
+        "order": "boundary nearest shared Axis first, then progressively inset images away from Axis"
+      },
+      "axisAccent": {
+        "enabled": false,
+        "progress": 0,
+        "envelope": 0,
+        "intensity": 1,
+        "amount": 0,
+        "start": 5.42,
+        "peak": 6.199999999999999,
+        "end": 8.18,
+        "role": "single eased highlight on the existing animated Axis folds; no new geometry or change to layer timing"
+      },
+      "oneShot": false,
+      "loop": true,
+      "isolatedSettings": false,
+      "center": "constant camera pan for every phase; sequence starts at panX zero; subsequent manual changes preserved",
+      "method": "co-moving affine faces; dimension contours engrave narrow light into gray carriers, open into gradients, then locally release the carrier around the marks; only late residual closure; no two-shot crossfade",
+      "source": "procedural six-plane fit; no video or reference texture"
+    },
+    "dimensions": "fixed contours and normals; staggered whole-layer fades; outer anchor retains 25% visibility; period follows duration"
   },
-  "heroTime": 7.5,
+  "heroTime": 2,
   "previews": [
     {
       "id": "main",
       "file": "artifacts/latest/preview-main.png",
-      "width": 864,
-      "height": 1080,
-      "heroTime": 7.5,
+      "width": 640,
+      "height": 800,
+      "heroTime": 2,
       "samples": 4,
       "mode": "optical-studio",
-      "look": "optical-glass",
-      "motionPreset": "light-orbit"
+      "look": "hybrid-ab",
+      "motionPreset": "optical-light-loop"
     },
     {
       "id": "4x5",
       "file": "artifacts/latest/preview-4x5.png",
-      "width": 1080,
-      "height": 1350,
-      "heroTime": 7.5,
+      "width": 640,
+      "height": 800,
+      "heroTime": 2,
       "samples": 4,
       "mode": "optical-studio",
-      "look": "optical-glass",
-      "motionPreset": "light-orbit"
+      "look": "hybrid-ab",
+      "motionPreset": "optical-light-loop"
     },
     {
       "id": "9x16",
       "file": "artifacts/latest/preview-9x16.png",
-      "width": 1080,
-      "height": 1920,
-      "heroTime": 7.5,
+      "width": 450,
+      "height": 800,
+      "heroTime": 2,
       "samples": 4,
       "mode": "optical-studio",
-      "look": "optical-glass",
-      "motionPreset": "light-orbit"
+      "look": "hybrid-ab",
+      "motionPreset": "optical-light-loop"
     }
   ],
   "validation": {
@@ -450,7 +3864,7 @@
       "name": "typecheck",
       "command": "npm run typecheck",
       "status": "pass",
-      "durationMs": 2037,
+      "durationMs": 2166,
       "exitCode": 0,
       "signal": null,
       "outputTail": "> pleos-27-axis@1.0.0 typecheck\n> tsc -b --pretty false"
@@ -459,23 +3873,23 @@
       "name": "verify",
       "command": "npm run verify",
       "status": "pass",
-      "durationMs": 20496,
+      "durationMs": 41544,
       "exitCode": 0,
       "signal": null,
-      "outputTail": "    \"red-main\": {\n      \"width\": 432,\n      \"height\": 540\n    },\n    \"blue-main\": {\n      \"width\": 432,\n      \"height\": 540\n    },\n    \"loop-end\": {\n      \"width\": 432,\n      \"height\": 540\n    },\n    \"manual-restored\": {\n      \"width\": 432,\n      \"height\": 540\n    },\n    \"lights-off\": {\n      \"width\": 432,\n      \"height\": 540\n    },\n    \"overview-green\": {\n      \"width\": 540,\n      \"height\": 675\n    },\n    \"overview-red\": {\n      \"width\": 540,\n      \"height\": 675\n    },\n    \"overview-blue\": {\n      \"width\": 540,\n      \"height\": 675\n    }\n  },\n  \"status\": \"pass\"\n}"
+      "outputTail": "      },\n      {\n        \"time\": 6.949999999999999,\n        \"difference\": {\n          \"mae\": 0.17251383463541667,\n          \"maximum\": 64,\n          \"changedChannelFraction\": 0.00096435546875\n        }\n      },\n      {\n        \"time\": 8.3,\n        \"difference\": {\n          \"mae\": 0.002384440104166667,\n          \"maximum\": 3,\n          \"changedChannelFraction\": 0.00001220703125\n        }\n      }\n    ],\n    \"statePreservation\": \"Only accent strength changes; exact state survives reload\",\n    \"tiled\": {\n      \"mae\": 0.000016666666666666667,\n      \"maximum\": 1,\n      \"changedChannelFraction\": 0\n    },\n    \"loopAndExport\": \"Normal reflection loop and repeated export frames are pixel-identical; transition pulse is evaluated from scene time\"\n  },\n  \"captureCount\": 79,\n  \"errors\": []\n}\n\n> pleos-27-axis@1.0.0 verify:optical-camera-motion\n> node scripts/verify-optical-camera-motion.mjs && node scripts/verify-optical-axis-motion.mjs\n\n{\"errors\":[],\"checks\":[{\"time\":0,\"explicitCameraPixelDifference\":0,\"savedAngleUnchanged\":true},{\"time\":5,\"explicitCameraPixelDifference\":0,\"savedAngleUnchanged\":true},{\"time\":6.5,\"explicitCameraPixelDifference\":0,\"savedAngleUnchanged\":true},{\"time\":8,\"explicitCameraPixelDifference\":0,\"savedAngleUnchanged\":true},{\"time\":13,\"explicitCameraPixelDifference\":0,\"savedAngleUnchanged\":true},{\"time\":20,\"explicitCameraPixelDifference\":0,\"savedAngleUnchanged\":true},{\"time\":30.3,\"explicitCameraPixelDifference\":0,\"savedAngleUnchanged\":true}],\"timeline\":[{\"time\":0,\"enabled\":true,\"start\":5,\"peak\":13,\"end\":30.3,\"weight\":0,\"azimuth\":80.384,\"elevation\":28.675,\"baseAzimuth\":80.384,\"baseElevation\":28.675,\"horizontal\":-24,\"vertical\":6,\"target\":[0,0,0],\"method\":\"fixed Axis geometry; eased out-and-back orthographic camera orbit; saved pan and zoom unchanged\"},{\"time\":5,\"enabled\":true,\"start\":5,\"peak\":13,\"end\":30.3,\"weight\":0,\"azimuth\":80.384,\"elevation\":28.675,\"baseAzimuth\":80.384,\"baseElevation\":28.675,\"horizontal\":-24,\"vertical\":6,\"target\":[0,0,0],\"method\":\"fixed Axis geometry; eased out-and-back orthographic camera orbit; saved pan and zoom unchanged\"},{\"time\":5.001,\"enabled\":true,\"start\":5,\"peak\":13,\"end\":30.3,\"weight\":1.952758807375003e-11,\"azimuth\":80.38399999953134,\"elevation\":28.675000000117166,\"baseAzimuth\":80.384,\"baseElevation\":28.675,\"horizontal\":-24,\"vertical\":6,\"target\":[0,0,0],\"method\":\"fixed Axis geometry; eased out-and-back orthographic camera orbit; saved pan and zoom unchanged\"},{\"time\":6.5,\"enabled\":true,\"start\":5,\"peak\":13,\"end\":30.3,\"weight\":0.04876899719238281,\"azimuth\":79.21354406738281,\"elevation\":28.967613983154298,\"baseAzimuth\":80.384,\"baseElevation\":28.675,\"horizontal\":-24,\"vertical\":6,\"target\":[0,0,0],\"method\":\"fixed Axis geometry; eased out-and-back orthographic camera orbit; saved pan and zoom unchanged\"},{\"time\":8,\"enabled\":true,\"start\":5,\"peak\":13,\"end\":30.3,\"weight\":0.27520751953125,\"azimuth\":73.77901953125,\"elevation\":30.3262451171875,\"baseAzimuth\":80.384,\"baseElevation\":28.675,\"horizontal\":-24,\"vertical\":6,\"target\":[0,0,0],\"method\":\"fixed Axis geometry; eased out-and-back orthographic camera orbit; saved pan and zoom unchanged\"},{\"time\":13,\"enabled\":true,\"start\":5,\"peak\":13,\"end\":30.3,\"weight\":1,\"azimuth\":56.384,\"elevation\":34.675,\"baseAzimuth\":80.384,\"baseElevation\":28.675,\"horizontal\":-24,\"vertical\":6,\"target\":[0,0,0],\"method\":\"fixed Axis geometry; eased out-and-back orthographic camera orbit; saved pan and zoom unchanged\"},{\"time\":20,\"enabled\":true,\"start\":5,\"peak\":13,\"end\":30.3,\"weight\":0.6745388921328066,\"azimuth\":64.19506658881264,\"elevation\":32.72223335279684,\"baseAzimuth\":80.384,\"baseElevation\":28.675,\"horizontal\":-24,\"vertical\":6,\"target\":[0,0,0],\"method\":\"fixed Axis geometry; eased out-and-back orthographic camera orbit; saved pan and zoom unchanged\"},{\"time\":30.299,\"enabled\":true,\"start\":5,\"peak\":13,\"end\":30.3,\"weight\":1.9306778398231472e-12,\"azimuth\":80.38399999995366,\"elevation\":28.675000000011586,\"baseAzimuth\":80.384,\"baseElevation\":28.675,\"horizontal\":-24,\"vertical\":6,\"target\":[0,0,0],\"method\":\"fixed Axis geometry; eased out-and-back orthographic camera orbit; saved pan and zoom unchanged\"},{\"time\":30.3,\"enabled\":true,\"start\":5,\"peak\":13,\"end\":30.3,\"weight\":0,\"azimuth\":80.384,\"elevation\":28.675,\"baseAzimuth\":80.384,\"baseElevation\":28.675,\"horizontal\":-24,\"vertical\":6,\"target\":[0,0,0],\"method\":\"fixed Axis geometry; eased out-and-back orthographic camera orbit; saved pan and zoom unchanged\"}],\"axisCameraLoop\":{\"limits\":{\"horizontal\":4.6967926025390625,\"vertical\":3.131195068359375,\"scale\":0.26093292236328125},\"minMargin\":0.07494302827230001,\"minHorizontal\":-4.696572730918391,\"maxHorizontal\":4.696650050872872,\"minVertical\":-3.1310288328805758,\"maxVertical\":3.131128217807235,\"start\":{\"enabled\":true,\"start\":5.3,\"peak\":7.383333333333333,\"end\":30.3,\"weight\":0,\"azimuth\":58.676,\"elevation\":13.048,\"baseAzimuth\":58.676,\"baseElevation\":13.048,\"horizontal\":0,\"vertical\":0,\"target\":[0,0,0],\"cycles\":3,\"period\":8.333333333333334,\"requestedHorizontal\":37,\"requestedVertical\":20,\"safeHorizontal\":4.6967926025390625,\"safeVertical\":3.131195068359375,\"safetyLimited\":true,\"method\":\"eased closed camera orbit, synchronized with rigid Axis swing; combined view-octant safety envelope\"},\"end\":{\"enabled\":true,\"start\":5.3,\"peak\":7.383333333333333,\"end\":30.3,\"weight\":0,\"azimuth\":58.676,\"elevation\":13.048,\"baseAzimuth\":58.676,\"baseElevation\":13.048,\"horizontal\":0,\"vertical\":0,\"target\":[0,0,0],\"cycles\":3,\"period\":8.333333333333334,\"requestedHorizontal\":37,\"requestedVertical\":20,\"safeHorizontal\":4.6967926025390625,\"safeVertical\":3.131195068359375,\"safetyLimited\":true,\"method\":\"eased closed camera orbit, synchronized with rigid Axis swing; combined view-octant safety envelope\"}},\"status\":\"PASS\"}\n{\"status\":\"pass\",\"errors\":[],\"yawEquivalenceMae\":0.000018310546875}"
     },
     {
       "name": "build",
       "command": "npm run build",
       "status": "pass",
-      "durationMs": 6732,
+      "durationMs": 10053,
       "exitCode": 0,
       "signal": null,
-      "outputTail": "dist/assets/fullscreen.vert-C-jkPNU4.js            0.22 kB │ gzip:   0.18 kB\ndist/assets/colors-D_b0tcXK.js                     0.28 kB │ gzip:   0.19 kB\ndist/assets/ModeRegistry-afUNfvaX.js               0.34 kB │ gzip:   0.22 kB\ndist/assets/LegacyArchiveView-CxfvYwCh.js          0.71 kB │ gzip:   0.41 kB\ndist/assets/PngMetadata-D7ZL0hXE.js                1.06 kB │ gzip:   0.57 kB\ndist/assets/RoundedBoxGeometry-CZcYavyv.js         1.72 kB │ gzip:   0.81 kB\ndist/assets/presets-BX97Zrue.js                    1.80 kB │ gzip:   0.80 kB\ndist/assets/RoomEnvironment-B4NOg-5c.js            2.07 kB │ gzip:   0.89 kB\ndist/assets/BufferGeometryUtils-CsoQxFFe.js        5.26 kB │ gzip:   1.71 kB\ndist/assets/index-zHoPM3na.js                      8.14 kB │ gzip:   3.00 kB\ndist/assets/StudioShell-9k7q1rvU.js               11.59 kB │ gzip:   3.82 kB\ndist/assets/UnrealBloomPass-mQeuDl5D.js           15.78 kB │ gzip:   3.93 kB\ndist/assets/index-Bgm4ANIy.js                     33.37 kB │ gzip:   9.99 kB\ndist/assets/AxisTrailsMode-ty1aSZbC.js            37.39 kB │ gzip:  12.39 kB\ndist/assets/LightFieldMode-CI5AOa5k.js            38.14 kB │ gzip:  12.57 kB\ndist/assets/GlassPrismMode-CRLLJRN7.js            39.73 kB │ gzip:  12.94 kB\ndist/assets/MeshBVH-BWDiuoAC.js                   47.96 kB │ gzip:  15.87 kB\ndist/assets/SMAAPass-DYQVrftP.js                  61.27 kB │ gzip:  38.28 kB\ndist/assets/OpticalStudio-BFR2mV10.js             67.94 kB │ gzip:  23.58 kB\ndist/assets/AxisMegastructureMode-0aiiUhp3.js     97.23 kB │ gzip:  29.86 kB\ndist/assets/index-BJOUBGGp.js                    119.59 kB │ gzip:  33.76 kB\ndist/assets/AxisHabitatMode-CAignr5e.js          189.39 kB │ gzip:  66.96 kB\ndist/assets/CrystalAssembly-Ck-HUeSp.js          209.53 kB │ gzip:  55.51 kB\ndist/assets/OutputPass-BDAB8kpn.js               250.34 kB │ gzip: 102.54 kB\ndist/assets/three.module-Dc7hrohh.js             735.86 kB │ gzip: 190.70 kB\ndist/assets/DimentionR3FMode-DaSJ8eQd.js         833.79 kB │ gzip: 321.72 kB\ndist/assets/Glass3DMode-CPybaoDK.js            1,204.37 kB │ gzip: 334.02 kB\ndist/assets/KineticGlassMode-Dbk4_3OY.js       2,257.69 kB │ gzip: 838.39 kB\n✓ built in 4.06s\n\n\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit."
+      "outputTail": "dist/assets/PngMetadata-D7ZL0hXE.js                1.06 kB │ gzip:   0.57 kB\ndist/assets/RoundedBoxGeometry-CZcYavyv.js         1.72 kB │ gzip:   0.81 kB\ndist/assets/presets-BX97Zrue.js                    1.80 kB │ gzip:   0.80 kB\ndist/assets/RoomEnvironment-B4NOg-5c.js            2.07 kB │ gzip:   0.89 kB\ndist/assets/BufferGeometryUtils-CsoQxFFe.js        5.26 kB │ gzip:   1.71 kB\ndist/assets/OpticalVideoExporter-BrHFo9bZ.js       8.06 kB │ gzip:   3.93 kB\ndist/assets/index-3Zu0mH1T.js                      8.21 kB │ gzip:   3.04 kB\ndist/assets/StudioShell-9k7q1rvU.js               11.59 kB │ gzip:   3.82 kB\ndist/assets/UnrealBloomPass-mQeuDl5D.js           15.78 kB │ gzip:   3.93 kB\ndist/assets/CrystalAssembly-D34H2fqQ.js           27.36 kB │ gzip:   7.88 kB\ndist/assets/index-CyrFIKh7.js                     31.63 kB │ gzip:   9.15 kB\ndist/assets/index-Bgm4ANIy.js                     33.37 kB │ gzip:   9.99 kB\ndist/assets/AxisTrailsMode-ty1aSZbC.js            37.39 kB │ gzip:  12.39 kB\ndist/assets/LightFieldMode-CI5AOa5k.js            38.14 kB │ gzip:  12.57 kB\ndist/assets/GlassPrismMode-CRLLJRN7.js            39.73 kB │ gzip:  12.94 kB\ndist/assets/MeshBVH-BWDiuoAC.js                   47.96 kB │ gzip:  15.87 kB\ndist/assets/SMAAPass-DYQVrftP.js                  61.27 kB │ gzip:  38.28 kB\ndist/assets/AxisMegastructureMode-0aiiUhp3.js     97.23 kB │ gzip:  29.86 kB\ndist/assets/index-BJOUBGGp.js                    119.59 kB │ gzip:  33.76 kB\ndist/assets/AxisHabitatMode-CAignr5e.js          189.39 kB │ gzip:  66.96 kB\ndist/assets/OpticalStudio-uAgWHY9j.js            200.97 kB │ gzip:  61.11 kB\ndist/assets/OutputPass-BDAB8kpn.js               250.34 kB │ gzip: 102.54 kB\ndist/assets/output-CSYw5mTT.js                   652.70 kB │ gzip: 167.84 kB\ndist/assets/three.module-Dc7hrohh.js             735.86 kB │ gzip: 190.70 kB\ndist/assets/DimentionR3FMode-D_ucvl2F.js         833.82 kB │ gzip: 321.73 kB\ndist/assets/Glass3DMode-Dqlw3MWa.js            1,204.41 kB │ gzip: 334.02 kB\ndist/assets/KineticGlassMode-Dbk4_3OY.js       2,257.69 kB │ gzip: 838.39 kB\n✓ built in 6.94s\n\n<script src=\"/Pleos-27-Axis/version-menu.js\"> in \"/index.html\" can't be bundled without type=\"module\" attribute\n\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit."
     }
   ],
   "browser": {
-    "url": "http://127.0.0.1:41741/",
+    "url": "http://127.0.0.1:5173/?look=hybrid-ab",
     "engine": "Chrome with GPU enabled",
     "consoleErrors": [],
     "warnings": [],

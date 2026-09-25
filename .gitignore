@@ -1,4 +1,6 @@
 node_modules/
+public/versions/
+public/version-catalog.json
 dist/
 .pleos/
 *.tsbuildinfo

@@ -1,0 +1,261 @@
+[
+  {
+    "id": "saved-20260922065707715",
+    "label": "2026. 9. 22. · A·B 통합안 V6 · 내부 면 반사",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "hybrid-ab"
+  },
+  {
+    "id": "saved-20260922064649103",
+    "label": "2026. 9. 22. · A·B 통합안 V5 · 열린 내부 반사면",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "hybrid-ab"
+  },
+  {
+    "id": "saved-20260922055654113",
+    "label": "2026. 9. 22. · A·B 통합안 V4 · 열린 면 반사",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "hybrid-ab"
+  },
+  {
+    "id": "saved-20260922034933369",
+    "label": "2026. 9. 22. · A·B 통합안 V3 · 뒤쪽이 열린 굴절층",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "hybrid-ab"
+  },
+  {
+    "id": "saved-20260921082636619",
+    "label": "2026. 9. 21. · A·B 통합안 V2 · A 내부 굴절 복원",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "hybrid-ab"
+  },
+  {
+    "id": "saved-20260921073913986",
+    "label": "2026. 9. 21. · A·B 통합안 · 내부 굴절과 RGB 밀도",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "hybrid-ab"
+  },
+  {
+    "id": "saved-20260916100428637",
+    "label": "2026. 9. 16. · 25엑시스 · 안전 카메라 부유 회전",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "sequence": "pleos25",
+    "transition": "layered"
+  },
+  {
+    "id": "saved-20260916093405726",
+    "label": "2026. 9. 16. · 9월 14일 원본 · 카메라 모션과 MP4",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "cube0914"
+  },
+  {
+    "id": "saved-20260916091701770",
+    "label": "2026. 9. 16. · 25엑시스 · 안전 회전과 카메라 부유",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "sequence": "pleos25",
+    "transition": "layered"
+  },
+  {
+    "id": "saved-20260916090617573",
+    "label": "2026. 9. 16. · 25엑시스 · 안전 양방향 회전 루프",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "sequence": "pleos25",
+    "transition": "layered"
+  },
+  {
+    "id": "saved-20260916083313081",
+    "label": "2026. 9. 16. · 라이팅 수정 전 · 기준 사이트",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "sequence": "pleos25",
+    "transition": "layered"
+  },
+  {
+    "id": "saved-20260916010751575",
+    "label": "2026. 9. 16. · 25엑시스 — 고정 카메라 엑시스 회전 · 검증본",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "sequence": "pleos25",
+    "transition": "layered"
+  },
+  {
+    "id": "saved-20260916010410593",
+    "label": "2026. 9. 16. · 25엑시스 — 카메라 고정 · 엑시스 회전",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "sequence": "pleos25",
+    "transition": "layered"
+  },
+  {
+    "id": "saved-20260915095918835",
+    "label": "2026. 9. 15. · 25엑시스 — 디멘션 카메라 모션",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "sequence": "pleos25",
+    "transition": "layered"
+  },
+  {
+    "id": "saved-20260915095138614",
+    "label": "2026. 9. 15. · 25엑시스 — 카메라 모션 전 고정본",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "sourceId": "saved-20260915092006676",
+    "sequence": "pleos25",
+    "transition": "layered"
+  },
+  {
+    "id": "saved-20260915092006676",
+    "label": "2026. 9. 15. · 25엑시스 — 반사 복구 · 전환 축 라이팅",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "sequence": "pleos25",
+    "transition": "layered"
+  },
+  {
+    "id": "saved-20260915090434072",
+    "label": "2026. 9. 15. · 디멘션 — 자체 발광 구조",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "sequence": "pleos25",
+    "transition": "layered"
+  },
+  {
+    "id": "saved-20260915085224893",
+    "label": "2026. 9. 15. · 디멘션 — 자체 발광 전 반사 방식",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "sequence": "pleos25",
+    "transition": "layered"
+  },
+  {
+    "id": "saved-20260915081212237",
+    "label": "2026. 9. 15. · 25엑시스 — 디멘션 전환 · 4K 영상 저장",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "sequence": "pleos25",
+    "transition": "layered"
+  },
+  {
+    "id": "saved-20260915071046349",
+    "label": "2026. 9. 15. · 25엑시스 — 축에서 순차 등장 (1초 스태거)",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "sequence": "pleos25",
+    "transition": "layered"
+  },
+  {
+    "id": "saved-20260915064626099",
+    "label": "2026. 9. 15. · 25엑시스 — 빛 새김 전환 (최신)",
+    "sequence": "pleos25",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true
+  },
+  {
+    "id": "saved-20260915065311136",
+    "label": "2026. 9. 15. · 25엑시스 — 라이팅 형성 (새김 직전)",
+    "note": "새김 전 라이팅 전환 · 마지막 이징과 4~5초 정지 제거 포함 · 개인 설정은 별도",
+    "localBuild": true,
+    "sequence": "pleos25"
+  },
+  {
+    "id": "saved-20260915060644717",
+    "label": "2026. 9. 15. · 25엑시스 — 중앙 고정·라이팅 형성",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true
+  },
+  {
+    "id": "saved-20260915054943369",
+    "label": "2026. 9. 15. · Pleos25 축 → 디멘션 전환",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true
+  },
+  {
+    "id": "saved-20260915052708275",
+    "label": "2026. 9. 15. · 디멘션 50겹 — 품질 개선 전",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true
+  },
+  {
+    "id": "saved-20260914100944103",
+    "label": "2026. 9. 14. · 직선 디멘션 — 빛 휘어짐 제거",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true
+  },
+  {
+    "id": "saved-20260914100301996",
+    "label": "2026. 9. 14. · Axis 꺾임 강조 — 테스트 버전",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true
+  },
+  {
+    "id": "saved-20260914095518462",
+    "label": "2026. 9. 14. · 고정 디멘션 — 층별 페이드 모션",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true
+  },
+  {
+    "id": "saved-20260914094839691",
+    "label": "2026. 9. 14. · 오늘 수정 전 — 큐브 디멘션 원본",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "sourceId": "saved-20260913150050902"
+  },
+  {
+    "id": "saved-20260914094359616",
+    "label": "2026. 9. 14. · 열린 디멘션 — Axis 중심 유지",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true
+  },
+  {
+    "id": "saved-20260914093551440",
+    "label": "2026. 9. 14. · 디멘션 외곽 정렬 — 검정 Axis 강조",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true
+  },
+  {
+    "id": "saved-20260913150336228",
+    "label": "2026. 9. 14. · 3D 디멘션 — 반사광 흐름 조정",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true
+  },
+  {
+    "id": "saved-20260913150050902",
+    "label": "2026. 9. 14. · 3D 반사광 흐름 조정 전",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true
+  },
+  {
+    "id": "saved-20260913143525402",
+    "label": "2026. 9. 13. · 큐브 디멘션 — 공간 표현 전 보관",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true
+  },
+  {
+    "id": "saved-20260913141931349",
+    "label": "2026. 9. 13. · 이름별 설정 저장 추가",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true
+  },
+  {
+    "id": "20260911-b-settings",
+    "commit": "7fc92f6356e224fab32215d9e359c75b58e474e1",
+    "label": "2026.09.11 · 플레오스 B — 저장 구도",
+    "note": "당시 공유용 카메라·조명 설정 포함"
+  },
+  {
+    "id": "20260911-b",
+    "commit": "5d98f4a8b6881abbda62295e969a579e0506d864",
+    "label": "2026.09.11 · 플레오스 B — RGB 순환",
+    "note": "당시 코드 기본 설정 · 개인 브라우저 설정 미포함"
+  }
+]

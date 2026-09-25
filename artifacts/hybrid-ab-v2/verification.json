@@ -1,0 +1,426 @@
+{
+  "status": "pass",
+  "errors": [],
+  "checks": {
+    "actualInternalBounceDifference": 6.500553333333333,
+    "hybridDistortion-difference": 21.62814,
+    "hybridDensity-difference": 43.64627333333333,
+    "hybridColorMix-difference": 27.851976666666665,
+    "noEmission": true,
+    "loopDifference": 0,
+    "noPageOverflow": true,
+    "independentPersistence": true,
+    "sequenceNavigationPreservesHybrid": true,
+    "hybridVersusB": 80.02145,
+    "unchangedB": 0,
+    "originalAStillActive": true,
+    "transitionAndMotion": true,
+    "native4K": true,
+    "mp4Export": {
+      "width": 384,
+      "height": 480,
+      "fps": 24,
+      "frames": 12,
+      "duration": 0.5,
+      "codec": "h264",
+      "codecLabel": "H.264",
+      "filename": "pleos-27-axis-384x480-24fps-2.00-2.50s-4spp-h264.mp4"
+    }
+  },
+  "images": {
+    "main-rgb": {
+      "width": 800,
+      "height": 1000,
+      "meanRGB": [
+        80.2835375,
+        96.428465,
+        115.75398375
+      ],
+      "litFraction": 0.92509375
+    },
+    "sub-red": {
+      "width": 800,
+      "height": 1000,
+      "meanRGB": [
+        100.40874875,
+        58.48043,
+        78.06237
+      ],
+      "litFraction": 0.919185
+    },
+    "sub-green": {
+      "width": 800,
+      "height": 1000,
+      "meanRGB": [
+        31.7869225,
+        145.3728625,
+        125.60947375
+      ],
+      "litFraction": 0.93049625
+    },
+    "sub-blue": {
+      "width": 800,
+      "height": 1000,
+      "meanRGB": [
+        36.0769875,
+        73.566885,
+        142.22036375
+      ],
+      "litFraction": 0.93135
+    },
+    "hybrid": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        80.84082,
+        96.696615,
+        116.02738
+      ],
+      "litFraction": 0.92849
+    },
+    "one-bounce": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        75.38105,
+        87.885015,
+        110.86283
+      ],
+      "litFraction": 0.920975
+    },
+    "sixteen-bounces": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        80.84082,
+        96.696615,
+        116.02738
+      ],
+      "litFraction": 0.92849
+    },
+    "partial-kv-3x2": {
+      "width": 960,
+      "height": 640,
+      "meanRGB": [
+        71.43720703125,
+        95.32589192708333,
+        95.5610205078125
+      ],
+      "litFraction": 0.902119140625
+    },
+    "poster-a-series": {
+      "width": 707,
+      "height": 1000,
+      "meanRGB": [
+        83.67777793493634,
+        96.22628005657708,
+        116.93586280056577
+      ],
+      "litFraction": 0.9235700141442715
+    },
+    "hybridDistortion-zero": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        84.681345,
+        99.544305,
+        120.54555
+      ],
+      "litFraction": 0.92896
+    },
+    "hybridDistortion-one": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        74.152255,
+        90.159335,
+        106.51454
+      ],
+      "litFraction": 0.907795
+    },
+    "hybridDensity-zero": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        61.02617,
+        79.94574,
+        95.33052
+      ],
+      "litFraction": 0.857015
+    },
+    "hybridDensity-one": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        106.424535,
+        119.7748,
+        141.022255
+      ],
+      "litFraction": 0.956065
+    },
+    "hybridColorMix-zero": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        48.961095,
+        96.18636,
+        100.89242
+      ],
+      "litFraction": 0.912735
+    },
+    "hybridColorMix-one": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        90.010855,
+        96.001765,
+        117.770605
+      ],
+      "litFraction": 0.931565
+    },
+    "lights-off": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        0,
+        0,
+        0
+      ],
+      "litFraction": 0
+    },
+    "loop-start": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        98.05814,
+        76.06472,
+        96.10822
+      ],
+      "litFraction": 0.925225
+    },
+    "loop-end": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        98.05814,
+        76.06472,
+        96.10822
+      ],
+      "litFraction": 0.925225
+    },
+    "hall-depth-concept": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        60.49345,
+        84.07741,
+        89.66161
+      ],
+      "litFraction": 0.909045
+    },
+    "view--45": {
+      "width": 240,
+      "height": 300,
+      "meanRGB": [
+        29.50559722222222,
+        18.650583333333334,
+        25.18138888888889
+      ],
+      "litFraction": 0.4770138888888889
+    },
+    "view-0": {
+      "width": 240,
+      "height": 300,
+      "meanRGB": [
+        81.80890277777777,
+        67.9792361111111,
+        94.62398611111111
+      ],
+      "litFraction": 0.9530416666666667
+    },
+    "view-45": {
+      "width": 240,
+      "height": 300,
+      "meanRGB": [
+        77.780125,
+        84.12620833333334,
+        101.43880555555556
+      ],
+      "litFraction": 0.9124444444444444
+    },
+    "view-90": {
+      "width": 240,
+      "height": 300,
+      "meanRGB": [
+        83.76125,
+        53.44956944444444,
+        79.95645833333333
+      ],
+      "litFraction": 0.9133194444444445
+    },
+    "view-135": {
+      "width": 240,
+      "height": 300,
+      "meanRGB": [
+        25.640291666666666,
+        13.513361111111111,
+        26.72186111111111
+      ],
+      "litFraction": 0.45413888888888887
+    },
+    "minimum-hybrid": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        48.63052,
+        44.85535,
+        51.969545
+      ],
+      "litFraction": 0.822045
+    },
+    "B-comparison": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        16.774075,
+        24.401585,
+        18.609955
+      ],
+      "litFraction": 0.517155
+    },
+    "B-before-revision": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        16.774075,
+        24.401585,
+        18.609955
+      ],
+      "litFraction": 0.517155
+    },
+    "A-comparison": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        68.313195,
+        56.46987,
+        68.710775
+      ],
+      "litFraction": 0.920235
+    },
+    "transition-gray": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        0,
+        0,
+        0
+      ],
+      "litFraction": 0
+    },
+    "transition-middle": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        117.225585,
+        107.03439,
+        123.372605
+      ],
+      "litFraction": 0.947595
+    },
+    "transition-dimensions": {
+      "width": 400,
+      "height": 500,
+      "meanRGB": [
+        87.45155,
+        98.77442,
+        95.698545
+      ],
+      "litFraction": 0.93367
+    },
+    "main-rgb-4k": {
+      "width": 3072,
+      "height": 3840,
+      "meanRGB": [
+        80.02490429348416,
+        96.26585591634115,
+        115.58611339992947
+      ],
+      "litFraction": 0.9229889763726129
+    }
+  },
+  "heroState": {
+    "hybridDistortion": 0.55,
+    "hybridDensity": 0.55,
+    "hybridColorMix": 0.6,
+    "hybridColorMode": 1,
+    "hybridDepthFlow": 0,
+    "hybridDepthCycles": 1,
+    "cameraFloat": 0,
+    "cameraFloatX": 4,
+    "cameraFloatY": 3,
+    "cameraFloatSeconds": 15,
+    "axisMotion": 0,
+    "axisYaw": 24,
+    "axisRoll": 12,
+    "axisMoveSeconds": 8,
+    "cameraMotion": 0,
+    "cameraOrbitHorizontal": -24,
+    "cameraOrbitVertical": 6,
+    "cameraMoveSeconds": 8,
+    "identityLayerStagger": 0,
+    "identityEngraving": 1,
+    "identityAxisAccent": 1,
+    "identityTransition": 0,
+    "identityHold": 5.3,
+    "identityDissolve": 3,
+    "identityCenterVersion": 0,
+    "dimensionDelayTop": 5.6,
+    "dimensionDelayLeft": 7.7,
+    "dimensionDelayRight": 0,
+    "lightMotionCycles": 1,
+    "layerFadeAmount": 0.6,
+    "layerFadeCycles": 4,
+    "layerStagger": 0.32,
+    "panX": -11.5,
+    "gap": 0.015,
+    "bevel": 0.03,
+    "ior": 1.86,
+    "dispersion": 0.008,
+    "roughness": 0.2,
+    "surfaceCurvature": 0,
+    "reflection": 2,
+    "absorption": 0,
+    "lightIntensity": 3.25,
+    "lightSpread": 1.14,
+    "red": 1,
+    "green": 0,
+    "blue": 0,
+    "exposure": 0.59,
+    "zoom": 1.485,
+    "azimuth": 32.275,
+    "elevation": 40.055,
+    "time": 2,
+    "duration": 20,
+    "speed": 0,
+    "dimensionTop": 5.05,
+    "dimensionLeft": 11.85,
+    "dimensionRight": 12,
+    "bloom": 0.18,
+    "dimensionSpacing": 0.14,
+    "dimensionSoftness": 1,
+    "dimensionFalloff": 1,
+    "lightColor": "#FA293C",
+    "dimensionSpacingTop": 0.3,
+    "dimensionSpacingLeft": 0.085,
+    "dimensionSpacingRight": 0.06,
+    "bounces": 16,
+    "playing": false,
+    "aspect": "4x5",
+    "lightCycle": true,
+    "lightCycleOffset": 0,
+    "videoLongEdge": 3840,
+    "videoFps": 30,
+    "videoSamples": 4
+  }
+}
