@@ -128,6 +128,10 @@ async function captureRuntime({ projectRoot, latestDirectory, appUrl, args }) {
     }
     context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 });
     const page = await context.newPage();
+    // Capture may seek/pause/edit its isolated scene, but must never publish
+    // those QA values back to the artist's cross-browser shared settings.
+    await page.route('**/__pleos/optical-state**', route =>
+      route.request().method()==='GET' ? route.continue() : route.fulfill({status:204}));
     await page.route("**/favicon.ico", (route) => route.fulfill({ status: 204 }));
     page.on("pageerror", (error) => result.browserErrors.push(error.message));
     page.on("console", (message) => {
@@ -287,6 +291,28 @@ ${PROJECT_INTENT}
 - Hybrid transition revision 1 synchronizes image formation, optical reflection and gray-carrier release. Zero stagger no longer bypasses the fade-in. Existing loop envelopes blend in late. V6 retains the gray intro but intentionally changes completed V4 pixels. Boundary/30fps-frame/archived-V4/MP4 checks: \`scripts/verify-hybrid-transition.mjs\`, \`artifacts/hybrid-transition/\`.
 - Direction and acceptance criteria: [HYBRID_AB_DIRECTION.md](HYBRID_AB_DIRECTION.md). Dedicated checks: [verify-hybrid-ab.mjs](../scripts/verify-hybrid-ab.mjs); the optional \`PLEOS_HYBRID_4K=1\` path checks native 4K PNG and a short MP4. A handoff pass alone does not assert that these dedicated checks ran.
 
+### Axis face separation study
+
+- Optional route: \`?look=hybrid-axis-split\`; selectable as “A/B 통합안 · 축 면 분리 시안”. Original \`?look=hybrid-ab\` remains unchanged and independently saved.
+- \`axisFaceGap\` now separates nine finite-thickness rounded dielectric panels (three per original domain). The former hit-discard aperture implementation has been removed. Actual front/back/side/rim intersections and normals drive physical reflection/refraction; virtual dimension images are transported with each face and roll off toward its polished lip. 0 restores the original connected domain. The interior image family is still an art-directed optical proxy, not a fully physical multi-scattering simulation. Crossing exactly zero changes topology; panel separation is not designed as a continuous zero-crossing animation. More intersections cost additional GPU time.
+- \`scripts/test-detached-panel-geometry.mjs\` runs the production GLSL in a float target and verifies front/back/side hits, rounded normals, an unobstructed gap ray and transported image coordinates.
+- Primary camera hits now use \`splitFrontHit\`: only outward fronts and front rims carry visible images. Back/thickness walls remain internal transport boundaries but no longer appear directly as coloured surfaces through the joints. B anchor and hybrid image branches share the same primary hit. GPU tests verify camera back/side misses and a front hit; artist wide-gap comparison is in \`artifacts/axis-face-split/rear-before.png\` and \`rear-after.png\`.
+- The split-study Axis anchor now uses a fixed planar normal and source sampling projected onto its nearest straight edge, returning to original shading across 0.01–0.04 times uHalf. A narrow world-space edge strip (0.005–0.035 times uHalf) gradually admits the original curved inner images; internal distortion is unchanged beyond that strip. This is a radiance-layer separation, not moving the Axis or painting an outline. See \`straight-before.png\` / \`straight-after.png\` in the same QA folder.
+- Separate persistence: \`pleos-optical-studio-v1:hybrid-axis-split\`. Dedicated QA: \`npm run verify:axis-face-split\`; screenshots/report in \`artifacts/axis-face-split/\`.
+- Layer Light Flow: \`layerLightContrast\` (default 0 preserves previous images), \`layerLightLength\`, and integer \`layerLightCycles\` drive object-space brightness toward the shared Axis origin, without moving contours/normals. All regions/images share the same flow clock (no per-layer/region phase offsets); existing appearance fades remain independent. Controls use existing persistence/history/variation and fixed-time output. QA: \`npm run verify:layer-light\`, including an actual GLSL inward-crest test.
+
+### COEX D Hall dimension gate — separate extension
+
+- Optional route: \`?look=coex-gate\`; version dropdown “코엑스 D홀 · 디멘션 게이트”. Original Axis routes/settings are preserved.
+- Files: \`src/gate/GateStudio.ts\`, \`GateRenderer.ts\`, \`gate.frag.glsl\`, \`GateState.ts\`, \`GateExport.ts\`.
+- 5248×2112 public unfolded mapping, top 576px, side legs 448px, physical central passage masked black. Confirm venue mapping before delivery.
+- Art-directed open U-plane optical images reuse HybridAB shoulder/crest, attenuation and dispersion language plus production tone mapping; not the cube physical integrator or volumetric path tracing.
+- First-use black-to-layered introduction then continuous inward Z projection and RGB temporal transport. Browser-local isolated gate settings.
+- Gate cornerRadius 0–320px (default 120) and bloomDirection −1..1 (default +1) are editable/saved/undoable/exported. +1 releases light below/inward from a sharper top/outside core, −1 reverses, 0 is symmetric. Stable near-core normals avoid pixel-scale angular flips. Dedicated rounding/directional profile QA: artifacts/coex-gate/rounding-release-validation.json.
+- Gate lighting shares active OpticalStudio environmentProfile emitters with gate-specific Snell/Fresnel virtual-image rays (not the entire cube transport engine). Its adapter alone omits cube-diagonal negative-fill flags. One open rounded U distance field and a continuous contour-local optical frame replace the diagonal top/side ownership seam. Independent frontWidth (8–320 design px on both top and sides) and widthTaper (0–3) controls migrate old gate saves with defaults 120 / 1.2 and preserve undo/export. Corner QA: artifacts/coex-gate/corner-validation.json.
+- PNG/native MP4 export with shared OPFS encoder helpers. Seamless loop output quantizes only export-snapshot Z speed to integer cycles per RGB period.
+- Dedicated test/report: \`scripts/verify-coex-gate.mjs\`, \`artifacts/coex-gate/validation.json\`. These previews are separate from default latest Axis captures; default handoff runtime does not inspect the gate route.
+
 ## Motion System
 
 - Runtime: ${motion?.kind ?? 'not captured'}; absolute-time evaluation.
@@ -321,6 +347,12 @@ ${PROJECT_INTENT}
 - PNG and MP4 are opaque 8-bit sRGB; MP4 is lossy and silent. No transparent/PPI-aware print or HDR-video UI. The older print workflows remain in the preserved studio instead.
 
 ## Inspector / UI
+
+- Structure Lighting UI is simplified to two faces per region in the standard Axis view: Top X/Z, Left X/Y, Right Y/Z. Hidden inputs and stored gains remain intact. No renderer changes or camera-dependent panel switching.
+
+- Hybrid “구조 라이팅” adjusts parent cube wall/floor orientation, not internal image normals: structureTop/Left/Right X/Y/Z gain 0–3, default 1; structureContrast 0–1, default 0. Entry geometry normal is evaluated before image transport. The same achromatic gain multiplies base dimension bands, traced reflection/refraction and broad reflected faces; 25 Axis carrier remains untouched. Continuous bevel weights, no camera-selected face switching. Existing image-face controls remain independent. Validation: npm run verify:structure-light; artifacts/structure-light/validation.json.
+
+- Hybrid current adjustment includes “면별 디멘션 라이팅”: per-region X/Y/Z optical image gain (0–3, default 1), smoothly weighted by object-space image normals across bevels. Paired ± faces share each directional gain. faceDimensionContrast defaults 0; raises vertical and reduces horizontal reflection energy. Applied to dimension bands and their broad image shoulders, not outer surface paint or Axis geometry. Settings, undo, full variations, PNG and MP4 use the same state. Validation: npm run verify:face-dimensions; artifacts/face-dimension-light/validation.json.
 
 - OpticalStudio owns a fresh Korean interface with monochrome application controls.
 - Collapsible sections: 25엑시스 → 디멘션, 빛 모션, 영역별 타이밍, 형태, 디멘션 레이어, 광학, 조명, 카메라, 출력. Existing section IDs and handlers remain compatible. The bottom transport controls time, loop length, light travel amount and artboard aspect.

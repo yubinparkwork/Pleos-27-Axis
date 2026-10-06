@@ -33,17 +33,19 @@ function validate(state: Readonly<OpticalState>, options: OpticalVideoOptions): 
     throw new Error('MP4 크기는 가로·세로 16–3840px의 짝수여야 합니다.');
   }
   if (![24, 30, 60].includes(fps)) throw new Error('동영상 프레임은 24, 30, 60fps 중 선택해 주세요.');
-  if (![4, 16].includes(samples)) throw new Error('영상 샘플은 4 또는 16으로 설정해 주세요.');
+  if (![4, 16, 64].includes(samples)) throw new Error('영상 샘플은 4, 16 또는 64로 설정해 주세요.');
   if (![start, end, state.duration].every(Number.isFinite) || start < 0 || end <= start || end > state.duration) {
     throw new Error('내보낼 구간은 0초부터 현재 재생 길이 사이이며, 끝 시간이 시작 시간보다 커야 합니다.');
   }
 }
 
-function encodingSettings(options: OpticalVideoOptions) {
+export function encodingSettings(options: OpticalVideoOptions) {
   const { width, height, fps } = options;
-  // 60 Mbps at UHD/30, scaled by actual pixels and frame rate. This is a target
+  // 60 Mbps at UHD/30, scaled by actual pixels and frame rate. Thin coloured
+  // specular lines need a higher 1080p floor than broad photographic footage.
+  // This is a target
   // bitrate, not an upscaling step or a claim of lossless H.264 output.
-  const bitrate = Math.round(Math.min(180_000_000, Math.max(12_000_000,
+  const bitrate = Math.round(Math.min(180_000_000, Math.max(30_000_000,
     60_000_000 * width * height / (3840 * 2160) * (fps / 30))));
   const macroblocks = Math.ceil(width / 16) * Math.ceil(height / 16);
   const rate = macroblocks * fps;
@@ -62,7 +64,7 @@ function encodingSettings(options: OpticalVideoOptions) {
   };
 }
 
-async function selectEncoder(
+export async function selectEncoder(
   mb: MediaBunny, options: OpticalVideoOptions, quality: InstanceType<MediaBunny['Quality']>,
   signal: AbortSignal,
 ) {
@@ -93,7 +95,7 @@ async function selectEncoder(
   throw new Error(`이 브라우저에서 ${width}×${height} · ${fps}fps MP4를 만들 수 있는 H.264/HEVC 인코더가 없습니다. 해상도는 임의로 낮추지 않았습니다. Chrome 하드웨어 가속을 확인하거나 출력 해상도·fps를 변경해 주세요.`);
 }
 
-async function createSink(mb: MediaBunny, estimatedBytes: number, signal: AbortSignal): Promise<VideoSink> {
+export async function createSink(mb: MediaBunny, estimatedBytes: number, signal: AbortSignal): Promise<VideoSink> {
   checkAbort(signal);
   let directory: FileSystemDirectoryHandle | undefined;
   let fileName: string | undefined;

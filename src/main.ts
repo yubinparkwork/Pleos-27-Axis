@@ -6,6 +6,11 @@ const root = document.querySelector<HTMLElement>("#app");
 if (!root) throw new Error("Missing #app root");
 
 async function mount(): Promise<void> {
+  if (new URLSearchParams(location.search).get('look') === 'coex-gate') {
+    const { mountGateStudio } = await import('./gate/GateStudio');
+    addEventListener('beforeunload', mountGateStudio(root!), { once: true });
+    return;
+  }
   const route = new URLSearchParams(location.search).get("renderer");
   if (!route || route === "optical" || route === 'axis-space') {
     const { mountOpticalStudio } = await import("./optical-studio/OpticalStudio");

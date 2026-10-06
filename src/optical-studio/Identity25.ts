@@ -56,6 +56,10 @@ export class Identity25 {
     const litF = Math.max(0, Math.min(1, (litTime - litA.time) / Math.max(.001, litB.time - litA.time)));
     for (let plane = 0; plane < 6; plane++) {
       for(let c=0;c<3;c++) this.strokes[plane*3+c]=litA.rays[plane][c]+(litB.rays[plane][c]-litA.rays[plane][c])*litF;
+      // Finish the incoming strokes together at the shared origin. The fit
+      // previously left one arm travelling toward a small inset after the
+      // others arrived, which read as a broken junction around source 1s.
+      this.strokes[plane*3] *= 1-smooth((this.sourceTime-.8)/.2);
       for (let c = 0; c < 6; c++) {
         const v = litA.planes[plane][c] + (litB.planes[plane][c] - litA.planes[plane][c]) * litF;
         if (c < 4) this.angular[plane * 4 + c] = v;

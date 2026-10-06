@@ -7,6 +7,17 @@ float identityLayerVisibility(float order) {
   return uIdentityLayerTiming.w < .5 ? 1.0
     : smoothstep(0.0,uIdentityLayerTiming.z,uIdentityLayerTiming.x-order*uIdentityLayerTiming.y);
 }
+
+// A newly arriving image settles before inheriting the authored disappearance
+// loop. This clock is per layer, not the global gray-plane dissolve: late
+// staggered layers must not appear halfway through an already-dark envelope.
+float identityLayerLoopBlend(float order) {
+  float handover = smoothstep(.70,1.0,uIdentityMix);
+  if (uIdentityLayerTiming.w < .5) return handover;
+  float age = uIdentityLayerTiming.x-order*uIdentityLayerTiming.y;
+  return handover*smoothstep(uIdentityLayerTiming.z+.35,
+    uIdentityLayerTiming.z+1.35,age);
+}
 uniform float uIdentityAngles[3];
 uniform float uIdentityTargets[3];
 uniform vec4 uIdentityAngular[6];
@@ -42,8 +53,12 @@ vec3 identity25(vec2 xy, float aspect) {
     vec3 stroke=uIdentityStrokes[i];
     float along=cos(theta-start)*radius;
     float distance=abs(sin(theta-start))*radius;
+    // Fitted video strokes use .006 as a sampling guard around the origin,
+    // not an intentional Axis gap. Remove that inset and cover the shared
+    // endpoint with the same thin stroke (no extra center dot or new geometry).
+    float strokeStart=max(0.0,stroke.x-.006);
     float line=(1.0-smoothstep(.00025,.0008+0.5/uResolution.y,distance))
-      *smoothstep(stroke.x-.001,stroke.x+.001,along)
+      *smoothstep(strokeStart-1.0/uResolution.y,strokeStart,along)
       *(1.0-smoothstep(stroke.y-.001,stroke.y+.001,along));
     edge=max(edge,line*stroke.z);
   }

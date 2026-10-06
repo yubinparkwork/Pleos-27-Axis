@@ -12,5 +12,7 @@ export function writeCube0914Weights(state: Readonly<OpticalState>, out: Float32
   const t = Math.max(0, Math.min(1, (fraction - .35) / .65));
   const ease = t*t*t*(t*(t*6-15)+10);
   const lead = (startingLightFamily(state.lightColor)-i+3)%3, next = (lead+2)%3;
-  out.fill(.1); out[lead] += .7*(1-ease); out[next] += .7*ease;
+  // Preserve the original 80/10/10 result for older saved settings.
+  const sub=state.cubeSubPercent/100, mainRemainder=1-3*sub;
+  out.fill(sub); out[lead] += mainRemainder*(1-ease); out[next] += mainRemainder*ease;
 }

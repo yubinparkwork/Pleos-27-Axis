@@ -2,12 +2,23 @@
 // The optical domain and every nested image extend together; B owns the anchor and
 // temporal envelopes. These are optical images, not nested opaque geometry.
 #ifdef HYBRID_AB
+// Object-space optical image normals identify the actual faces, not screen
+// halves or view-selected face IDs. Continuous weights retain the bevel blend.
+float dimensionFaceGain(vec3 imageNormal,int id){
+  vec3 w=pow(abs(imageNormal),vec3(4.));w/=max(w.x+w.y+w.z,.000001);
+  vec3 gains=id==0?uFaceGainTop:id==1?uFaceGainLeft:uFaceGainRight;
+  return dot(w,gains)*mix(1.,mix(1.35,.65,w.y),uFaceDimensionContrast);
+}
 float hybridDimensionLayers(vec3 entry, vec3 rd, int id, int channel, float footprint, out vec3 engraving) {
   engraving=vec3(0.0);
   float count = uDimensions[id];
   if (count <= 0.0 || uLightIntensity <= 0.0) return 0.0;
   vec3 local = entry-hybridCenter(id);
   vec3 outward = hybridNormal(entry,id);
+#ifdef AXIS_SPLIT
+  // Entry is transported into the virtual image domain, not a physical rim.
+  outward=roundedNormal(entry-hybridCenter(id),uHalf+hybridExtension());
+#endif
   vec3 shading = opticalNormal(entry-uCenters[id],outward);
   float ior = max(1.0001,uIOR+uDispersion*(float(channel)-1.0)*.5);
   vec3 ray = refract(rd,shading,1.0/ior);
@@ -24,6 +35,7 @@ float hybridDimensionLayers(vec3 entry, vec3 rd, int id, int channel, float foot
     float phase=uPhase-uDimensionDelay[id];
     float visibility=smoothstep(.12,.82,.5+.5*cos(phase*uLayerFadeCycles-order*uLayerStagger-float(id)*.45));
     float envelope=mix(1.0,visibility,uLayerFadeAmount);
+    envelope=mix(1.0,envelope,identityLayerLoopBlend(order));
     float imageOrder=order+(.5-.5*cos(uPhase*uHybridDepthCycles))*uHybridDepthFlow*2.0;
     float imageExtent=(uHalf-uBevel*.16)*exp(-uLayerSpacing[id]*(imageOrder+.7));
     float extent=imageExtent+hybridExtension();
@@ -65,13 +77,12 @@ float hybridDimensionLayers(vec3 entry, vec3 rd, int id, int channel, float foot
       // Stagger=0 means simultaneous layers, NOT an immediate full-light gate.
       float arrival=.025+order/max(count,1.0)*.12
         +smoothstep(0.0,uHalf*5.0,axisDistance)*.08;
-      formation=smoothstep(arrival,arrival+.24,uIdentityMix);
-      faceFormation=smoothstep(arrival+.12,.90,uIdentityMix);
+      // One raw clock, eased once. Previously nested easing compressed most
+      // optical energy into a short bright burst in the middle of the dissolve.
+      formation=smoothstep(arrival,arrival+.65,uIdentityAxisAccent.x);
+      faceFormation=smoothstep(arrival+.10,1.0,uIdentityAxisAccent.x);
       release=smoothstep(arrival+.10,.88,uIdentityMix);
-      spreadWidth*=mix(.28,1.0,faceFormation);
-      // Do not let the ongoing layer fade erase a layer as it is first etched.
-      // Hand back to the unchanged loop continuously near transition completion.
-      envelope=mix(1.0,envelope,smoothstep(.50,1.0,uIdentityMix));
+      spreadWidth*=mix(.65,1.0,faceFormation);
     }
     float band=exp(-pow(signedBand/spreadWidth,2.0))*(width/spreadWidth);
     float core=exp(-pow(edgeDistance/max(width*.27,footprint),2.0))*.14;
@@ -80,7 +91,10 @@ float hybridDimensionLayers(vec3 entry, vec3 rd, int id, int channel, float foot
     // Scaling normals by the expanded box would flatten away A's character.
     vec3 faceProximity=max(vec3(1.0)-(vec3(extent)-a)/imageExtent,vec3(.00001));
     vec3 n=normalize(sign(p)*pow(faceProximity,vec3(mix(24.0,10.0,uHybridDistortion))));
+    float faceGain=dimensionFaceGain(n,id);
     float incident=environmentProfile(entry,reflect(ray,n),.035+uRoughness*.14+order*.007,1.0)[channel];
+    // Modulate each optical image along its length, not the surface shape.
+    envelope*=layerLightEnvelope(worldPoint,id,order);
     float decay=mix(mix(.08,.6,uLayerFalloff),.10,uHybridDensity*.8);
     float attenuation=exp(-order*decay-uAbsorption*(uHalf-imageExtent)*2.0);
     float edgeFresnel=mix(.32,1.0,pow(1.0-abs(dot(-ray,n)),3.0));
@@ -99,7 +113,7 @@ float hybridDimensionLayers(vec3 entry, vec3 rd, int id, int channel, float foot
       engraving.z+=appearance*formation*activation*attenuation*(band+core)*boundaryFade*openFalloff;
     }
     // Narrow initial grooves must not brighten inversely with their width.
-    radiance+=formation*(spreadWidth/finalSpreadWidth)*activation*appearance*envelope*attenuation*(band+core)*incident*edgeFresnel*boundaryFade*openFalloff;
+    radiance+=faceGain*formation*(spreadWidth/finalSpreadWidth)*activation*appearance*envelope*attenuation*(band+core)*incident*edgeFresnel*boundaryFade*openFalloff;
     // Broad optical shoulders on the OPEN images, not an opaque surface fill.
     // The original contour/Axis is untouched; all radiance is sampled from the
     // same RGB rig. A bounded 8-image budget keeps 50-layer scenes interactive.
@@ -119,7 +133,7 @@ float hybridDimensionLayers(vec3 entry, vec3 rd, int id, int channel, float foot
         .065+uRoughness*.22+order*.012,1.0)[channel];
       float overlapBand=exp(-pow((edgeDistance-sheetCenter-sheetWidth*.85)/(sheetWidth*1.35),2.0));
       float faceLight=sheet*incident+uHybridRefractionOverlap*.75*overlapBand*overlapLight;
-      radiance+=formation*faceFormation*activation*appearance*envelope*attenuation*sheetEnergy*faceLight
+      radiance+=faceGain*formation*faceFormation*activation*appearance*envelope*attenuation*sheetEnergy*faceLight
         *edgeFresnel*boundaryFade*openFalloff;
     }
   }

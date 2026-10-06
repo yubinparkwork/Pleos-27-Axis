@@ -1,5 +1,182 @@
 [
   {
+    "id": "saved-20261001054528297",
+    "label": "2026. 10. 1. · 코엑스 D홀 · 게이트 V6 · A/B 광학 재질과 라이팅 패널",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "coex-gate"
+  },
+  {
+    "id": "saved-20261001053611405",
+    "label": "2026. 10. 1. · 코엑스 D홀 · 게이트 V5 · 외곽 하이라이트와 안쪽 잔광",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "coex-gate"
+  },
+  {
+    "id": "saved-20261001052230635",
+    "label": "2026. 10. 1. · 코엑스 D홀 · 게이트 V4 · 균일 광학층과 깊이",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "coex-gate"
+  },
+  {
+    "id": "saved-20261001023345899",
+    "label": "2026. 10. 1. · A/B 통합안 · 큰 구조 면별 라이팅",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "hybrid-ab"
+  },
+  {
+    "id": "saved-20261001015850505",
+    "label": "2026. 10. 1. · A/B 통합안 · 면별 디멘션 라이팅",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "hybrid-ab"
+  },
+  {
+    "id": "saved-20261001014757839",
+    "label": "2026. 10. 1. · 코엑스 D홀 · 게이트 V3 · 연속 모서리와 아래 방향 번짐",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "coex-gate"
+  },
+  {
+    "id": "saved-20261001011431555",
+    "label": "2026. 10. 1. · 코엑스 D홀 · 디멘션 게이트 V2 · 반사광과 깊이별 빛 폭",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "coex-gate"
+  },
+  {
+    "id": "saved-20261001004400206",
+    "label": "2026. 10. 1. · 코엑스 D홀 · 디멘션 게이트 V1",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "coex-gate"
+  },
+  {
+    "id": "saved-20260930182516452",
+    "label": "2026. 10. 1. · A/B 통합안 · 베벨 잔떨림 보정 전",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "hybrid-ab"
+  },
+  {
+    "id": "saved-20260930112937067",
+    "label": "2026. 9. 30. · 0930 A조정안 · RGB 비율 조절",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "cube0914"
+  },
+  {
+    "id": "saved-20260930110231639",
+    "label": "2026. 9. 30. · 0930 A조정안 · 겉면 빛 강도 수정",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "cube0914"
+  },
+  {
+    "id": "saved-20260930105023310",
+    "label": "2026. 9. 30. · 0930 A조정안",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "cube0914"
+  },
+  {
+    "id": "saved-20260930101948925",
+    "label": "2026. 9. 30. · A/B 통합안 · Axis 중심향 빛 흐름",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "hybrid-axis-split"
+  },
+  {
+    "id": "saved-20260930100629802",
+    "label": "2026. 9. 30. · A/B 통합안 · 층 밝기 흐름 · 출력 호환",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "hybrid-axis-split"
+  },
+  {
+    "id": "saved-20260930100404438",
+    "label": "2026. 9. 30. · A/B 통합안 · 층 내부 밝기 흐름",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "hybrid-axis-split"
+  },
+  {
+    "id": "saved-20260930094901979",
+    "label": "2026. 9. 30. · A/B 통합안 · 축 인접 빛 직선 정렬",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "hybrid-axis-split"
+  },
+  {
+    "id": "saved-20260930093558711",
+    "label": "2026. 9. 30. · A/B 통합안 · 분리면 뒤쪽 노출 제거",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "hybrid-axis-split"
+  },
+  {
+    "id": "saved-20260930091632641",
+    "label": "2026. 9. 30. · A/B 통합안 · 실제 분리면과 연마 경계",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "hybrid-axis-split"
+  },
+  {
+    "id": "saved-20260930083432732",
+    "label": "2026. 9. 30. · A/B 통합안 · 축 면 분리 시안",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "hybrid-axis-split"
+  },
+  {
+    "id": "saved-20260930082750019",
+    "label": "2026. 9. 30. · A/B 통합안 · 면 분리 전 보존",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "hybrid-ab"
+  },
+  {
+    "id": "saved-20260929102345650",
+    "label": "2026. 9. 29. · 판형 배리에이션 전체 설정 저장",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "hybrid-ab"
+  },
+  {
+    "id": "saved-20260929035103941",
+    "label": "2026. 9. 29. · 판형별 카메라 구도 저장",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "hybrid-ab"
+  },
+  {
+    "id": "saved-20260929010021550",
+    "label": "2026. 9. 29. · A/B 통합안 · 축에서 걷히는 전환",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "sequence": "pleos25",
+    "transition": "layered",
+    "look": "hybrid-ab"
+  },
+  {
+    "id": "saved-20260926051002037",
+    "label": "2026. 9. 26. · A/B 통합안 V8 · 25엑시스 레드 전환",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "hybrid-ab"
+  },
+  {
+    "id": "saved-20260926035641749",
+    "label": "2026. 9. 26. · A/B 통합안 V7 · RGB 메인 90%",
+    "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",
+    "localBuild": true,
+    "look": "hybrid-ab"
+  },
+  {
     "id": "saved-20260922065707715",
     "label": "2026. 9. 22. · A·B 통합안 V6 · 내부 면 반사",
     "note": "로컬 실행본 보관 · 브라우저 개인 설정은 별도 저장",

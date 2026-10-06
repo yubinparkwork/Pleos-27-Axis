@@ -3,7 +3,7 @@ import cube0914Source from './cube0914.frag.glsl?raw';
 import hybridOpticsSource from './hybridOptics.glsl?raw';
 import hybridInternalSource from './hybridInternalReflection.glsl?raw';
 import { CUBE0914, writeCube0914Weights } from './Cube0914';
-import { HYBRID_AB, writeHybridWeights } from './HybridAB';
+import { AXIS_SPLIT, HYBRID_AB, writeHybridWeights } from './HybridAB';
 import identitySource from './identity25.glsl?raw';
 import { identityLayerTiming } from './IdentityLayerTiming';
 import { Identity25 } from './Identity25';
@@ -15,7 +15,7 @@ import { OPTICAL_DEFAULTS } from './OpticalState';
 import { getRenderAxisCubes } from "./AxisGeometry";
 import type { OpticalState } from "./OpticalState";
 import { OpticalResolve } from "./OpticalResolve";
-import { writeLightPalette, writeLightWeights } from './OpticalLighting';
+import { opticalLightPhase, writeLightPalette, writeLightWeights } from './OpticalLighting';
 
 const vertexSource = `#version 300 es
 void main() {
@@ -67,14 +67,14 @@ export class OpticalRenderer {
       const source = CUBE0914 ? cube0914Source : fragmentSource.replace('// IDENTITY25_SOURCE', identitySource)
         .replace('// HYBRID_OPTICS_SOURCE', HYBRID_AB ? hybridInternalSource + hybridOpticsSource : '');
       gl.attachShader(program, compile(gl.FRAGMENT_SHADER, HYBRID_AB
-        ? source.replace('#version 300 es', '#version 300 es\n#define HYBRID_AB') : source));
+        ? source.replace('#version 300 es', '#version 300 es\n#define HYBRID_AB' + (AXIS_SPLIT ? '\n#define AXIS_SPLIT' : '')) : source));
       gl.linkProgram(program);
       if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(`광학 프로그램 연결 실패: ${gl.getProgramInfoLog(program)}`);
     } catch (error) { gl.deleteProgram(program); throw error; }
     finally { shaders.forEach(shader => gl.deleteShader(shader)); }
     this.program = program;
     this.vao = gl.createVertexArray()!;
-    try { this.resolve = new OpticalResolve(gl); }
+    try { this.resolve = new OpticalResolve(gl, HYBRID_AB); }
     catch (error) { gl.deleteVertexArray(this.vao); gl.deleteProgram(program); throw error; }
     canvas.addEventListener("webglcontextlost", this.onContextLost);
     gl.disable(gl.DEPTH_TEST); gl.disable(gl.BLEND); gl.disable(gl.DITHER);
@@ -123,6 +123,10 @@ export class OpticalRenderer {
     // becomes a visible offset after several refractions at high zoom.
     const worldPixel = 6 / state.zoom / Math.min(fullWidth, fullHeight) / sampleScale;
     gl.uniform1f(this.uniform("uRayEpsilon"), Math.max(0.000002, Math.min(0.00012, worldPixel * 0.025)));
+    // The optical contour's minimum width must be measured in OUTPUT pixels.
+    // Using the supersample pixel made 16-spp highlights four times thinner
+    // than a resolved pixel, so fine RGB lines could break near the Axis.
+    gl.uniform1f(this.uniform("uOutputFootprint"), worldPixel * sampleScale);
     const color = Number.parseInt(state.lightColor.slice(1), 16);
     gl.uniform3f(this.uniform("uLightColor"), ((color >> 16) & 255) / 255, ((color >> 8) & 255) / 255, (color & 255) / 255);
     gl.uniform1i(this.uniform('uLightCycle'), HYBRID_AB || state.lightCycle ? 1 : 0);
@@ -133,13 +137,24 @@ export class OpticalRenderer {
       gl.uniform3fv(this.uniform('uCycleWeights'), this.lightWeights);
     }
     gl.uniform3f(this.uniform("uDimensions"), state.dimensionTop, state.dimensionLeft, state.dimensionRight);
+    gl.uniform3f(this.uniform('uFaceGainTop'),state.faceTopX,state.faceTopY,state.faceTopZ);
+    gl.uniform3f(this.uniform('uFaceGainLeft'),state.faceLeftX,state.faceLeftY,state.faceLeftZ);
+    gl.uniform3f(this.uniform('uFaceGainRight'),state.faceRightX,state.faceRightY,state.faceRightZ);
+    gl.uniform1f(this.uniform('uFaceDimensionContrast'),state.faceDimensionContrast);
+    gl.uniform3f(this.uniform('uStructureTop'),state.structureTopX,state.structureTopY,state.structureTopZ);
+    gl.uniform3f(this.uniform('uStructureLeft'),state.structureLeftX,state.structureLeftY,state.structureLeftZ);
+    gl.uniform3f(this.uniform('uStructureRight'),state.structureRightX,state.structureRightY,state.structureRightZ);
+    gl.uniform1f(this.uniform('uStructureContrast'),state.structureContrast);
     const delayToPhase = Math.PI * 2 / state.duration;
     gl.uniform3f(this.uniform('uDimensionDelay'), (state.dimensionDelayTop ?? 0) * delayToPhase,
       (state.dimensionDelayLeft ?? 0) * delayToPhase, (state.dimensionDelayRight ?? 0) * delayToPhase);
     gl.uniform3f(this.uniform("uLayerSpacing"), state.dimensionSpacingTop ?? state.dimensionSpacing, state.dimensionSpacingLeft ?? state.dimensionSpacing, state.dimensionSpacingRight ?? state.dimensionSpacing);
     gl.uniform1i(this.uniform("uHDR"), this.resolve.supportsHDR ? 1 : 0);
     gl.uniform1i(this.uniform("uBounces"), state.bounces);
-    gl.uniform1f(this.uniform("uPhase"), (state.time % state.duration) / state.duration * Math.PI * 2);
+    // Keep the source colours, reflected strip motion and layer envelopes on
+    // one clock. With 25 Axis enabled its gray lead-in no longer spends the
+    // first red stage before the dimension light can be seen.
+    gl.uniform1f(this.uniform("uPhase"), opticalLightPhase(state));
     writeWorldToAxis(state, this.worldToAxis);
     // Inverse model transform of the fixed world-camera ray basis. Evaluating
     // this on CPU leaves the legacy shader bit-for-bit unchanged when off.
@@ -157,6 +172,7 @@ export class OpticalRenderer {
     gl.uniform1f(this.uniform('uIdentityMix'), this.identity.mix);
     const axisAccent = identityAxisAccent(state);
     gl.uniform2f(this.uniform('uIdentityAxisAccent'), axisAccent.progress, axisAccent.amount);
+    if (HYBRID_AB) gl.uniform1f(this.uniform('uIdentityTransitionBrightness'), state.identityTransitionBrightness);
     const layerTiming=identityLayerTiming(state);
     gl.uniform1f(this.uniform('uIdentityEngraving'), state.identityEngraving ?? 1);
     gl.uniform4f(this.uniform('uIdentityLayerTiming'),state.time-layerTiming.firstStart,
@@ -173,6 +189,7 @@ export class OpticalRenderer {
       uHybridColorMix: state.hybridColorMix, uHybridDepthFlow: state.hybridDepthFlow,
       uHybridDepthCycles: state.hybridDepthCycles,
       uHybridOpening: state.hybridOpening,
+      uAxisFaceGap: AXIS_SPLIT ? state.axisFaceGap : 0,
       uHybridFaceReflection: state.hybridFaceReflection,
       uHybridFaceWidth: state.hybridFaceWidth,
       uHybridRefractionOverlap: state.hybridRefractionOverlap,
@@ -180,9 +197,13 @@ export class OpticalRenderer {
       uLayerFadeCycles: state.layerFadeCycles ?? 1, uLayerStagger: state.layerStagger ?? .32,
       uBevel: state.bevel, uIOR: state.ior, uDispersion: state.dispersion, uRoughness: state.roughness, uSurfaceCurvature: state.surfaceCurvature,
       uReflection: state.reflection, uAbsorption: state.absorption, uLightIntensity: state.lightIntensity,
+      uCubeSurfaceLight: state.cubeSurfaceLight ?? 1, uCubeThroughLight: state.cubeThroughLight ?? 1,
+      uCubeFaceLight: state.cubeFaceLight ?? 1,
       uSpread: state.lightSpread, uExposure: state.exposure, uZoom: state.zoom, uSpeed: state.speed,
       uPanX: state.panX ?? 0,
       uLayerSoftness: state.dimensionSoftness, uLayerFalloff: state.dimensionFalloff,
+      uLayerLightContrast: state.layerLightContrast ?? 0, uLayerLightLength: state.layerLightLength ?? 1.5,
+      uLayerLightCycles: Math.round(state.layerLightCycles ?? 1),
     };
     for (const [name, value] of Object.entries(values)) gl.uniform1f(this.uniform(name), value);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -232,9 +253,9 @@ export class OpticalFrameCapture {
   private disposed=false;
 
   constructor(readonly width:number, readonly height:number, samples=4) {
-    if (!Number.isFinite(samples)||samples<1||samples>16) throw new Error('서브픽셀 샘플은 1~16 범위로 지정해 주세요.');
+    if (!Number.isFinite(samples)||samples<1||samples>64) throw new Error('서브픽셀 샘플은 1~64 범위로 지정해 주세요.');
     if (!Number.isInteger(width)||!Number.isInteger(height)||width<1||height<1||Math.max(width,height)>8192||width*height>34_000_000) throw new Error('출력은 한 변 8192px, 전체 3400만 픽셀 이내로 지정해 주세요.');
-    this.scale=Math.min(4,Math.max(1,Math.ceil(Math.sqrt(samples))));
+    this.scale=Math.min(8,Math.max(1,Math.ceil(Math.sqrt(samples))));
     this.canvas.width=width; this.canvas.height=height;
     const context=this.canvas.getContext('2d',{alpha:false});
     if (!context) throw new Error('프레임 출력 버퍼를 만들지 못했습니다.');

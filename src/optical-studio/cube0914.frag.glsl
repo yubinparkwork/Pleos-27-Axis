@@ -13,6 +13,9 @@ uniform float uDispersion;
 uniform float uRoughness;
 uniform float uSurfaceCurvature;
 uniform float uReflection;
+uniform float uCubeSurfaceLight;
+uniform float uCubeThroughLight;
+uniform float uCubeFaceLight;
 uniform float uAbsorption;
 uniform float uLightIntensity;
 uniform float uSpread;
@@ -274,7 +277,8 @@ float traceGlass(vec3 ro, vec3 rd, int channel, int firstId, float firstT) {
   float coneWidth = uRoughness * .05;
   vec3 reflectedEntry = reflect(rd, entryNormal);
   if (dot(reflectedEntry, outward) <= 0.0) reflectedEntry = reflect(rd, outward);
-  float radiance = f * uReflection * throughScene(entry + outward * EPS * 5.0, reflectedEntry, ior, channel, coneWidth);
+  // Exterior reflection only: never scales the dimension-image family.
+  float radiance = uCubeSurfaceLight * f * uReflection * throughScene(entry + outward * EPS * 5.0, reflectedEntry, ior, channel, coneWidth);
   vec3 internalRay = normalize(refract(rd, entryNormal, 1.0 / ior));
   vec3 origin = entry - outward * EPS * 4.0;
   float energy = 1.0 - f;
@@ -297,7 +301,9 @@ float traceGlass(vec3 ro, vec3 rd, int channel, int firstId, float firstT) {
       exitRay = refract(internalRay, -normal, ior);
     }
     if (reflectance < .9999) {
-      radiance += energy * (1.0 - reflectance) * throughScene(p + normal * EPS * 4.0, normalize(exitRay), ior, channel, coneWidth);
+      // Direct transmitted fill is separate from subsequent internal reflections.
+      float directFill = bounce == 0 ? uCubeThroughLight : 1.0;
+      radiance += directFill * energy * (1.0 - reflectance) * throughScene(p + normal * EPS * 4.0, normalize(exitRay), ior, channel, coneWidth);
     }
     energy *= reflectance;
     // Retain the coherent (sharp) component of each successive reflection.
@@ -402,7 +408,9 @@ void main() {
   float footprint = 6.0 / uZoom / min(uResolution.x, uResolution.y);
   // Balance the fine coherent branch against the broader reflection-image
   // family. This is an authored exposure ratio, not a change to glass albedo.
-  colour = colour * .52 + vec3(dimensionLayers(entry, rd, id, 0, footprint), dimensionLayers(entry, rd, id, 1, footprint), dimensionLayers(entry, rd, id, 2, footprint));
+  // All shell-path face fill, including later physical bounces, is independently
+  // controllable. Authored dimension images keep their full original radiance.
+  colour = colour * (.52 * uCubeFaceLight) + vec3(dimensionLayers(entry, rd, id, 0, footprint), dimensionLayers(entry, rd, id, 1, footprint), dimensionLayers(entry, rd, id, 2, footprint));
   colour *= uExposure;
   // Preserve highlight radiance for the HDR optical resolve. On devices with
   // no floating render target, use a reversible range-compressed fallback.

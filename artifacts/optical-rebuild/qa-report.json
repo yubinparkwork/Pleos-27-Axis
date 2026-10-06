@@ -9,180 +9,195 @@
       "width": 720,
       "height": 720,
       "samples": 1,
-      "bytes": 401957,
-      "sha256": "98c7539299e28de3e4a2d3f4bde8a3cd3c93099d3c07eee4c64dcc2bb8ffddb3",
-      "wallMs": 443,
-      "litFraction": 0.26857831790123454,
-      "peak": 249,
+      "bytes": 145732,
+      "sha256": "d85e9f02d8ad7773399b6310a7c848163cf63aeb7ea9fc4ef21977867f6e7fba",
+      "wallMs": 233,
+      "litFraction": 0.04521990740740741,
+      "peak": 240,
       "meanRGB": [
-        25.71607060185185,
-        35.23375964506173,
-        30.01996913580247
+        3.4082966820987655,
+        3.5633545524691357,
+        3.594579475308642
       ]
     },
     "qa-baseline": {
       "width": 360,
       "height": 360,
       "samples": 1,
-      "bytes": 130004,
-      "sha256": "9fad35751d0b1773a91ed91ad4e017adb5b735732d82469a5446179b05690a73",
-      "wallMs": 129,
-      "litFraction": 0.2992438271604938,
-      "peak": 248,
+      "bytes": 52428,
+      "sha256": "076096ea0e0ee2ed34efc1cb1741a38f1ac6de9843170e68cc81324084cd23b9",
+      "wallMs": 58,
+      "litFraction": 0.05633487654320988,
+      "peak": 214,
       "meanRGB": [
-        28.29193672839506,
-        35.93001543209876,
-        30.760625
+        3.6974537037037036,
+        3.872283950617284,
+        3.906087962962963
       ]
     },
     "qa-repeat": {
       "width": 360,
       "height": 360,
       "samples": 1,
-      "bytes": 130004,
-      "sha256": "9fad35751d0b1773a91ed91ad4e017adb5b735732d82469a5446179b05690a73",
-      "wallMs": 170,
-      "litFraction": 0.2992438271604938,
-      "peak": 248,
+      "bytes": 52428,
+      "sha256": "076096ea0e0ee2ed34efc1cb1741a38f1ac6de9843170e68cc81324084cd23b9",
+      "wallMs": 80,
+      "litFraction": 0.05633487654320988,
+      "peak": 214,
       "meanRGB": [
-        28.29193672839506,
-        35.93001543209876,
-        30.760625
+        3.6974537037037036,
+        3.872283950617284,
+        3.906087962962963
       ]
     },
     "qa-loop-end": {
       "width": 360,
       "height": 360,
       "samples": 1,
-      "bytes": 130004,
-      "sha256": "9fad35751d0b1773a91ed91ad4e017adb5b735732d82469a5446179b05690a73",
-      "wallMs": 164,
-      "litFraction": 0.2992438271604938,
-      "peak": 248,
+      "bytes": 52428,
+      "sha256": "076096ea0e0ee2ed34efc1cb1741a38f1ac6de9843170e68cc81324084cd23b9",
+      "wallMs": 94,
+      "litFraction": 0.05633487654320988,
+      "peak": 214,
       "meanRGB": [
-        28.29193672839506,
-        35.93001543209876,
-        30.760625
-      ]
-    },
-    "qa-change-gap": {
-      "width": 360,
-      "height": 360,
-      "samples": 1,
-      "bytes": 130611,
-      "sha256": "2677ca7e44aadf2a89c1d924d7876718d0b06e985ca8ce00bee1132449c1609c",
-      "wallMs": 182,
-      "litFraction": 0.29867283950617285,
-      "peak": 248,
-      "meanRGB": [
-        28.239375,
-        35.66526234567901,
-        30.609413580246912
-      ]
-    },
-    "qa-change-bevel": {
-      "width": 360,
-      "height": 360,
-      "samples": 1,
-      "bytes": 135151,
-      "sha256": "766336e1f89021bde1076a146ca561a81637ebce5cb8c9af6938565db2cf2829",
-      "wallMs": 139,
-      "litFraction": 0.35151234567901235,
-      "peak": 248,
-      "meanRGB": [
-        36.25604938271605,
-        46.71660493827161,
-        39.48792438271605
-      ]
-    },
-    "qa-change-ior": {
-      "width": 360,
-      "height": 360,
-      "samples": 1,
-      "bytes": 129705,
-      "sha256": "3412a941a28b6987b6a7061fd61219682f53b2aa1d05b17c6ec7c2ade5b962a6",
-      "wallMs": 175,
-      "litFraction": 0.2834104938271605,
-      "peak": 242,
-      "meanRGB": [
-        25.435694444444444,
-        30.40276234567901,
-        25.878364197530864
-      ]
-    },
-    "qa-change-dispersion": {
-      "width": 360,
-      "height": 360,
-      "samples": 1,
-      "bytes": 129057,
-      "sha256": "ec9125df0491f13d3c54d64e0bf9538d6cc1f9a963e91ee9867871dfe442aac0",
-      "wallMs": 153,
-      "litFraction": 0.319320987654321,
-      "peak": 247,
-      "meanRGB": [
-        33.08641975308642,
-        24.829837962962962,
-        13.65224537037037
-      ]
-    },
-    "qa-change-roughness": {
-      "width": 360,
-      "height": 360,
-      "samples": 1,
-      "bytes": 137132,
-      "sha256": "5edc6aa237d6d75b95a3e73322f2fc461256bbb25aadeac303b0883b3cd8f835",
-      "wallMs": 181,
-      "litFraction": 0.3155324074074074,
-      "peak": 249,
-      "meanRGB": [
-        32.92918981481481,
-        40.1716512345679,
-        35.65578703703704
+        3.6974537037037036,
+        3.872283950617284,
+        3.906087962962963
       ]
     },
     "qa-change-bounces": {
       "width": 360,
       "height": 360,
       "samples": 1,
-      "bytes": 116454,
-      "sha256": "b3ec4a1b0d9b685c7c73ffe3b0d63607a3a5034b54e97bc2bb3bcc942fd174af",
-      "wallMs": 195,
-      "litFraction": 0.278070987654321,
-      "peak": 246,
+      "bytes": 52428,
+      "sha256": "076096ea0e0ee2ed34efc1cb1741a38f1ac6de9843170e68cc81324084cd23b9",
+      "wallMs": 66,
+      "litFraction": 0.05633487654320988,
+      "peak": 214,
       "meanRGB": [
-        20.13810185185185,
-        29.456782407407406,
-        24.221944444444443
+        3.6974537037037036,
+        3.872283950617284,
+        3.906087962962963
+      ]
+    },
+    "qa-no-dimensions": {
+      "width": 360,
+      "height": 360,
+      "samples": 1,
+      "bytes": 4030,
+      "sha256": "9839bcaab35b2a185d87854eb6ccab273ff64e0f5addc319f402df3091b7a4ff",
+      "wallMs": 75,
+      "litFraction": 0,
+      "peak": 0,
+      "meanRGB": [
+        0,
+        0,
+        0
+      ]
+    },
+    "qa-change-gap": {
+      "width": 360,
+      "height": 360,
+      "samples": 1,
+      "bytes": 52440,
+      "sha256": "06902ed4f2e1fb2821705a5053ea3a1ca1327f487e0897220aa96d93a8dc5e0b",
+      "wallMs": 65,
+      "litFraction": 0.05378858024691358,
+      "peak": 212,
+      "meanRGB": [
+        3.558364197530864,
+        3.726358024691358,
+        3.758472222222222
+      ]
+    },
+    "qa-change-bevel": {
+      "width": 360,
+      "height": 360,
+      "samples": 1,
+      "bytes": 56757,
+      "sha256": "ba5605c854c7d15c0a264ab38a423ec7f72dc57955ea9780fa327def46a90c87",
+      "wallMs": 80,
+      "litFraction": 0.07054783950617284,
+      "peak": 207,
+      "meanRGB": [
+        4.545385802469136,
+        4.755223765432099,
+        4.793603395061728
+      ]
+    },
+    "qa-change-ior": {
+      "width": 360,
+      "height": 360,
+      "samples": 1,
+      "bytes": 66083,
+      "sha256": "b23261ee1fd46bcdf9bd22294bd73ebafbe23f7d1b7d5ff6540382174564ab10",
+      "wallMs": 78,
+      "litFraction": 0.07121141975308642,
+      "peak": 210,
+      "meanRGB": [
+        5.031481481481482,
+        5.182893518518519,
+        5.28278549382716
+      ]
+    },
+    "qa-change-dispersion": {
+      "width": 360,
+      "height": 360,
+      "samples": 1,
+      "bytes": 54852,
+      "sha256": "c1cfd87862993a9ed7cd294c7b603ec75116d2af430e36269f802fa35d604d8c",
+      "wallMs": 82,
+      "litFraction": 0.05827932098765432,
+      "peak": 214,
+      "meanRGB": [
+        3.4049768518518517,
+        3.880825617283951,
+        3.9844675925925928
+      ]
+    },
+    "qa-change-roughness": {
+      "width": 360,
+      "height": 360,
+      "samples": 1,
+      "bytes": 52069,
+      "sha256": "b4ac5c9aded72da89636bd3b46cbc316eaf4fa8621073cd266756dd31e769905",
+      "wallMs": 89,
+      "litFraction": 0.05556327160493827,
+      "peak": 215,
+      "meanRGB": [
+        3.6540895061728396,
+        3.8272453703703704,
+        3.8600154320987654
       ]
     },
     "qa-wide-bevel": {
       "width": 360,
       "height": 360,
       "samples": 1,
-      "bytes": 118844,
-      "sha256": "d2ebb3485017b5d24cbf043473226b471248ce5db230fc058421cdfdb0bdd5bf",
-      "wallMs": 110,
-      "litFraction": 0.27510802469135803,
-      "peak": 249,
+      "bytes": 51356,
+      "sha256": "38938e492bf29f283dd55ec674dd6c28e6240576398bfd3a29c4f9ab96e4dd22",
+      "wallMs": 119,
+      "litFraction": 0.05442901234567901,
+      "peak": 223,
       "meanRGB": [
-        26.00508487654321,
-        35.51192129629629,
-        30.217229938271604
+        3.7153472222222224,
+        3.8884876543209876,
+        3.919675925925926
       ]
     },
     "qa-motion-midpoint": {
       "width": 360,
       "height": 360,
       "samples": 1,
-      "bytes": 129630,
-      "sha256": "ae58373b1919e9118190942737299c517dca4a1d88899343235ea4fa75f626b3",
-      "wallMs": 139,
-      "litFraction": 0.2985262345679012,
-      "peak": 246,
+      "bytes": 28301,
+      "sha256": "e97a1485cb397c9d59b357f8cad3ec866ec649164f2d201e359f1d99eb83babc",
+      "wallMs": 90,
+      "litFraction": 0.01681327160493827,
+      "peak": 123,
       "meanRGB": [
-        27.474081790123456,
-        35.76375,
-        30.56253086419753
+        0.9120833333333334,
+        0.9676929012345679,
+        0.9790972222222222
       ]
     },
     "qa-lights-off": {
@@ -191,7 +206,7 @@
       "samples": 1,
       "bytes": 4030,
       "sha256": "9839bcaab35b2a185d87854eb6ccab273ff64e0f5addc319f402df3091b7a4ff",
-      "wallMs": 155,
+      "wallMs": 110,
       "litFraction": 0,
       "peak": 0,
       "meanRGB": [
@@ -228,40 +243,36 @@
       "changedFraction": 0,
       "maximum": 0
     },
+    "shellRadianceExcluded": true,
     "gap": {
-      "meanAbsoluteChannelDifference": 22.933531378600822,
-      "changedFraction": 0.36868055555555557,
-      "maximum": 245
+      "meanAbsoluteChannelDifference": 2.7090097736625514,
+      "changedFraction": 0.12034722222222222,
+      "maximum": 203
     },
     "bevel": {
-      "meanAbsoluteChannelDifference": 21.697070473251028,
-      "changedFraction": 0.3911882716049383,
-      "maximum": 232
+      "meanAbsoluteChannelDifference": 4.558197016460905,
+      "changedFraction": 0.16554783950617283,
+      "maximum": 155
     },
     "ior": {
-      "meanAbsoluteChannelDifference": 13.239963991769548,
-      "changedFraction": 0.343070987654321,
-      "maximum": 223
+      "meanAbsoluteChannelDifference": 2.024591049382716,
+      "changedFraction": 0.18567901234567902,
+      "maximum": 90
     },
     "dispersion": {
-      "meanAbsoluteChannelDifference": 18.858415637860084,
-      "changedFraction": 0.3495293209876543,
-      "maximum": 247
+      "meanAbsoluteChannelDifference": 0.18041666666666667,
+      "changedFraction": 0.0736496913580247,
+      "maximum": 41
     },
     "roughness": {
-      "meanAbsoluteChannelDifference": 4.857919238683127,
-      "changedFraction": 0.3270679012345679,
-      "maximum": 207
-    },
-    "bounces": {
-      "meanAbsoluteChannelDifference": 7.077147633744856,
-      "changedFraction": 0.21756172839506172,
-      "maximum": 218
+      "meanAbsoluteChannelDifference": 0.10586934156378601,
+      "changedFraction": 0.026334876543209877,
+      "maximum": 51
     },
     "motion": {
-      "meanAbsoluteChannelDifference": 3.2812937242798355,
-      "changedFraction": 0.31517746913580247,
-      "maximum": 109
+      "meanAbsoluteChannelDifference": 2.8747968106995883,
+      "changedFraction": 0.09881172839506173,
+      "maximum": 151
     },
     "noEmission": "all pixels black when lightIntensity is zero",
     "persistence": "UI changes survived reload",
@@ -336,9 +347,16 @@
   },
   "note": "Capture durations are end-to-end wall time, not GPU execution timing or a realtime frame-rate claim.",
   "initial": {
+    "hybrid": null,
+    "expressionSource": null,
     "ready": true,
-    "renderer": "WebGL2 analytic dielectric ray integrator / linear HDR",
+    "renderer": "WebGL2 analytic optical contours / linear HDR",
     "projection": "orthographic",
+    "persistence": {
+      "browserKey": "pleos-optical-studio-v1",
+      "shared": "browser-only",
+      "sharedFile": ".pleos/optical-state/"
+    },
     "axis": {
       "family": "30deg",
       "sharedOrigin": false,
@@ -392,6 +410,73 @@
       ]
     },
     "state": {
+      "cubeSurfaceLight": 1,
+      "cubeThroughLight": 1,
+      "cubeFaceLight": 1,
+      "cubeSubPercent": 10,
+      "axisFaceGap": 0.025,
+      "hybridSubPercent": 8,
+      "hybridDistortion": 0.55,
+      "hybridDensity": 0.55,
+      "hybridColorMix": 0.6,
+      "hybridColorMode": 0,
+      "hybridDepthFlow": 0,
+      "hybridDepthCycles": 1,
+      "hybridOpening": 1,
+      "hybridFaceReflection": 0.7,
+      "hybridFaceWidth": 0.5,
+      "hybridRefractionOverlap": 0.55,
+      "faceTopX": 1,
+      "faceTopY": 1,
+      "faceTopZ": 1,
+      "faceLeftX": 1,
+      "faceLeftY": 1,
+      "faceLeftZ": 1,
+      "faceRightX": 1,
+      "faceRightY": 1,
+      "faceRightZ": 1,
+      "faceDimensionContrast": 0,
+      "structureTopX": 1,
+      "structureTopY": 1,
+      "structureTopZ": 1,
+      "structureLeftX": 1,
+      "structureLeftY": 1,
+      "structureLeftZ": 1,
+      "structureRightX": 1,
+      "structureRightY": 1,
+      "structureRightZ": 1,
+      "structureContrast": 0,
+      "cameraFloat": 0,
+      "cameraFloatX": 4,
+      "cameraFloatY": 3,
+      "cameraFloatSeconds": 15,
+      "axisMotion": 0,
+      "axisYaw": 24,
+      "axisRoll": 12,
+      "axisMoveSeconds": 8,
+      "cameraMotion": 0,
+      "cameraOrbitHorizontal": -24,
+      "cameraOrbitVertical": 6,
+      "cameraMoveSeconds": 8,
+      "identityLayerStagger": 0,
+      "identityEngraving": 1,
+      "identityAxisAccent": 1,
+      "identityTransitionBrightness": 1,
+      "identityTransition": 0,
+      "identityHold": 5.3,
+      "identityDissolve": 3,
+      "identityCenterVersion": 0,
+      "dimensionDelayTop": 0,
+      "dimensionDelayLeft": 0,
+      "dimensionDelayRight": 0,
+      "lightMotionCycles": 1,
+      "layerFadeAmount": 1,
+      "layerFadeCycles": 1,
+      "layerStagger": 0.32,
+      "layerLightContrast": 0,
+      "layerLightLength": 1.5,
+      "layerLightCycles": 1,
+      "panX": 0,
       "gap": 0.025,
       "bevel": 0.32,
       "ior": 1.5,
@@ -426,20 +511,157 @@
       "bounces": 16,
       "playing": false,
       "aspect": "main",
+      "customAspectWidth": 1,
+      "customAspectHeight": 1,
+      "cameraProfiles": {},
+      "cameraDrafts": {},
+      "variations": [],
+      "activeVariationId": "",
       "lightCycle": false,
-      "lightCycleOffset": 0
+      "lightCycleOffset": 0,
+      "lightTimingCustom": 0,
+      "lightHoldRed": 2,
+      "lightHoldGreen": 2,
+      "lightHoldBlue": 2,
+      "lightCrossfade": 2,
+      "videoLongEdge": 3840,
+      "videoFps": 30,
+      "videoSamples": 4
     },
     "artboard": {
       "preset": "main",
       "width": 3840,
-      "height": 3840
+      "height": 3840,
+      "supportedFormats": [
+        {
+          "id": "main",
+          "label": "1:1",
+          "ratio": 1
+        },
+        {
+          "id": "4x5",
+          "label": "4:5",
+          "ratio": 0.8
+        },
+        {
+          "id": "9x16",
+          "label": "9:16",
+          "ratio": 0.5625
+        },
+        {
+          "id": "16x9",
+          "label": "16:9",
+          "ratio": 1.7777777777777777
+        },
+        {
+          "id": "a-series",
+          "label": "A시리즈 · 세로",
+          "ratio": 0.7071067811865475
+        },
+        {
+          "id": "3x2",
+          "label": "3:2",
+          "ratio": 1.5
+        },
+        {
+          "id": "custom",
+          "label": "직접 입력",
+          "ratio": 1
+        }
+      ],
+      "variations": []
     },
     "motion": {
       "time": 0,
       "duration": 15,
       "playing": false,
       "deterministic": true,
-      "kind": "optical-light-loop"
+      "float": {
+        "enabled": false,
+        "start": 0,
+        "period": 15,
+        "cycles": 1,
+        "x": 0,
+        "y": 0,
+        "units": "percent of artboard width/height",
+        "method": "bounded image-plane translation; fixed viewing direction and depth"
+      },
+      "axis": {
+        "enabled": false,
+        "yaw": 0,
+        "roll": 0,
+        "weight": 0,
+        "start": 0,
+        "peak": 1.875,
+        "end": 15,
+        "cycles": 2,
+        "period": 7.5,
+        "requestedYaw": 24,
+        "requestedRoll": 12,
+        "safeYaw": 20,
+        "safeRoll": 12,
+        "safetyLimited": true,
+        "pivot": [
+          0,
+          0,
+          0
+        ],
+        "method": "eased signed 0 → positive → 0 → negative → 0 swing; view-octant safety envelope; fixed camera; rigid shared Axis"
+      },
+      "camera": {
+        "enabled": false,
+        "start": 0,
+        "peak": 8,
+        "end": 15,
+        "weight": 0,
+        "azimuth": 45,
+        "elevation": 35.264389682754654,
+        "baseAzimuth": 45,
+        "baseElevation": 35.264389682754654,
+        "horizontal": -24,
+        "vertical": 6,
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "method": "fixed Axis geometry; eased out-and-back orthographic camera orbit; saved pan and zoom unchanged"
+      },
+      "kind": "optical-light-loop",
+      "identityTransition": {
+        "enabled": false,
+        "name": "25엑시스",
+        "sourceSegment": 5.3,
+        "lightingBuildSeconds": 3,
+        "layerAppearance": {
+          "enabled": false,
+          "staggerSeconds": 0,
+          "count": 4,
+          "firstStart": 5.3,
+          "fadeSeconds": 0.8,
+          "lastStart": 5.3,
+          "completeAt": 6.1,
+          "order": "boundary nearest shared Axis first, then progressively inset images away from Axis"
+        },
+        "axisAccent": {
+          "enabled": false,
+          "progress": 0,
+          "envelope": 0,
+          "intensity": 1,
+          "amount": 0,
+          "start": 5.42,
+          "peak": 6.199999999999999,
+          "end": 8.18,
+          "role": "single eased highlight on the existing animated Axis folds; no new geometry or change to layer timing"
+        },
+        "oneShot": false,
+        "loop": true,
+        "isolatedSettings": false,
+        "center": "constant camera pan for every phase; sequence starts at panX zero; subsequent manual changes preserved",
+        "method": "co-moving affine faces; dimension contours engrave narrow light into gray carriers, open into gradients, then locally release the carrier around the marks; only late residual closure; no two-shot crossfade",
+        "source": "procedural six-plane fit; no video or reference texture"
+      },
+      "dimensions": "fixed contours and normals; staggered whole-layer fades; outer anchor retains 25% visibility; period follows duration"
     },
     "limits": {
       "maxOutputDimension": 8192,
@@ -451,22 +673,53 @@
       "width": 1244,
       "height": 1244,
       "sampleScale": 1,
-      "sourceWidth": 1276,
-      "sourceHeight": 1276,
-      "guardPixels": 16,
-      "cpuSubmitMs": 43.89999997615814
+      "sourceWidth": 1278,
+      "sourceHeight": 1278,
+      "guardPixels": 17,
+      "cpuSubmitMs": 2.7999999970197678
     },
     "exporting": false,
+    "videoExport": {
+      "busy": false,
+      "status": "대기 중",
+      "progress": 0,
+      "format": "MP4 / H.264 preferred, HEVC Main8 fallback at unchanged resolution / sRGB 8-bit, no audio",
+      "deterministic": true,
+      "maxLongEdge": 3840,
+      "fps": [
+        24,
+        30,
+        60
+      ],
+      "spatialSamples": [
+        4,
+        16
+      ],
+      "method": "sequential fixed-time guarded HDR tiles; bounded encoder queue; no screen recording or upscaling"
+    },
     "rendering": {
-      "primaryInternalReflection": "deterministic split rays",
-      "secondaryInterfaces": 8,
+      "expression": "reflective-dimensions",
+      "primaryInternalReflection": "refracted virtual cubical light images",
+      "secondaryInterfaces": 0,
       "spectralChannels": 3,
       "emission": false,
       "textureFeedback": false,
+      "shellRadiance": false,
+      "physicalRayBudgetActive": false,
+      "physicalIORActive": true,
+      "viewInvariantRadiance": false,
+      "visibilityNote": "Restored studio reflections; projection, overlap, reflected direction and Fresnel vary with view.",
+      "axisFold": "constant planar image rays and sharp virtual corners; straight emitter profiles; no spatial lens warp",
       "dimensions": {
         "top": 3,
         "left": 4,
         "right": 3,
+        "lightFlow": {
+          "contrast": 0,
+          "length": 1.5,
+          "cycles": 1,
+          "method": "object-space per-image brightness envelope; geometry unchanged"
+        },
         "spacing": {
           "top": 0.14,
           "left": 0.14,
@@ -475,7 +728,17 @@
         "softness": 0.55,
         "falloff": 0.55,
         "spread": "spacing-linked asymmetric gradient tail away from shared world Axis origin; smooth face-tangent direction and bounded width",
-        "meaning": "continuous light-only virtual cubical reflection layers, fractional last-layer fade; independent of physical ray depth",
+        "boundaryAnchor": "near-origin planes and bevel fixed; light-image carriers extend outward without visible far caps; remaining images inset exponentially",
+        "openExterior": {
+          "enabled": true,
+          "extensionInHalfSizes": 8,
+          "radianceFadeHalfSizes": [
+            2,
+            8
+          ],
+          "meaning": "3D expression carriers only; canonical cube centers and Axis gap remain unchanged"
+        },
+        "meaning": "continuous light-only virtual cubical reflection layers, fractional last-layer fade; physical-shell radiance excluded",
         "physicalSimulation": false
       },
       "hdr": true,
@@ -487,22 +750,31 @@
           "enabled": false,
           "periodSeconds": 15,
           "phaseOffset": 0,
-          "order": "green → red → blue (rotated to chosen starting colour)",
+          "timing": {
+            "custom": false,
+            "start": 0,
+            "red": 1.75,
+            "green": 1.75,
+            "blue": 1.75,
+            "crossfade": 3.25,
+            "period": 15
+          },
+          "order": "red → green → blue",
           "powerFractionsRGB": [
-            0.10000000149011612,
             0.800000011920929,
+            0.10000000149011612,
             0.10000000149011612
           ],
-          "dominant": "그린",
-          "meaning": "emitter power fractions, not guaranteed screen colour coverage"
+          "dominant": "레드",
+          "meaning": "studio light power fractions, not guaranteed screen colour coverage"
         },
-        "controls": "shared intensity; optional spatial RGB ribbons with 80/10/10 power handover; no material tint or object emission"
+        "controls": "shared intensity; spatial RGB ribbons with smooth 80/10/10 power handover; continuous grazing optical projection; no material tint or object emission"
       },
       "surfaceFigure": {
         "amount": 0.065,
-        "model": "smooth lens-like shading-normal approximation; geometric silhouette and medium offsets unchanged"
+        "model": "static reflection-lobe concentration only; legacy state key retained; no image ray or contour curvature"
       },
-      "roughness": "path-dependent emitter filtering and coherent reflection attenuation; scattered energy not fully integrated"
+      "roughness": "emitter filtering on virtual image rays; scattered energy not fully integrated"
     }
   },
   "gpu": {

@@ -27,7 +27,7 @@ layout(location = 0) out vec4 outColor;
 void main() {
   vec3 sum = vec3(0.0);
   vec2 base = floor(gl_FragCoord.xy) * float(uSampleScale);
-  for (int y = 0; y < 4; ++y) for (int x = 0; x < 4; ++x) {
+  for (int y = 0; y < 8; ++y) for (int x = 0; x < 8; ++x) {
     if (x >= uSampleScale || y >= uSampleScale) continue;
     vec2 uv = (base + vec2(float(x) + 0.5, float(y) + 0.5)) / uSourceSize;
     sum += decodeRadiance(texture(uSource, uv).rgb);
@@ -84,7 +84,9 @@ vec3 displayAt(vec2 uv) {
   return mix(color * 12.92, 1.055 * pow(color, vec3(1.0 / 2.4)) - 0.055, step(vec3(0.0031308), color));
 }
 float luma(vec3 color) {
-  return max(color.r, max(color.g, color.b));
+  // Max-channel luma treats equally bright red, green and blue as identical.
+  // Their narrow spectral boundaries then bypass FXAA altogether.
+  return dot(color, vec3(0.2126, 0.7152, 0.0722));
 }
 void main() {
   vec3 center = displayAt(vUv);
@@ -100,7 +102,10 @@ void main() {
   float lnw = luma(nw), lne = luma(ne), lsw = luma(sw), lse = luma(se);
   float minimum = min(lm, min(min(lnw, lne), min(lsw, lse)));
   float maximum = max(lm, max(max(lnw, lne), max(lsw, lse)));
-  if (maximum - minimum < max(0.0312, maximum * 0.125)) {
+  float chromaContrast = max(
+    max(length(center - nw), length(center - ne)),
+    max(length(center - sw), length(center - se)));
+  if (max(maximum - minimum, chromaContrast * .55) < max(0.0312, maximum * 0.125)) {
     outColor = vec4(center, 1.0);
     return;
   }
@@ -114,9 +119,40 @@ void main() {
   float candidateLuma = luma(candidateB);
   vec3 resolved = candidateLuma < minimum || candidateLuma > maximum ? candidateA : candidateB;
   vec3 neighbours = (2.0 * (north + south + east + west) + nw + ne + sw + se) / 12.0;
-  float subpixel = clamp(abs(luma(neighbours) - lm) / max(maximum - minimum, 1e-5), 0.0, 1.0);
+  float subpixel = clamp(max(abs(luma(neighbours) - lm), length(neighbours - center) * .2)
+    / max(maximum - minimum, chromaContrast * .55), 0.0, 1.0);
   subpixel = smoothstep(0.12, 0.75, subpixel);
-  outColor = vec4(mix(resolved, neighbours, 0.7 * subpixel * subpixel), 1.0);
+  resolved = mix(resolved, neighbours, 0.7 * subpixel * subpixel);
+  // A second, strictly along-edge reconstruction removes subpixel on/off
+  // sparkle from bright spectral reflections bordering the black Axis gap.
+  // It cannot bleed colours across the edge or soften large face gradients.
+  float edgeLength = length(direction / uTexelSize);
+  if (edgeLength > 0.05) {
+    vec2 tangent = direction / uTexelSize / edgeLength * uTexelSize;
+#ifdef AXIS_REFLECTION_FILTER
+    // Colour gradients define the true edge direction even where RGB
+    // channels cancel in luminance. The structure tensor is sign-invariant.
+    vec3 gx=east-west,gy=north-south;
+    float xx=dot(gx,gx),yy=dot(gy,gy),xy=dot(gx,gy);
+    if(xx+yy>.0001){
+      float angle=.5*atan(2.0*xy,xx-yy);
+      tangent=vec2(-sin(angle),cos(angle))*uTexelSize;
+    }
+#endif
+    float spectralEdge = smoothstep(0.08, 0.28, chromaContrast)
+      * (1.0 - smoothstep(0.03, 0.13, minimum));
+#ifdef AXIS_REFLECTION_FILTER
+    // Polished coloured rims often border another lit face, not pure black.
+    // Include those boundaries while retaining a bounded along-edge filter.
+    spectralEdge=max(spectralEdge,smoothstep(.035,.18,chromaContrast)
+      *(1.0-smoothstep(.18,.45,minimum)));
+#endif
+    vec3 along = resolved * 0.4
+      + (displayAt(vUv - tangent) + displayAt(vUv + tangent)) * 0.2
+      + (displayAt(vUv - tangent * 2.0) + displayAt(vUv + tangent * 2.0)) * 0.1;
+    resolved = mix(resolved, along, spectralEdge * 0.8);
+  }
+  outColor = vec4(resolved, 1.0);
 }`;
 
 interface Target { framebuffer: WebGLFramebuffer; texture: WebGLTexture }
@@ -156,10 +192,12 @@ export class OpticalResolve {
 
   /** Guard in OUTPUT pixels, including the bilinear/FXAA reach. */
   static requiredGuardPixels(pixelScale = 1, bloom = 0): number {
-    return bloom > 0 ? Math.ceil(OpticalResolve.bloomRadiusPixels * pixelScale) + 2 : 2;
+    // Along-edge reconstruction reaches two output texels; bilinear sampling
+    // needs one extra guarded texel so tiled PNG/video frames match preview.
+    return bloom > 0 ? Math.ceil(OpticalResolve.bloomRadiusPixels * pixelScale) + 3 : 3;
   }
 
-  constructor(private readonly gl: WebGL2RenderingContext) {
+  constructor(private readonly gl: WebGL2RenderingContext, axisReflectionFilter = false) {
     const targets: Target[] = [], programs: WebGLProgram[] = [], shaders: WebGLShader[] = [];
     let vao: WebGLVertexArrayObject | null = null;
     const location = (program: WebGLProgram, name: string): WebGLUniformLocation => {
@@ -202,7 +240,7 @@ export class OpticalResolve {
     };
     try {
       this.hdr = Boolean(gl.getExtension('EXT_color_buffer_float'));
-      this.resolvePass = createPass(fragmentSource); this.averagePass = createPass(averageSource); this.blurPass = createPass(blurSource);
+      this.resolvePass = createPass(axisReflectionFilter?fragmentSource.replace('#version 300 es','#version 300 es\n#define AXIS_REFLECTION_FILTER'):fragmentSource); this.averagePass = createPass(averageSource); this.blurPass = createPass(blurSource);
       this.sourceSizeLocation = location(this.averagePass.program, 'uSourceSize');
       this.sampleScaleLocation = location(this.averagePass.program, 'uSampleScale');
       this.bloomSourceLocation = location(this.resolvePass.program, 'uBloomSource');
@@ -271,7 +309,7 @@ export class OpticalResolve {
   finish(fullWidth: number, fullHeight: number, bloom = 0, pixelScale = 1, outputInset = 0): void {
     this.assertAvailable();
     const sampleScale = this.width / fullWidth;
-    if (!Number.isInteger(fullWidth) || !Number.isInteger(fullHeight) || fullWidth < 1 || fullHeight < 1 || !Number.isInteger(sampleScale) || sampleScale < 1 || sampleScale > 4 || this.height / fullHeight !== sampleScale || !Number.isFinite(bloom) || bloom < 0 || !Number.isFinite(pixelScale) || pixelScale <= 0) throw new Error('광학 HDR 출력 크기 또는 샘플 배율이 올바르지 않습니다.');
+    if (!Number.isInteger(fullWidth) || !Number.isInteger(fullHeight) || fullWidth < 1 || fullHeight < 1 || !Number.isInteger(sampleScale) || sampleScale < 1 || sampleScale > 8 || this.height / fullHeight !== sampleScale || !Number.isFinite(bloom) || bloom < 0 || !Number.isFinite(pixelScale) || pixelScale <= 0) throw new Error('광학 HDR 출력 크기 또는 샘플 배율이 올바르지 않습니다.');
     if (!Number.isInteger(outputInset) || outputInset < 0 || outputInset * 2 >= fullWidth || outputInset * 2 >= fullHeight) throw new Error('광학 HDR 출력 여백이 올바르지 않습니다.');
     const gl = this.gl;
     gl.disable(gl.DEPTH_TEST); gl.disable(gl.STENCIL_TEST); gl.disable(gl.CULL_FACE);

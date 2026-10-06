@@ -67,6 +67,9 @@
 
 .optical-studio .optical-inspector { display: grid; grid-template-rows: 45px minmax(0, 1fr) auto; min-width: 0; min-height: 0; background: var(--optical-panel); border-left: 1px solid var(--optical-line); }
 .optical-studio .optical-inspector-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 17px; border-bottom: 1px solid var(--optical-line); font-size: 11px; font-weight: 500; }
+.optical-studio .optical-history-actions { display: flex; align-items: center; gap: 5px; }
+.optical-studio .optical-history-actions .optical-text-button { margin-right: 0; padding-inline: 5px; }
+.optical-studio .optical-history-actions .optical-text-button:disabled { opacity: .4; cursor: default; }
 .optical-studio .optical-text-button { min-height: 28px; padding: 3px 4px; margin-right: -4px; color: var(--optical-muted); background: transparent; border: 1px solid transparent; border-radius: 3px; font-size: 10px; }
 .optical-studio .optical-text-button:hover:not(:disabled) { color: var(--optical-text); background: #23252a; }
 .optical-studio .optical-text-button:active:not(:disabled) { background: #30333a; }
@@ -80,6 +83,23 @@
 .optical-studio .optical-section[open] .optical-chevron { transform: rotate(45deg); }
 .optical-studio .optical-section-content { padding-bottom: 13px; }
 .optical-studio .optical-section-note { margin: 0 0 12px; color: var(--optical-muted); font-size: 10px; line-height: 1.6; }
+.optical-studio .optical-camera-profile { margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--optical-control-line); }
+.optical-studio .optical-camera-profile-heading { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 8px; color: var(--optical-text); font-size: 11px; }
+.optical-studio .optical-camera-profile-heading span:last-child { color: var(--optical-muted); }
+.optical-studio .optical-camera-profile-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 9px; }
+.optical-studio .optical-camera-profile-actions .optical-text-button { margin: 0; padding-inline: 8px; border-color: var(--optical-control-line); }
+.optical-studio .optical-camera-profile-actions .optical-text-button:disabled { opacity: .45; cursor: default; }
+.optical-studio .optical-variation-actions { display: flex; flex-wrap: wrap; gap: 5px; margin: 7px 0 11px; }
+.optical-studio .optical-variation-actions .optical-text-button { margin: 0; padding-inline: 7px; border-color: var(--optical-control-line); }
+.optical-studio .optical-variation-save { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; margin-bottom: 9px; }
+.optical-studio .optical-variation-save input { min-width: 0; height: 28px; padding: 3px 7px; color: var(--optical-text); background: var(--optical-field); border: 1px solid var(--optical-control-line); border-radius: 3px; font-size: 11px; }
+.optical-studio .optical-variation-save button { min-height: 28px; padding: 3px 9px; color: #101216; background: #e1e4e9; border: 1px solid #e1e4e9; border-radius: 3px; font-size: 11px; font-weight: 600; }
+.optical-studio .optical-variation-save button:hover:not(:disabled) { background: #fff; }
+.optical-studio .optical-variation-save button:active:not(:disabled) { background: #c8ccd4; }
+.optical-studio .optical-custom-aspect { border-top: 1px solid var(--optical-line); padding-top: 10px; margin-top: 10px; }
+.optical-studio .optical-custom-aspect[hidden] { display: none; }
+.optical-studio .optical-custom-aspect-fields { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; margin-bottom: 8px; }
+.optical-studio .optical-custom-aspect-fields input { text-align: center; }
 .optical-studio .optical-control { display: grid; grid-template-columns: 82px minmax(30px, 1fr) 58px; align-items: center; gap: 10px; min-height: 33px; }
 .optical-studio .optical-control > label { color: #c4c6cc; font-size: 11px; line-height: 1.35; }
 .optical-studio .optical-control-group { margin: 8px 0; }
@@ -200,3 +220,6 @@
 .optical-studio .optical-control[hidden],
 .optical-studio .optical-section[hidden],
 .optical-studio .optical-section-note[hidden] { display: none !important; }
+.optical-rgb-times { border: 0; padding: 0; margin: 8px 0; min-width: 0; }
+.optical-rgb-times:disabled { opacity: .5; }
+.optical-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

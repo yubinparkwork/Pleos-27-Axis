@@ -2,8 +2,10 @@ import { OPTICAL_DEFAULTS, sanitizeOpticalState, type OpticalState } from './Opt
 import { writeLightWeights } from './OpticalLighting';
 
 /** Separate expression and persistence; neither approved A nor B is replaced. */
-export const HYBRID_AB = typeof location !== 'undefined'
-  && new URLSearchParams(location.search).get('look') === 'hybrid-ab';
+export const AXIS_SPLIT = typeof location !== 'undefined'
+  && new URLSearchParams(location.search).get('look') === 'hybrid-axis-split';
+export const HYBRID_AB = AXIS_SPLIT || (typeof location !== 'undefined'
+  && new URLSearchParams(location.search).get('look') === 'hybrid-ab');
 export const HYBRID_COLOR_NAMES = ['RGB 순환', '메인 · RGB 균형', '서브 · 레드 우세', '서브 · 그린 우세', '서브 · 블루 우세'] as const;
 
 // Fallback composition observed in B on 2026-09-21. On first local use, the
@@ -30,12 +32,18 @@ export function createHybridState(source?: unknown): OpticalState {
 
 /** Energy fractions, not a guarantee of screen-area percentages. No allocations in draw(). */
 export function writeHybridWeights(state: Readonly<OpticalState>, out: Float32Array): void {
-  if (state.hybridColorMode === 0) writeLightWeights(state, out);
+  if (state.hybridColorMode === 0) {
+    writeLightWeights(state, out);
+    // Each secondary gets the same floor; the lead receives the remainder.
+    // Preserve timing, unit total power and smooth transitions at every ratio.
+    const sub=state.hybridSubPercent/100;
+    for (let i=0;i<3;i++) out[i] = sub + (out[i]-.1)*((1-3*sub)/.7);
+  }
   // A balanced image is not equal source wattage: red has a narrower reflected
   // footprint in this rig. Fixed art-direction compensation, never view-based.
   else if (state.hybridColorMode === 1) { out[0]=.48; out[1]=.26; out[2]=.26; }
   else { out.fill(.04); out[state.hybridColorMode - 2] = .92; }
-  if (state.hybridColorMode !== 1) {
+  if (state.hybridColorMode > 1) {
     // Preserve the main/sub relationship while making both secondary colours legible.
     const blend = state.hybridColorMix * .38;
     for (let i=0;i<3;i++) out[i] = out[i] * (1-blend) + blend/3;
@@ -44,10 +52,14 @@ export function writeHybridWeights(state: Readonly<OpticalState>, out: Float32Ar
 
 export function inspectHybrid(state: Readonly<OpticalState>) {
   const weights = new Float32Array(3); writeHybridWeights(state, weights);
-  return { look:'hybrid-ab', revision:6, base:'A closed optical proxy internal-reflection paths + open B anchor and motion',
+  return { look:AXIS_SPLIT ? 'hybrid-axis-split' : 'hybrid-ab', revision:6,
+    faceSeparation: { enabled:AXIS_SPLIT, width:AXIS_SPLIT ? state.axisFaceGap : 0,
+      method:'front-only visible detached panels; hidden back/side boundaries for internal optical transport; transported virtual reflection images',
+      physicalPanels: AXIS_SPLIT && state.axisFaceGap > 0 ? 9 : 0 },
+    base:'A closed optical proxy internal-reflection paths + open B anchor and motion',
     internalFaceTransport:'secondary closed rounded-cube proxy; no exterior or unreflected transmission; art-directed open-domain mapping',
     opening:state.hybridOpening, openAtFull:true,
-    transitionRevision:1, transition:'shared contour formation, optical shoulder growth and gray-carrier release',
+    transitionRevision:2, transition:'radiance-coupled neutral replacement; coloured narrow Axis glint; per-layer settle before loop; transported-pixel filtering',
     faceReflection:{strength:state.hybridFaceReflection,width:state.hybridFaceWidth,overlap:state.hybridRefractionOverlap,maxImages:8},
     color:HYBRID_COLOR_NAMES[state.hybridColorMode], powerFractionsRGB:Array.from(weights),
     outerAxisLocked:true, shellRadiance:true, exteriorReflectionScale:.035,

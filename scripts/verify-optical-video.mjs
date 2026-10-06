@@ -171,7 +171,11 @@ try {
   await accentRange.focus(); await accentRange.press('ArrowRight');
   assert.equal(Number(await accentNumber.inputValue()), 1.05);
   const accentState = await page.evaluate(() => window.__pleosOptical.inspect().state);
-  assert.deepEqual(accentState, { ...sourceState, identityAxisAccent: 1.05 }, 'Accent adjustment must preserve all other authored settings');
+  // The first edit can legitimately initialize an aspect camera draft cache.
+  // Its creation is independent of the authored lighting and render settings.
+  const { cameraDrafts: _sourceDrafts, ...sourceAuthored } = sourceState;
+  const { cameraDrafts: _accentDrafts, ...accentAuthored } = accentState;
+  assert.deepEqual(accentAuthored, { ...sourceAuthored, identityAxisAccent: 1.05 }, 'Accent adjustment must preserve all other authored settings');
   await page.reload(); await page.waitForFunction(() => window.__pleosOptical?.inspect().ready);
   assert.deepEqual(await page.evaluate(() => window.__pleosOptical.inspect().state), accentState, 'Accent value must survive reload');
   await page.evaluate(state => window.__pleosOptical.set(state), sourceState);
@@ -226,8 +230,12 @@ try {
   assert.equal(await longEdge.inputValue(), '1920'); assert.equal(await fps.inputValue(), '30');
   assert.equal(await samples.inputValue(), '16');
   await longEdge.selectOption('3840'); await samples.selectOption('4');
+  await samples.selectOption('64');
+  assert.equal(await samples.inputValue(), '64', 'Precision video quality must be selectable');
+  await samples.selectOption('4');
   const afterControls = await page.evaluate(() => window.__pleosOptical.inspect().state);
-  assert.deepEqual(afterControls, sourceState, 'Export settings must not alter camera, lighting, motion, or final appearance');
+  const { cameraDrafts: _controlDrafts, ...afterControlsAuthored } = afterControls;
+  assert.deepEqual(afterControlsAuthored, sourceAuthored, 'Export settings must not alter camera, lighting, motion, or final appearance');
   await longEdge.scrollIntoViewIfNeeded(); await page.screenshot({ path: path.join(output, 'panel-wide.png') });
   await page.setViewportSize({ width: 320, height: 900 });
   await longEdge.scrollIntoViewIfNeeded();
@@ -250,9 +258,14 @@ try {
   const nativeOptions = { width: 3072, height: 3840, fps: 30, samples: 4, start: 6.5, end: 6.5 + 2 / 30 };
   console.log('Rendering real native 4K two-frame MP4...');
   const nativeFile = await exportVideo('native-4k-4x5.mp4', nativeOptions);
-  assert.deepEqual(await page.evaluate(() => window.__pleosOptical.inspect().state), sourceState,
+  const afterExportState = await page.evaluate(() => window.__pleosOptical.inspect().state);
+  const { cameraDrafts: _exportDrafts, ...afterExportAuthored } = afterExportState;
+  assert.deepEqual(afterExportAuthored, sourceAuthored,
     'Successful export must restore exact paused source state');
-  assert.equal(await page.evaluate(() => localStorage.getItem('pleos-optical-studio-v1:identity25:layered')), sourceRaw,
+  const afterExportRaw = await page.evaluate(() => localStorage.getItem('pleos-optical-studio-v1:identity25:layered'));
+  const { cameraDrafts: _beforeSaveDrafts, ...beforeSavedValues } = JSON.parse(sourceRaw);
+  const { cameraDrafts: _afterSaveDrafts, ...afterSavedValues } = JSON.parse(afterExportRaw);
+  assert.deepEqual(afterSavedValues, beforeSavedValues,
     'Fixed export timestamps must never leak into autosaved settings');
   const first = await decodeFirst(nativeFile, 'native-4k-first-frame.png');
   const reference = await capturePng('native-4k-png-reference.png', nativeOptions.width, nativeOptions.height, 4);
@@ -263,6 +276,15 @@ try {
     'Video must preserve vertical orientation');
   report.checks.native4K = { nativeDimensions: true, sameShaderAndCamera: true,
     uiExcluded: true, sameTimePngDifference: expectedDifference, wrongOrientationDifference: flippedDifference };
+
+  const preciseOptions = { width: 640, height: 360, fps: 30, samples: 64,
+    start: 6.5, end: 6.5 + 1 / 30 };
+  const preciseFile = await exportVideo('precision-64spp.mp4', preciseOptions);
+  const preciseFrame = await decodeFirst(preciseFile, 'precision-64spp-first-frame.png');
+  const precisePng = await capturePng('precision-64spp-reference.png', 640, 360, 64);
+  report.checks.precision64 = difference(precisePng, preciseFrame);
+  assert(report.checks.precision64.meanAbsoluteChannelDifference < 4,
+    '64-sample encoded frame must match the clean same-time PNG');
 
   // Invalid requests fail safely before output work and leave the app usable.
   report.checks.invalidRequests = [];
